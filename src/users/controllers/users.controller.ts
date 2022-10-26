@@ -1,11 +1,10 @@
 import { Controller, Get } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
 
-import { Env } from 'src/config/config.schema';
+import { ConfigService } from '../../config/config.service';
 
 @Controller('users')
 export class UsersController {
-  constructor(private configService: ConfigService<Env>) {}
+  constructor(private configService: ConfigService) {}
 
   @Get()
   getName() {
