@@ -6,12 +6,7 @@ import { validate } from './config.validator';
 
 @Global()
 @Module({
-  imports: [
-    DefaultConfigModule.forRoot({
-      isGlobal: true,
-      validate,
-    }),
-  ],
+  imports: [DefaultConfigModule.forRoot({ validate })],
   providers: [ConfigService],
   exports: [ConfigService],
 })

@@ -1,13 +1,15 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Post, Body } from '@nestjs/common';
+import { CommandBus } from '@nestjs/cqrs';
 
-import { ConfigService } from '../../config/config.service';
+import { CreateUserCommand } from '../commands/impl/create-user.command';
+import { CreateUserDto } from '../dtos/create-user.dto';
 
 @Controller('users')
 export class UsersController {
-  constructor(private configService: ConfigService) {}
+  constructor(private readonly commandBus: CommandBus) {}
 
-  @Get()
-  getName() {
-    return this.configService.get('APPLICATION_NAME');
+  @Post()
+  createUser(@Body() body: CreateUserDto) {
+    return this.commandBus.execute(new CreateUserCommand(body));
   }
 }
