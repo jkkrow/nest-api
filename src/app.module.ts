@@ -1,11 +1,19 @@
-import { Module } from '@nestjs/common';
+import { Module, ValidationPipe } from '@nestjs/common';
+import { APP_PIPE } from '@nestjs/core';
 import { CqrsModule } from '@nestjs/cqrs';
 
 import { ConfigModule } from './config/config.module';
 import { DatabaseModule } from './database/database.module';
-import { UsersModule } from './users/users.module';
+import { UserModule } from './user/user.module';
+import { CloudModule } from './cloud/cloud.module';
 
 @Module({
-  imports: [CqrsModule, ConfigModule, DatabaseModule, UsersModule],
+  imports: [CqrsModule, ConfigModule, DatabaseModule, UserModule, CloudModule],
+  providers: [
+    {
+      provide: APP_PIPE,
+      useValue: new ValidationPipe({ transform: true, whitelist: true }),
+    },
+  ],
 })
 export class AppModule {}

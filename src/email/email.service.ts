@@ -11,11 +11,11 @@ export class EmailService {
   constructor(
     @InjectModel(BounceSchema.name)
     private readonly bounceModel: Model<BounceSchema>,
-    private readonly configService: ConfigService,
+    private readonly config: ConfigService,
   ) {}
 
   private readonly client = new ServerClient(
-    this.configService.get('EMAIL_SERVER_API_TOKEN'),
+    this.config.get('EMAIL_SERVER_API_TOKEN'),
   );
 
   async sendEmail(options: {
@@ -26,7 +26,7 @@ export class EmailService {
     messageStream?: string;
   }) {
     await this.checkBounce(options.to);
-    const sender = this.configService.get('EMAIL_FROM');
+    const sender = this.config.get('EMAIL_FROM');
 
     return this.client.sendEmail({
       From: sender.replace('@', options.from + '@'),
@@ -45,7 +45,7 @@ export class EmailService {
     messageStream?: string;
   }) {
     await this.checkBounce(options.to);
-    const sender = this.configService.get('EMAIL_FROM');
+    const sender = this.config.get('EMAIL_FROM');
 
     return this.client.sendEmailWithTemplate({
       From: sender.replace('@', options.from + '@'),

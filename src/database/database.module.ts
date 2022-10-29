@@ -13,4 +13,8 @@ import { ConfigService } from '../config/config.service';
     }),
   ],
 })
-export class DatabaseModule {}
+export class DatabaseModule extends MongooseModule {
+  constructor() {
+    super();
+  }
+}
