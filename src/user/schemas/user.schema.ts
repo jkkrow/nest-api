@@ -29,7 +29,11 @@ export class UserSchema extends DatabaseSchema {
   @Prop({
     type: {
       id: { type: String, required: true },
-      name: { type: String, required: true },
+      name: {
+        type: String,
+        required: true,
+        enum: ['Standard', 'Business', 'Enterprise'],
+      },
       expiredAt: { type: Date, required: true },
       isCancelled: { type: Boolean, required: true, default: false },
     },

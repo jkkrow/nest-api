@@ -20,12 +20,18 @@ export class UserMiddleware implements NestMiddleware {
 
     const { authorization } = req.headers;
 
-    if (authorization) {
-      const token = authorization.split(' ')[1] || '';
-      const result = this.authService.verifyToken(token);
-
-      result.type === 'access' && (req.user = { id: result.userId });
+    if (!authorization) {
+      return next();
     }
+
+    const token = authorization.split(' ')[1] || '';
+    const result = this.authService.verifyToken(token);
+
+    if (result.type !== 'access') {
+      return next();
+    }
+
+    req.user = { id: result.userId };
 
     next();
   }

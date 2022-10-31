@@ -1,4 +1,6 @@
 export interface IUser {
+  _id: string;
+  type: string;
   name: string;
   email: string;
   password: string;
@@ -6,7 +8,7 @@ export interface IUser {
   verified: boolean;
   admin: boolean;
   premium: IUserPremium | null;
-  subscribers: string[]; // ref to User Document
+  subscribers: string[];
 }
 
 export interface IUserPremium {
