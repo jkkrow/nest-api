@@ -1,6 +1,6 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 
-import { DatabaseSchema } from 'src/database/database.schema';
+import { DatabaseSchema } from 'src/database/schemas/database.schema';
 
 @Schema({ collection: 'bounces' })
 export class BounceSchema extends DatabaseSchema {

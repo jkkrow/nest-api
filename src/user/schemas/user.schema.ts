@@ -1,12 +1,15 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 
-import { DatabaseSchema } from 'src/database/database.schema';
+import { DatabaseSchema } from 'src/database/schemas/database.schema';
 import { IUserPremium } from '../interfaces/user.interface';
 
 @Schema({ collection: 'users' })
 export class UserSchema extends DatabaseSchema {
   @Prop({ required: true })
   name: string;
+
+  @Prop({ required: true, enum: ['native', 'google'] })
+  type: string;
 
   @Prop({ required: true, unique: true })
   email: string;

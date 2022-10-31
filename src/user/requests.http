@@ -1,7 +1,7 @@
 @host = http://localhost:5000
 
-### Create User
-POST {{host}}/users
+### Signup
+POST {{host}}/users/signup
 Content-Type: application/json
 
 {

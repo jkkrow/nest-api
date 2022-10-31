@@ -12,16 +12,19 @@ export class EnvironmentVariables {
   JWT_KEY: string;
 
   @IsString()
+  AUTH_CREDENTIALS_USERNAME: string;
+  @IsString()
+  AUTH_CREDENTIALS_PASSWORD: string;
+  @IsString()
+  AUTH_CREDENTIALS_API_KEY: string;
+
+  @IsString()
   MONGODB_URI: string;
   @IsString()
   GOOGLE_CLIENT_ID: string;
 
   @IsString()
   EMAIL_SERVER_API_TOKEN: string;
-  @IsString()
-  EMAIL_CREDENTIALS_USERNAME: string;
-  @IsString()
-  EMAIL_CREDENTIALS_PASSWORD: string;
   @IsString()
   EMAIL_FROM: string;
 
@@ -36,12 +39,9 @@ export class EnvironmentVariables {
   @IsString()
   AWS_S3_BUCKET_MEDIA: string;
   @IsString()
-  AWS_EVENTBRIDGE_API_KEY: string;
-  @IsString()
   AWS_MEDIACONVERT_ROLE: string;
   @IsString()
   AWS_MEDIACONVERT_ENDPOINT: string;
-
   @IsString()
   AWS_CLOUDFRONT_MEDIA_URL: string;
   @IsString()

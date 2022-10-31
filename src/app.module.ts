@@ -4,11 +4,19 @@ import { CqrsModule } from '@nestjs/cqrs';
 
 import { ConfigModule } from './config/config.module';
 import { DatabaseModule } from './database/database.module';
+import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { CloudModule } from './cloud/cloud.module';
 
 @Module({
-  imports: [CqrsModule, ConfigModule, DatabaseModule, UserModule, CloudModule],
+  imports: [
+    CqrsModule,
+    ConfigModule,
+    DatabaseModule,
+    AuthModule,
+    UserModule,
+    CloudModule,
+  ],
   providers: [
     {
       provide: APP_PIPE,

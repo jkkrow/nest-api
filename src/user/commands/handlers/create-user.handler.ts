@@ -18,12 +18,12 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
     );
 
     const { createUserDto } = command;
-    const user = this.publisher.mergeObjectContext(
-      this.repository.createUser(createUserDto.name),
-    );
+    // const user = this.publisher.mergeObjectContext(
+    //  this.repository.createUser(createUserDto.name),
+    //  );
 
-    user.commit();
+    // user.commit();
 
-    return user;
+    // return user;
   }
 }
