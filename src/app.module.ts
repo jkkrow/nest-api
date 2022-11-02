@@ -7,6 +7,12 @@ import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { CloudModule } from './cloud/cloud.module';
+import { SerializeInterceptor } from './common/interceptors/serialize.interceptor';
+
+const GlobalValidationPipe = {
+  provide: APP_PIPE,
+  useValue: new ValidationPipe({ transform: true, whitelist: true }),
+};
 
 @Module({
   imports: [
@@ -17,11 +23,6 @@ import { CloudModule } from './cloud/cloud.module';
     UserModule,
     CloudModule,
   ],
-  providers: [
-    {
-      provide: APP_PIPE,
-      useValue: new ValidationPipe({ transform: true, whitelist: true }),
-    },
-  ],
+  providers: [GlobalValidationPipe, SerializeInterceptor],
 })
 export class AppModule {}

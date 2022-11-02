@@ -16,4 +16,12 @@ export class UserRepository extends DatabaseRepository<UserSchema, User> {
   ) {
     super(userModel, userSchemaFactory);
   }
+
+  findOneById(_id: string, notFoundError?: boolean) {
+    return this.findOne({ _id }, notFoundError);
+  }
+
+  findOneAndReplaceById(_id: string, entity: User) {
+    return this.findOneAndReplace({ _id }, entity);
+  }
 }

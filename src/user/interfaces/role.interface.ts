@@ -1,3 +1,3 @@
-export type Role = 'verified' | 'premium' | 'admin';
+export type IRole = 'verified' | 'premium' | 'admin';
 
-export const ROLES_KEY = 'roles';
+export const ROLE_KEY = 'role';

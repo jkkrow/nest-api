@@ -14,23 +14,6 @@ export abstract class DatabaseRepository<
     protected readonly schemaFactory: DatabaseSchemaFactory<TSchema, TEntity>,
   ) {}
 
-  protected async findById(
-    id: string,
-    notFoundError?: boolean,
-  ): Promise<TEntity> {
-    const entityDocument = await this.entityModel.findById(
-      id,
-      {},
-      { lean: true },
-    );
-
-    if (!entityDocument && notFoundError) {
-      throw new NotFoundException('Entity not found');
-    }
-
-    return this.schemaFactory.createFromSchema(entityDocument);
-  }
-
   protected async findOne(
     entityFilterQuery?: FilterQuery<TSchema>,
     notFoundError?: boolean,

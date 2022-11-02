@@ -2,17 +2,17 @@ import {
   Controller,
   Post,
   HttpCode,
-  Body,
   Get,
   Patch,
   Headers,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 
-import { CreateUserCommand } from './commands/impl/create-user.command';
-import { CreateUserDto } from './dtos/create-user.dto';
+import { Serialize } from 'src/common/interceptors/serialize.interceptor';
+import { UserDto } from './dtos/user.dto';
 
 @Controller('users')
+@Serialize(UserDto)
 export class UserController {
   constructor(
     private readonly commandBus: CommandBus,

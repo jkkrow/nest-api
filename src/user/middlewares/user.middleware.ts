@@ -1,19 +1,21 @@
 import { Injectable, NestMiddleware } from '@nestjs/common';
+import { QueryBus } from '@nestjs/cqrs';
 import { Request, Response, NextFunction } from 'express';
 
 import { AuthService } from 'src/auth/services/auth.service';
+import { GetUserQuery } from '../queries/impl/get-user.query';
+import { IUser } from '../interfaces/user.interface';
 
-interface UserSession {
-  id: string;
-}
-
-interface RequestWithUser extends Request {
-  user?: UserSession;
+export interface RequestWithUser extends Request {
+  user?: IUser;
 }
 
 @Injectable()
 export class UserMiddleware implements NestMiddleware {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly queryBus: QueryBus,
+    private readonly authService: AuthService,
+  ) {}
 
   async use(req: RequestWithUser, _: Response, next: NextFunction) {
     if (req.method === 'OPTIONS') return next();
@@ -31,7 +33,11 @@ export class UserMiddleware implements NestMiddleware {
       return next();
     }
 
-    req.user = { id: result.userId };
+    const user = await this.queryBus.execute<GetUserQuery, IUser>(
+      new GetUserQuery(result.userId),
+    );
+
+    req.user = user;
 
     next();
   }
