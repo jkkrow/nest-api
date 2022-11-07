@@ -3,14 +3,10 @@ import { Module } from '@nestjs/common';
 import { DatabaseModule } from 'src/database/database.module';
 import { EmailController } from './email.controller';
 import { EmailService } from './email.service';
-import { BounceSchema, BounceSchemaClass } from './schemas/bounce.schema';
+import { BounceEntity } from './entities/bounce.entity';
 
 @Module({
-  imports: [
-    DatabaseModule.forFeature([
-      { name: BounceSchema.name, schema: BounceSchemaClass },
-    ]),
-  ],
+  imports: [DatabaseModule.forFeature([BounceEntity])],
   controllers: [EmailController],
   providers: [EmailService],
   exports: [EmailService],

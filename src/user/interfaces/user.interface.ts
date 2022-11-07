@@ -1,6 +1,6 @@
 export interface IUser {
-  _id: string;
-  type: string;
+  id: string;
+  type: 'native' | 'google';
   name: string;
   email: string;
   password: string;
@@ -13,7 +13,7 @@ export interface IUser {
 
 export interface IUserPremium {
   id: string;
-  name: 'Standard' | 'Business' | 'Enterprise';
+  name: 'standard' | 'business' | 'enterprise';
   expiredAt: Date;
   cancelled: boolean;
 }

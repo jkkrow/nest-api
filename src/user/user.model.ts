@@ -5,7 +5,7 @@ import { IUserPremium } from './interfaces/user.interface';
 
 export class User extends AggregateRoot {
   constructor(
-    private readonly _id: string,
+    private readonly id: string,
     private readonly type: string,
     private name: string,
     private readonly email: string,
@@ -14,13 +14,12 @@ export class User extends AggregateRoot {
     private verified: boolean,
     private admin: boolean,
     private premium: IUserPremium | null,
-    private readonly subscribers: string[],
   ) {
     super();
   }
 
   getId() {
-    return this._id;
+    return this.id;
   }
 
   getType() {
@@ -53,10 +52,6 @@ export class User extends AggregateRoot {
 
   getPremium() {
     return this.premium ? { ...this.premium } : null;
-  }
-
-  getSubscribers() {
-    return [...this.subscribers];
   }
 
   createUser(userId: string, email: string) {

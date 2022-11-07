@@ -19,7 +19,18 @@ export class EnvironmentVariables {
   AUTH_CREDENTIALS_API_KEY: string;
 
   @IsString()
-  MONGODB_URI: string;
+  DB_HOST: string;
+  @IsString()
+  DB_USERNAME: string;
+  @IsString()
+  DB_PASSWORD: string;
+  @IsString()
+  DB_PORT: string;
+  @IsString()
+  DB_DATABASE: string;
+  @IsString()
+  DB_OPTIONS: string;
+
   @IsString()
   GOOGLE_CLIENT_ID: string;
 

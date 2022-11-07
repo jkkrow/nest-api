@@ -12,9 +12,8 @@ import { QueryHandlers } from './queries/handler';
 import { EventHandlers } from './events/handlers';
 import { UserSaga } from './sagas/user.saga';
 import { UserRepository } from './repositories/user.repository';
-import { UserFactory } from './user.factory';
-import { UserSchema, UserSchemaClass } from './schemas/user.schema';
-import { UserSchemaFactory } from './schemas/user-schema.factory';
+import { UserEntity } from './entities/user.entity';
+import { PremiumEntity } from './entities/premium.entity';
 
 const GlobalRoleGuard = {
   provide: APP_GUARD,
@@ -24,9 +23,7 @@ const GlobalRoleGuard = {
 @Module({
   imports: [
     CqrsModule,
-    DatabaseModule.forFeature([
-      { name: UserSchema.name, schema: UserSchemaClass },
-    ]),
+    DatabaseModule.forFeature([UserEntity, PremiumEntity]),
     AuthModule,
   ],
   controllers: [UserController],
@@ -36,8 +33,6 @@ const GlobalRoleGuard = {
     ...EventHandlers,
     UserSaga,
     UserRepository,
-    UserFactory,
-    UserSchemaFactory,
     GlobalRoleGuard,
   ],
 })

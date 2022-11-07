@@ -1,19 +1,12 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { ConfigService } from '../config/config.service';
+import { typeOrmAsyncConfig } from './config/database.config';
 
 @Module({
-  imports: [
-    MongooseModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        uri: config.get('MONGODB_URI'),
-      }),
-    }),
-  ],
+  imports: [TypeOrmModule.forRootAsync(typeOrmAsyncConfig)],
 })
-export class DatabaseModule extends MongooseModule {
+export class DatabaseModule extends TypeOrmModule {
   constructor() {
     super();
   }

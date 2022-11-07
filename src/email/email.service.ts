@@ -1,16 +1,16 @@
 import { NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { InjectRepository } from '@nestjs/typeorm/dist';
+import { Repository } from 'typeorm';
 import { ServerClient } from 'postmark';
 
 import { ConfigService } from 'src/config/config.service';
 import { CreateBounceDto } from './dtos/create-bounce.dto';
-import { BounceSchema } from './schemas/bounce.schema';
+import { BounceEntity } from './entities/bounce.entity';
 
 export class EmailService {
   constructor(
-    @InjectModel(BounceSchema.name)
-    private readonly bounceModel: Model<BounceSchema>,
+    @InjectRepository(BounceEntity)
+    private readonly bounceRepository: Repository<BounceEntity>,
     private readonly config: ConfigService,
   ) {}
 
@@ -57,22 +57,22 @@ export class EmailService {
   }
 
   createBounce(createBounceDto: CreateBounceDto) {
-    const bounce = new this.bounceModel(createBounceDto);
-    return bounce.save();
+    const bounce = this.bounceRepository.create(createBounceDto);
+    return this.bounceRepository.save(bounce);
   }
 
   async deleteBounce(Email: string) {
-    const bounce = await this.bounceModel.findOne({ Email });
+    const bounce = await this.bounceRepository.findOneBy({ Email });
 
     if (!bounce) {
       throw new NotFoundException('Bounce not found');
     }
 
-    return await bounce.remove();
+    return await this.bounceRepository.remove(bounce);
   }
 
   async checkBounce(Email: string) {
-    const bounce = await this.bounceModel.findOne({ Email });
+    const bounce = await this.bounceRepository.findOneBy({ Email });
 
     if (bounce) {
       throw new NotFoundException('Invalid email: Bounced');
