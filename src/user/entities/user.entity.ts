@@ -1,14 +1,7 @@
-import {
-  Entity,
-  Column,
-  OneToOne,
-  ManyToMany,
-  JoinColumn,
-  JoinTable,
-} from 'typeorm';
+import { Entity, Column, ManyToMany, JoinTable } from 'typeorm';
 
 import { DatabaseEntity } from 'src/database/entities/database.entity';
-import { PremiumEntity } from './premium.entity';
+import { Premium } from './premium.embedded';
 
 @Entity({ name: 'users' })
 export class UserEntity extends DatabaseEntity {
@@ -33,9 +26,8 @@ export class UserEntity extends DatabaseEntity {
   @Column({ type: 'boolean', default: false })
   admin: boolean;
 
-  @OneToOne(() => PremiumEntity, { nullable: true, cascade: true, eager: true })
-  @JoinColumn()
-  premium: PremiumEntity;
+  @Column(() => Premium)
+  premium: Premium;
 
   @ManyToMany(() => UserEntity, (user) => user.subscribes)
   @JoinTable({ name: 'subscriptions' })
