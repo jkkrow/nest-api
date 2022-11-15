@@ -1,24 +1,32 @@
 import { IsString, IsDate } from 'class-validator';
+import { Expose } from 'class-transformer';
 
 export class CreateBounceDto {
   @IsString()
-  readonly Email: string;
+  @Expose({ name: 'Email' })
+  readonly email: string;
 
   @IsString()
-  readonly From: string;
+  @Expose({ name: 'From' })
+  readonly sender: string;
 
   @IsString()
-  readonly Type: string;
+  @Expose({ name: 'Type' })
+  readonly type: string;
 
   @IsString()
-  readonly Description: string;
+  @Expose({ name: 'Description' })
+  readonly description: string;
 
   @IsString()
-  readonly Details: string;
+  @Expose({ name: 'Details' })
+  readonly details: string;
 
   @IsString()
-  readonly MessageStream: string;
+  @Expose({ name: 'MessageStream' })
+  readonly messageStream: string;
 
   @IsDate()
-  readonly BouncedAt: Date;
+  @Expose({ name: 'BouncedAt' })
+  readonly bouncedAt: Date;
 }

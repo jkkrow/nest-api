@@ -17,11 +17,11 @@ const typeOrmConfig: TypeOrmModuleOptions = {
   username: config.get('DB_USERNAME'),
   database: config.get('DB_DATABASE'),
   password: config.get('DB_PASSWORD'),
+  ssl: config.get('DB_HOST') === 'localhost' ? false : true,
   extra: {
     options: config.get('DB_OPTIONS'),
   },
 
-  ssl: true,
   synchronize: false,
   logging: true,
   namingStrategy: new SnakeNamingStrategy(),

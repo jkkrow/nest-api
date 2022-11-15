@@ -5,7 +5,7 @@ import { ServerClient } from 'postmark';
 
 import { ConfigService } from 'src/config/config.service';
 import { CreateBounceDto } from './dtos/create-bounce.dto';
-import { BounceEntity } from './entities/bounce.entity';
+import { BounceEntity } from './db/entities/bounce.entity';
 
 export class EmailService {
   constructor(
@@ -61,8 +61,8 @@ export class EmailService {
     return this.bounceRepository.save(bounce);
   }
 
-  async deleteBounce(Email: string) {
-    const bounce = await this.bounceRepository.findOneBy({ Email });
+  async deleteBounce(email: string) {
+    const bounce = await this.bounceRepository.findOneBy({ email });
 
     if (!bounce) {
       throw new NotFoundException('Bounce not found');
@@ -71,8 +71,8 @@ export class EmailService {
     return await this.bounceRepository.remove(bounce);
   }
 
-  async checkBounce(Email: string) {
-    const bounce = await this.bounceRepository.findOneBy({ Email });
+  async checkBounce(email: string) {
+    const bounce = await this.bounceRepository.findOneBy({ email });
 
     if (bounce) {
       throw new NotFoundException('Invalid email: Bounced');

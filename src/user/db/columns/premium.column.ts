@@ -1,9 +1,9 @@
 import { Column } from 'typeorm';
 
-import { IUserPremium } from '../interfaces/user.interface';
+import { IUserPremium } from '../../interfaces/user.interface';
 
-export class Premium implements IUserPremium {
-  @Column({ type: 'varchar', length: 30, nullable: true })
+export class PremiumColumn implements IUserPremium {
+  @Column({ type: 'varchar', length: 100, nullable: true })
   id: string;
 
   @Column({

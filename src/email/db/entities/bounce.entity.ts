@@ -1,27 +1,27 @@
 import { Entity, Column } from 'typeorm';
 
-import { DatabaseEntity } from 'src/database/entities/database.entity';
+import { BaseEntityWithTimestamp } from 'src/database/entities/database.entity';
 
-@Entity({ name: 'bounces' })
-export class BounceEntity extends DatabaseEntity {
+@Entity('bounces')
+export class BounceEntity extends BaseEntityWithTimestamp {
   @Column({ type: 'varchar', length: 30, unique: true })
-  Email: string;
+  email: string;
 
   @Column({ type: 'varchar', length: 30 })
-  From: string;
+  sender: string;
 
   @Column({ type: 'varchar', length: 20 })
-  Type: string;
+  type: string;
 
   @Column({ type: 'varchar', length: 200 })
-  Description: string;
+  description: string;
 
   @Column({ type: 'varchar', length: 200 })
-  Details: string;
+  details: string;
 
   @Column({ type: 'varchar', length: 20 })
-  MessageStream: string;
+  messageStream: string;
 
   @Column({ type: 'timestamp' })
-  BouncedAt: Date;
+  bouncedAt: Date;
 }

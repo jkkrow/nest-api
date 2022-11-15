@@ -2,7 +2,7 @@ import { Logger } from '@nestjs/common';
 import { CommandHandler, ICommandHandler, EventPublisher } from '@nestjs/cqrs';
 
 import { CreateUserCommand } from '../impl/create-user.command';
-import { UserRepository } from '../../repositories/user.repository';
+import { UserRepository } from '../../db/repositories/user.repository';
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {

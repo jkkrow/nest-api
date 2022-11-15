@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm/dist';
 import { Repository } from 'typeorm';
 
 import { GetUserQuery } from '../impl/get-user.query';
-import { UserEntity } from 'src/user/entities/user.entity';
+import { UserEntity } from 'src/user/db/entities/user.entity';
 
 @QueryHandler(GetUserQuery)
 export class GetUserHandler implements IQueryHandler<GetUserQuery> {
