@@ -1,4 +1,4 @@
 import { GetUserHandler } from './get-user.handler';
-import { SigninQuery } from '../impl/signin.query';
+import { SigninHandler } from './signin-handler';
 
-export const QueryHandlers = [GetUserHandler, SigninQuery];
+export const QueryHandlers = [GetUserHandler, SigninHandler];

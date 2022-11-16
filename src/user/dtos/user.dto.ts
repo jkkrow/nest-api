@@ -1,13 +1,13 @@
-import { Expose, Transform } from 'class-transformer';
+import { Expose, Type } from 'class-transformer';
 
-import { IUserPremium } from '../interfaces/user.interface';
+import { IUser, IUserPremium } from '../interfaces/user.interface';
 
-export class UserDto {
+export class UserDto implements Partial<IUser> {
   @Expose()
-  _id: string;
+  id: string;
 
   @Expose()
-  type: string;
+  type: IUser['type'];
 
   @Expose()
   name: string;
@@ -25,8 +25,20 @@ export class UserDto {
   admin: boolean;
 
   @Expose()
-  premium: IUserPremium | null;
+  @Type(() => PremiumDto)
+  premium: IUserPremium;
+}
 
-  @Transform(({ value }) => value.length)
-  subscribers: number;
+class PremiumDto implements IUserPremium {
+  @Expose()
+  id: string;
+
+  @Expose()
+  name: IUserPremium['name'];
+
+  @Expose()
+  expiredAt: Date;
+
+  @Expose()
+  cancelled: boolean;
 }

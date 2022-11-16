@@ -23,7 +23,6 @@ const typeOrmConfig: TypeOrmModuleOptions = {
   },
 
   synchronize: false,
-  logging: true,
   namingStrategy: new SnakeNamingStrategy(),
 
   entities: [__dirname + '/../../**/*.entity{.ts,.js}'],

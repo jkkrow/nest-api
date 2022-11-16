@@ -4,13 +4,14 @@ import { ApiTags } from '@nestjs/swagger/dist';
 
 import { Serialize } from 'src/common/interceptors/serialize.interceptor';
 import { CreateUserCommand } from './commands/impl/create-user.command';
-// import { SigninQuery } from './queries/impl/signin.query';
-import { SignupRequestDto } from './dtos/signup-request.dto';
-import { UserDto } from './dtos/user.dto';
+import { SigninQuery } from './queries/impl/signin.query';
+import { SignupRequestDto } from './dtos/request/signup-request.dto';
+import { SigninRequestDto } from './dtos/request/signin-request.dto';
+import { SignupResponseDto } from './dtos/response/signup-response.dto';
+import { SigninResponseDto } from './dtos/response/signin-response.dto';
 
 @Controller('users')
 @ApiTags('Users')
-@Serialize(UserDto)
 export class UserController {
   constructor(
     private readonly commandBus: CommandBus,
@@ -18,20 +19,24 @@ export class UserController {
   ) {}
 
   @Post('signup')
+  @Serialize(SignupResponseDto)
   async signup(@Body() { name, email, password }: SignupRequestDto) {
     const command = new CreateUserCommand(name, email, password);
     await this.commandBus.execute(command);
 
-    // const query = new SigninQuery(email, password);
-    // const result = await this.queryBus.execute(query);
+    const query = new SigninQuery(email, password);
+    const result = await this.queryBus.execute(query);
 
-    // return result;
+    return result;
   }
 
   @Post('signin')
-  siginin() {
-    // Get Tokens Query
-    // Get User Query
+  @Serialize(SigninResponseDto)
+  async siginin(@Body() { email, password }: SigninRequestDto) {
+    const query = new SigninQuery(email, password);
+    const result = await this.queryBus.execute(query);
+
+    return result;
   }
 
   @Post('signin/google')

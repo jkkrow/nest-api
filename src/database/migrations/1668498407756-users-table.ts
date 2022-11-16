@@ -14,7 +14,7 @@ export class usersTable1668498407756 implements MigrationInterface {
           name VARCHAR(30) NOT NULL,
           type user_type NOT NULL,
           email VARCHAR(30) NOT NULL UNIQUE,
-          password VARCHAR(50) NOT NULL,
+          password VARCHAR(200) NOT NULL,
           picture VARCHAR(200) NOT NULL DEFAULT '',
           verified BOOLEAN NOT NULL DEFAULT false,
           admin BOOLEAN NOT NULL DEFAULT false,

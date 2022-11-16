@@ -21,7 +21,7 @@ export abstract class BaseRepository<
     const entity = await this.repository.findOneBy(entityFilterQuery);
 
     if (!entity && notFoundError) {
-      throw new NotFoundException('Entity not found.');
+      throw new NotFoundException('Entity not found');
     }
 
     return entity ? this.factory.createFromEntity(entity) : null;
@@ -49,7 +49,7 @@ export abstract class BaseRepository<
     const updatedEntity = this.factory.createEntity(model);
 
     if (!entity) {
-      throw new NotFoundException('Entity not found.');
+      throw new NotFoundException('Entity not found');
     }
 
     for (const key in updatedEntity) {
@@ -65,7 +65,7 @@ export abstract class BaseRepository<
     const entity = await this.repository.findOneBy(entityFilterQuery);
 
     if (!entity) {
-      throw new NotFoundException('Entity not found.');
+      throw new NotFoundException('Entity not found');
     }
 
     await this.repository.remove(entity);
