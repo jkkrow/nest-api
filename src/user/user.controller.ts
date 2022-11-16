@@ -1,17 +1,15 @@
-import {
-  Controller,
-  Post,
-  HttpCode,
-  Get,
-  Patch,
-  Headers,
-} from '@nestjs/common';
+import { Controller, Post, Get, Patch, Body } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { ApiTags } from '@nestjs/swagger/dist';
 
 import { Serialize } from 'src/common/interceptors/serialize.interceptor';
+import { CreateUserCommand } from './commands/impl/create-user.command';
+// import { SigninQuery } from './queries/impl/signin.query';
+import { SignupRequestDto } from './dtos/signup-request.dto';
 import { UserDto } from './dtos/user.dto';
 
 @Controller('users')
+@ApiTags('Users')
 @Serialize(UserDto)
 export class UserController {
   constructor(
@@ -20,14 +18,16 @@ export class UserController {
   ) {}
 
   @Post('signup')
-  signup(@Headers('authorization') auth: string) {
-    // Create User Command
-    console.log(auth);
-    // Get Tokens Query
-    // Get User Query
+  async signup(@Body() { name, email, password }: SignupRequestDto) {
+    const command = new CreateUserCommand(name, email, password);
+    await this.commandBus.execute(command);
+
+    // const query = new SigninQuery(email, password);
+    // const result = await this.queryBus.execute(query);
+
+    // return result;
   }
 
-  @HttpCode(200)
   @Post('signin')
   siginin() {
     // Get Tokens Query

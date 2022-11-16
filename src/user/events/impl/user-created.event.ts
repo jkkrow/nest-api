@@ -1,3 +1,5 @@
-export class UserCreatedEvent {
-  constructor(public readonly userId: string, public readonly email: string) {}
+import { IEvent } from '@nestjs/cqrs';
+
+export class UserCreatedEvent implements IEvent {
+  constructor(public readonly id: string, public readonly email: string) {}
 }

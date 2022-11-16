@@ -11,9 +11,10 @@ import { CommandHandlers } from './commands/handlers';
 import { QueryHandlers } from './queries/handler';
 import { EventHandlers } from './events/handlers';
 import { UserSaga } from './sagas/user.saga';
-import { UserRepository } from './db/repositories/user.repository';
 import { UserEntity } from './db/entities/user.entity';
 import { SubscriptionEntity } from './db/entities/subscription.entity';
+import { UserRepository } from './db/repositories/user.repository';
+import { UserFactory } from './db/factories/user.factory';
 
 const GlobalRoleGuard = {
   provide: APP_GUARD,
@@ -33,6 +34,7 @@ const GlobalRoleGuard = {
     ...EventHandlers,
     UserSaga,
     UserRepository,
+    UserFactory,
     GlobalRoleGuard,
   ],
 })

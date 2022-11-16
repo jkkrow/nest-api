@@ -9,7 +9,7 @@ export class UserEntity extends BaseEntityWithTimestamp {
   name: string;
 
   @Column({ type: 'enum', enum: ['native', 'google'] })
-  type: string;
+  type: 'native' | 'google';
 
   @Column({ type: 'varchar', length: 30, unique: true })
   email: string;

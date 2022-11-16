@@ -1,69 +1,73 @@
-// import { NotFoundException } from '@nestjs/common';
-// import { AggregateRoot } from '@nestjs/cqrs';
+import { NotFoundException } from '@nestjs/common';
+import { AggregateRoot } from '@nestjs/cqrs';
+import { FindOptionsWhere, Repository } from 'typeorm';
 
-// import { DatabaseEntityFactory } from '../entities/database-entity.factory';
-// import { DatabaseEntity } from '../entities/database.entity';
+import { BaseEntity } from '../entities/database.entity';
+import { BaseFactory } from '../factories/database.factory';
 
-// export abstract class DatabaseRepository<
-//   TSchema extends DatabaseEntity,
-//   TEntity extends AggregateRoot,
-// > {
-//   constructor(
-//     protected readonly entityModel: Model<TSchema>,
-//     protected readonly schemaFactory: DatabaseEntityFactory<TSchema, TEntity>,
-//   ) {}
+export abstract class BaseRepository<
+  TEntity extends BaseEntity,
+  TModel extends AggregateRoot,
+> {
+  constructor(
+    protected readonly repository: Repository<TEntity>,
+    protected readonly factory: BaseFactory<TEntity, TModel>,
+  ) {}
 
-//   protected async findOne(
-//     entityFilterQuery?: FilterQuery<TSchema>,
-//     notFoundError?: boolean,
-//   ): Promise<TEntity> {
-//     const entityDocument = await this.entityModel.findOne(
-//       entityFilterQuery,
-//       {},
-//       { lean: true },
-//     );
+  protected async findOne(
+    entityFilterQuery: FindOptionsWhere<TEntity>,
+    notFoundError?: boolean,
+  ) {
+    const entity = await this.repository.findOneBy(entityFilterQuery);
 
-//     if (!entityDocument && notFoundError) {
-//       throw new NotFoundException('Entity not found.');
-//     }
+    if (!entity && notFoundError) {
+      throw new NotFoundException('Entity not found.');
+    }
 
-//     return this.schemaFactory.createFromSchema(entityDocument);
-//   }
+    return entity ? this.factory.createFromEntity(entity) : null;
+  }
 
-//   protected async find(
-//     entityFilterQuery?: FilterQuery<TSchema>,
-//   ): Promise<TEntity[]> {
-//     const entityDocuments = await this.entityModel.find(
-//       entityFilterQuery,
-//       {},
-//       { lean: true },
-//     );
+  protected async find(entityFilterQuery: FindOptionsWhere<TEntity>) {
+    const entities = await this.repository.findBy(entityFilterQuery);
 
-//     return entityDocuments.map((entityDocument) =>
-//       this.schemaFactory.createFromSchema(entityDocument),
-//     );
-//   }
+    return entities.map((entity) => this.factory.createFromEntity(entity));
+  }
 
-//   protected async create(entity: TEntity): Promise<void> {
-//     await new this.entityModel(this.schemaFactory.create(entity)).save();
-//   }
+  protected async create(props: any) {
+    const model = this.factory.create(props);
 
-//   protected async findOneAndReplace(
-//     entityFilterQuery: FilterQuery<TSchema>,
-//     entity: TEntity,
-//   ): Promise<void> {
-//     const updatedEntityDocument = await this.entityModel.findOneAndReplace(
-//       entityFilterQuery,
-//       this.schemaFactory.create(entity),
-//       {
-//         new: true,
-//         useFindAndModify: false,
-//         lean: true,
-//       },
-//     );
+    await this.repository.save(this.factory.createEntity(model));
 
-//     if (!updatedEntityDocument) {
-//       throw new NotFoundException('Unable to find the entity to replace.');
-//     }
-//   }
-// }
+    return model;
+  }
+
+  protected async update(
+    entityFilterQuery: FindOptionsWhere<TEntity>,
+    model: TModel,
+  ) {
+    const entity = await this.repository.findOneBy(entityFilterQuery);
+    const updatedEntity = this.factory.createEntity(model);
+
+    if (!entity) {
+      throw new NotFoundException('Entity not found.');
+    }
+
+    for (const key in updatedEntity) {
+      entity[key] = updatedEntity[key];
+    }
+
+    await this.repository.save(entity);
+
+    return model;
+  }
+
+  protected async delete(entityFilterQuery: FindOptionsWhere<TEntity>) {
+    const entity = await this.repository.findOneBy(entityFilterQuery);
+
+    if (!entity) {
+      throw new NotFoundException('Entity not found.');
+    }
+
+    await this.repository.remove(entity);
+  }
+}

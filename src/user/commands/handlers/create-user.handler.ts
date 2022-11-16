@@ -1,5 +1,6 @@
-import { Logger } from '@nestjs/common';
 import { CommandHandler, ICommandHandler, EventPublisher } from '@nestjs/cqrs';
+import { ConflictException } from '@nestjs/common';
+import { v4 as uuidv4 } from 'uuid';
 
 import { CreateUserCommand } from '../impl/create-user.command';
 import { UserRepository } from '../../db/repositories/user.repository';
@@ -11,19 +12,17 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
     private readonly publisher: EventPublisher,
   ) {}
 
-  async execute(command: CreateUserCommand) {
-    Logger.log(
-      'CreateUserCommand',
-      JSON.stringify(command.createUserDto, null, 2),
+  async execute({ name, email, password }: CreateUserCommand) {
+    const isExisting = await this.repository.findByEmail(email);
+
+    if (isExisting) {
+      throw new ConflictException('Email already exists.');
+    }
+
+    const user = this.publisher.mergeObjectContext(
+      await this.repository.createUser(uuidv4(), name, email, password),
     );
 
-    const { createUserDto } = command;
-    // const user = this.publisher.mergeObjectContext(
-    //  this.repository.createUser(createUserDto.name),
-    //  );
-
-    // user.commit();
-
-    // return user;
+    user.commit();
   }
 }

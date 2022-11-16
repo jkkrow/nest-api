@@ -1,60 +1,91 @@
 import { AggregateRoot } from '@nestjs/cqrs';
 
 import { UserCreatedEvent } from './events/impl/user-created.event';
-import { IUserPremium } from './interfaces/user.interface';
+import { UserDeletedEvent } from './events/impl/user-deleted.event';
+import { IUser, IUserPremium } from './interfaces/user.interface';
 
-export class User extends AggregateRoot {
+export class User extends AggregateRoot implements IUser {
   constructor(
-    private readonly id: string,
-    private readonly type: string,
-    private name: string,
-    private readonly email: string,
-    private password: string,
-    private picture: string,
-    private verified: boolean,
-    private admin: boolean,
-    private premium: IUserPremium | null,
+    private readonly props: {
+      readonly id: string;
+      readonly type: 'native' | 'google';
+      readonly email: string;
+      name: string;
+      password: string;
+      picture: string;
+      verified: boolean;
+      admin: boolean;
+      premium: IUserPremium;
+    },
   ) {
     super();
   }
 
-  getId() {
-    return this.id;
+  get id() {
+    return this.props.id;
   }
 
-  getType() {
-    return this.type;
+  get type() {
+    return this.props.type;
   }
 
-  getName() {
-    return this.name;
+  get name() {
+    return this.props.name;
   }
 
-  getEmail() {
-    return this.email;
+  get email() {
+    return this.props.email;
   }
 
-  getPassword() {
-    return this.password;
+  get password() {
+    return this.props.password;
   }
 
-  getPicture() {
-    return this.picture;
+  get picture() {
+    return this.props.picture;
   }
 
-  getVerified() {
-    return this.verified;
+  get verified() {
+    return this.props.verified;
   }
 
-  getAdmin() {
-    return this.admin;
+  get admin() {
+    return this.props.admin;
   }
 
-  getPremium() {
-    return this.premium ? { ...this.premium } : null;
+  get premium() {
+    return { ...this.props.premium };
   }
 
-  createUser(userId: string, email: string) {
-    this.apply(new UserCreatedEvent(userId, email));
+  createUser() {
+    this.apply(new UserCreatedEvent(this.id, this.email));
+  }
+
+  deleteUser() {
+    this.apply(new UserDeletedEvent(this.id));
+  }
+
+  updateName(name: string) {
+    this.props.name = name;
+  }
+
+  updatePassword(password: string) {
+    this.props.password = password;
+  }
+
+  updatePicture(picture: string) {
+    this.props.picture = picture;
+  }
+
+  updatePremium(premium: IUserPremium) {
+    this.props.premium = { ...premium };
+  }
+
+  updateVerified(verified: boolean) {
+    this.props.verified = verified;
+  }
+
+  updateAdmin(admin: boolean) {
+    this.props.admin = admin;
   }
 }
