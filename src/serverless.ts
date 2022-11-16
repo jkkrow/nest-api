@@ -6,7 +6,7 @@ import { bootstrap } from './main';
 let server: Handler;
 
 async function generateServerlessInstance() {
-  const app = await bootstrap(true);
+  const app = await bootstrap(false);
   await app.init();
 
   const expressApp = app.getHttpAdapter().getInstance();

@@ -25,10 +25,10 @@ export class RoleGuard implements CanActivate {
     return roles[requiredRole];
   }
 
-  private validateUserRole(user: IUser) {
+  private validateUserRole(user?: IUser) {
     const roles: Record<IRole, boolean> = {
       verified: false,
-      premium: false,
+      member: false,
       admin: false,
     };
 
@@ -40,8 +40,8 @@ export class RoleGuard implements CanActivate {
       roles.verified = true;
     }
 
-    if (user.premium && new Date(user.premium.expiredAt) > new Date()) {
-      roles.premium = true;
+    if (user.membership && new Date(user.membership.expiredAt) > new Date()) {
+      roles.member = true;
     }
 
     if (user.admin) {

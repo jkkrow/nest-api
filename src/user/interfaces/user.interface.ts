@@ -7,12 +7,12 @@ export interface IUser {
   picture: string;
   verified: boolean;
   admin: boolean;
-  premium: IUserPremium;
+  membership: IMembership | null;
 }
 
-export interface IUserPremium {
-  id: string | null;
-  name: 'standard' | 'business' | 'enterprise' | null;
-  expiredAt: Date | null;
-  cancelled: boolean | null;
+export interface IMembership {
+  id: string;
+  name: 'standard' | 'business' | 'enterprise';
+  expiredAt: Date;
+  cancelled: boolean;
 }

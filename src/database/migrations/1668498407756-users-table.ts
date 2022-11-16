@@ -5,9 +5,6 @@ export class usersTable1668498407756 implements MigrationInterface {
     await queryRunner.query(
       `CREATE TYPE user_type AS ENUM('native', 'google')`,
     );
-    await queryRunner.query(
-      `CREATE TYPE premium_name AS ENUM('standard', 'business', 'enterprise')`,
-    );
     await queryRunner.query(`
         CREATE TABLE users (
           id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -18,10 +15,7 @@ export class usersTable1668498407756 implements MigrationInterface {
           picture VARCHAR(200) NOT NULL DEFAULT '',
           verified BOOLEAN NOT NULL DEFAULT false,
           admin BOOLEAN NOT NULL DEFAULT false,
-          premium_id VARCHAR(100),
-          premium_name premium_name,
-          premium_expired_at TIMESTAMP,
-          premium_cancelled BOOLEAN,
+          membership VARCHAR(100) REFERENCES memberships(id) ON DELETE CASCADE ON UPDATE CASCADE,
           created_at TIMESTAMP NOT NULL DEFAULT now(),
           updated_at TIMESTAMP NOT NULL DEFAULT now()
         )

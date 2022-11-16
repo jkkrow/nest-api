@@ -1,6 +1,6 @@
 import { Expose, Type } from 'class-transformer';
 
-import { IUser, IUserPremium } from '../interfaces/user.interface';
+import { IUser, IMembership } from '../interfaces/user.interface';
 
 export class UserDto implements Partial<IUser> {
   @Expose()
@@ -25,16 +25,16 @@ export class UserDto implements Partial<IUser> {
   admin: boolean;
 
   @Expose()
-  @Type(() => PremiumDto)
-  premium: IUserPremium;
+  @Type(() => MembershipDto)
+  membership: IMembership | null;
 }
 
-class PremiumDto implements IUserPremium {
+class MembershipDto implements IMembership {
   @Expose()
   id: string;
 
   @Expose()
-  name: IUserPremium['name'];
+  name: IMembership['name'];
 
   @Expose()
   expiredAt: Date;

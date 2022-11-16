@@ -2,7 +2,7 @@ import { AggregateRoot } from '@nestjs/cqrs';
 
 import { UserCreatedEvent } from './events/impl/user-created.event';
 import { UserDeletedEvent } from './events/impl/user-deleted.event';
-import { IUser, IUserPremium } from './interfaces/user.interface';
+import { IUser, IMembership } from './interfaces/user.interface';
 
 export class User extends AggregateRoot implements IUser {
   constructor(
@@ -15,7 +15,7 @@ export class User extends AggregateRoot implements IUser {
       picture: string;
       verified: boolean;
       admin: boolean;
-      premium: IUserPremium;
+      membership: IMembership | null;
     },
   ) {
     super();
@@ -53,8 +53,8 @@ export class User extends AggregateRoot implements IUser {
     return this.props.admin;
   }
 
-  get premium() {
-    return { ...this.props.premium };
+  get membership() {
+    return this.props.membership ? { ...this.props.membership } : null;
   }
 
   createUser() {
@@ -77,8 +77,8 @@ export class User extends AggregateRoot implements IUser {
     this.props.picture = picture;
   }
 
-  updatePremium(premium: IUserPremium) {
-    this.props.premium = { ...premium };
+  updateMembership(membership: IMembership | null) {
+    this.props.membership = membership;
   }
 
   updateVerified(verified: boolean) {

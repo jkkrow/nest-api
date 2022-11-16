@@ -5,7 +5,7 @@ import helmet from 'helmet';
 import { AppModule } from './app.module';
 import { ConfigService } from './config/config.service';
 
-export async function bootstrap(serverless?: boolean) {
+export async function bootstrap(server = true) {
   const app = await NestFactory.create(AppModule);
 
   const config = app.get(ConfigService);
@@ -25,11 +25,9 @@ export async function bootstrap(serverless?: boolean) {
   app.enableCors({ origin });
   app.use(helmet());
 
-  if (serverless) {
-    return app;
-  }
+  server && (await app.listen(port));
 
-  await app.listen(port);
+  return app;
 }
 
 bootstrap();

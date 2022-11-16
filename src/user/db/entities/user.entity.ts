@@ -1,7 +1,7 @@
-import { Entity, Column } from 'typeorm';
+import { Entity, Column, OneToOne, JoinColumn } from 'typeorm';
 
 import { BaseEntityWithTimestamp } from 'src/database/entities/database.entity';
-import { PremiumColumn } from '../columns/premium.column';
+import { MembershipEntity } from './membership.entity';
 
 @Entity('users')
 export class UserEntity extends BaseEntityWithTimestamp {
@@ -26,6 +26,7 @@ export class UserEntity extends BaseEntityWithTimestamp {
   @Column({ type: 'boolean', default: false })
   admin: boolean;
 
-  @Column(() => PremiumColumn)
-  premium: PremiumColumn;
+  @OneToOne(() => MembershipEntity, { cascade: true, eager: true })
+  @JoinColumn({ name: 'membership' })
+  membership: MembershipEntity | null;
 }

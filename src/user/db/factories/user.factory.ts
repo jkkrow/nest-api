@@ -15,13 +15,13 @@ export class UserFactory implements BaseFactory<UserEntity, User> {
     picture?: User['picture'];
     verified?: User['verified'];
     admin?: User['admin'];
-    premium?: User['premium'];
+    membership?: User['membership'];
   }) {
     const user = new User({
       picture: '',
       verified: false,
       admin: false,
-      premium: { id: null, name: null, expiredAt: null, cancelled: null },
+      membership: null,
       ...params,
     });
 
@@ -38,7 +38,7 @@ export class UserFactory implements BaseFactory<UserEntity, User> {
       picture: model.picture,
       verified: model.verified,
       admin: model.admin,
-      premium: model.premium,
+      membership: model.membership,
     } as UserEntity;
   }
 
@@ -52,7 +52,7 @@ export class UserFactory implements BaseFactory<UserEntity, User> {
       picture: entity.picture,
       verified: entity.verified,
       admin: entity.admin,
-      premium: entity.premium,
+      membership: entity.membership,
     });
   }
 }
