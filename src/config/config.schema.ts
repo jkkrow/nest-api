@@ -24,12 +24,19 @@ export class EnvironmentVariables {
   DB_USERNAME: string;
   @IsString()
   DB_PASSWORD: string;
-  @IsString()
-  DB_PORT: string;
+  @IsNumber()
+  DB_PORT: number;
   @IsString()
   DB_DATABASE: string;
   @IsString()
   DB_OPTIONS: string;
+
+  @IsString()
+  REDIS_HOST: string;
+  @IsNumber()
+  REDIS_PORT: number;
+  @IsString()
+  REDIS_PASSWORD: string;
 
   @IsString()
   GOOGLE_CLIENT_ID: string;
