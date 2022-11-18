@@ -4,8 +4,6 @@ import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { ConfigService } from 'src/config/config.service';
 import { AuthService } from 'src/auth/services/auth.service';
 import { EmailService } from 'src/email/email.service';
-import { From } from 'src/email/constants/from.constant';
-import { Template } from 'src/email/constants/template.constant';
 import { SendVerificationCommand } from '../impl/send-verification.command';
 import { UserRepository } from '../../db/repositories/user.repository';
 
@@ -37,9 +35,9 @@ export class SendVerificationHandler
     const retryUrl = `${clientUrl}/user/account`;
 
     await this.emailService.sendEmailWithTemplate({
-      from: From.Auth,
+      from: 'auth',
       to: email,
-      template: Template.AccountVerification,
+      template: 'account-verification',
       templateModel: { actionUrl, retryUrl },
     });
   }

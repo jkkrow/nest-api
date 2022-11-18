@@ -3,12 +3,13 @@ import { AggregateRoot } from '@nestjs/cqrs';
 import { UserCreatedEvent } from './events/impl/user-created.event';
 import { UserDeletedEvent } from './events/impl/user-deleted.event';
 import { IUser, IMembership } from './interfaces/user.interface';
+import { UserType } from './constants/user.constant';
 
 export class User extends AggregateRoot implements IUser {
   constructor(
     private readonly props: {
       readonly id: string;
-      readonly type: 'native' | 'google';
+      readonly type: UserType;
       readonly email: string;
       name: string;
       password: string;

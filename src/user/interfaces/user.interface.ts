@@ -1,6 +1,8 @@
+import { UserType, MembershipName } from '../constants/user.constant';
+
 export interface IUser {
   id: string;
-  type: 'native' | 'google';
+  type: UserType;
   name: string;
   email: string;
   password: string;
@@ -12,7 +14,7 @@ export interface IUser {
 
 export interface IMembership {
   id: string;
-  name: 'standard' | 'business' | 'enterprise';
+  name: MembershipName;
   expiredAt: Date;
   cancelled: boolean;
 }

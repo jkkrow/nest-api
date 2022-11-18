@@ -1,13 +1,14 @@
 import { Expose, Type } from 'class-transformer';
 
 import { IUser, IMembership } from '../interfaces/user.interface';
+import { MembershipName, UserType } from '../constants/user.constant';
 
-export class UserDto implements Partial<IUser> {
+export class UserDto implements Omit<IUser, 'password'> {
   @Expose()
   id: string;
 
   @Expose()
-  type: IUser['type'];
+  type: UserType;
 
   @Expose()
   name: string;
@@ -34,7 +35,7 @@ class MembershipDto implements IMembership {
   id: string;
 
   @Expose()
-  name: IMembership['name'];
+  name: MembershipName;
 
   @Expose()
   expiredAt: Date;

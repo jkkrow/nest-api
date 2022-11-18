@@ -6,8 +6,8 @@ import { ServerClient } from 'postmark';
 import { ConfigService } from 'src/config/config.service';
 import { CreateBounceDto } from './dtos/create-bounce.dto';
 import { BounceEntity } from './db/entities/bounce.entity';
-import { From } from './constants/from.constant';
-import { Template } from 'aws-sdk/clients/appsync';
+import { From } from './constants/email.constant';
+import { Template } from './constants/email.constant';
 
 export class EmailService {
   constructor(

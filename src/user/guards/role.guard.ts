@@ -1,7 +1,7 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
-import { IRole, ROLE_KEY } from '../interfaces/role.interface';
+import { RoleName, ROLE_KEY } from '../constants/role.constant';
 import { RequestWithUser } from '../middlewares/user.middleware';
 import { IUser } from '../interfaces/user.interface';
 
@@ -10,7 +10,7 @@ export class RoleGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext) {
-    const requiredRole = this.reflector.getAllAndOverride<IRole>(ROLE_KEY, [
+    const requiredRole = this.reflector.getAllAndOverride<RoleName>(ROLE_KEY, [
       context.getClass(),
       context.getHandler(),
     ]);
@@ -26,7 +26,7 @@ export class RoleGuard implements CanActivate {
   }
 
   private validateUserRole(user?: IUser) {
-    const roles: Record<IRole, boolean> = {
+    const roles: Record<RoleName, boolean> = {
       verified: false,
       member: false,
       admin: false,
