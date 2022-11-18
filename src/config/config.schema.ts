@@ -7,9 +7,12 @@ export class EnvironmentVariables {
   @IsString()
   APPLICATION_NAME: string;
   @IsString()
-  CLIENT_URL: string;
+  DOMAIN_URL: string;
   @IsString()
-  JWT_KEY: string;
+  CLIENT_URL: string;
+
+  @IsString()
+  JWT_SECRET_KEY: string;
 
   @IsString()
   AUTH_CREDENTIALS_USERNAME: string;

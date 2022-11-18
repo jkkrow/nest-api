@@ -26,8 +26,9 @@ export class GoogleSigninHandler implements IQueryHandler<GoogleSigninQuery> {
       throw new NotFoundException('User not found');
     }
 
-    const refreshToken = this.authService.signToken(user.id, 'refresh', '7d');
-    const accessToken = this.authService.signToken(user.id, 'access', '15m');
+    const { refreshToken, accessToken } = this.authService.signAuthTokens(
+      user.id,
+    );
 
     return { user, refreshToken, accessToken };
   }

@@ -30,7 +30,11 @@ export class SendVerificationHandler
     }
 
     const clientUrl = this.configService.get('CLIENT_URL');
-    const token = this.authService.signToken(user.id, 'verification', '1d');
+    const token = this.authService.sign(user.id, {
+      sub: 'verification',
+      exp: '1d',
+    });
+
     const actionUrl = `${clientUrl}/auth/verification/${token}`;
     const retryUrl = `${clientUrl}/user/account`;
 

@@ -27,9 +27,9 @@ export class UserMiddleware implements NestMiddleware {
     }
 
     const token = authorization.split(' ')[1] || '';
-    const result = this.authService.verifyToken(token);
+    const result = this.authService.verify(token);
 
-    if (result.type !== 'access') {
+    if (result.sub !== 'access') {
       return next();
     }
 

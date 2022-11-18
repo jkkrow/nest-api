@@ -29,8 +29,9 @@ export class SigninHandler implements IQueryHandler<SigninQuery> {
       throw new BadRequestException('Invalid email or password');
     }
 
-    const refreshToken = this.authService.signToken(user.id, 'refresh', '7d');
-    const accessToken = this.authService.signToken(user.id, 'access', '15m');
+    const { refreshToken, accessToken } = this.authService.signAuthTokens(
+      user.id,
+    );
 
     return { user, refreshToken, accessToken };
   }
