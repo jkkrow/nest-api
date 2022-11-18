@@ -3,20 +3,11 @@ import { Injectable } from '@nestjs/common';
 import { BaseFactory } from 'src/database/factories/database.factory';
 import { UserEntity } from '../entities/user.entity';
 import { User } from '../../user.model';
+import { ICreateUserParams } from '../../interfaces/user.interface';
 
 @Injectable()
 export class UserFactory implements BaseFactory<UserEntity, User> {
-  create(params: {
-    id: User['id'];
-    type: User['type'];
-    name: User['name'];
-    email: User['email'];
-    password: User['password'];
-    picture?: User['picture'];
-    verified?: User['verified'];
-    admin?: User['admin'];
-    membership?: User['membership'];
-  }) {
+  create(params: ICreateUserParams) {
     const user = new User({
       picture: '',
       verified: false,

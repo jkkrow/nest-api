@@ -1,8 +1,7 @@
-import { IsString, IsEmail, MaxLength } from 'class-validator';
+import { IsString, IsEmail } from 'class-validator';
 
 export class SigninRequestDto {
   @IsEmail()
-  @MaxLength(30)
   email: string;
 
   @IsString()

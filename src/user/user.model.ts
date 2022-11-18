@@ -57,11 +57,11 @@ export class User extends AggregateRoot implements IUser {
     return this.props.membership ? { ...this.props.membership } : null;
   }
 
-  createUser() {
-    this.apply(new UserCreatedEvent(this.id, this.email));
+  create() {
+    this.apply(new UserCreatedEvent(this.id, this.type, this.email));
   }
 
-  deleteUser() {
+  delete() {
     this.apply(new UserDeletedEvent(this.id));
   }
 

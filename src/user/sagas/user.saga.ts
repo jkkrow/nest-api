@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Saga, ICommand, ofType } from '@nestjs/cqrs';
+import { Saga, ofType } from '@nestjs/cqrs';
 import { Observable, map } from 'rxjs';
 
 import { UserCreatedEvent } from '../events/impl/user-created.event';
@@ -8,10 +8,11 @@ import { SendVerificationCommand } from '../commands/impl/send-verification.comm
 @Injectable()
 export class UserSaga {
   @Saga()
-  userCreated = (event$: Observable<any>): Observable<ICommand> => {
+  userCreated = (event$: Observable<any>) => {
     return event$.pipe(
       ofType(UserCreatedEvent),
-      map(({ email }) => {
+      map(({ type, email }) => {
+        if (type !== 'native') return;
         Logger.log(
           'UserCreatedEvent triggers SendVerificationCommand',
           'UserSaga',

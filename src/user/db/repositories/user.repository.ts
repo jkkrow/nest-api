@@ -6,6 +6,7 @@ import { BaseRepository } from 'src/database/repositories/database.repository';
 import { UserFactory } from '../factories/user.factory';
 import { UserEntity } from '../entities/user.entity';
 import { User } from '../../user.model';
+import { ICreateUserParams } from '../../interfaces/user.interface';
 
 @Injectable()
 export class UserRepository extends BaseRepository<UserEntity, User> {
@@ -25,8 +26,8 @@ export class UserRepository extends BaseRepository<UserEntity, User> {
     return this.findOne({ email });
   }
 
-  createUser(id: string, name: string, email: string, password: string) {
-    return this.create({ id, name, type: 'native', email, password });
+  createUser(params: ICreateUserParams) {
+    return this.create(params);
   }
 
   updateUser(id: string, user: User) {

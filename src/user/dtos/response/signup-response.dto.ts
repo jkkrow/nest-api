@@ -1,18 +1,8 @@
-import { Expose, Type } from 'class-transformer';
+import { Expose } from 'class-transformer';
 
-import { UserDto } from '../user.dto';
+import { SigninResponseDto } from './signin-response.dto';
 
-export class SignupResponseDto {
-  @Expose()
-  @Type(() => UserDto)
-  user: UserDto;
-
-  @Expose()
-  refreshToken: string;
-
-  @Expose()
-  accessToken: string;
-
+export class SignupResponseDto extends SigninResponseDto {
   @Expose()
   message: string;
 }
