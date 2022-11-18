@@ -4,11 +4,13 @@ import { ApiTags } from '@nestjs/swagger/dist';
 
 import { Serialize } from 'src/common/interceptors/serialize.interceptor';
 import { CreateUserCommand } from './commands/impl/create-user.command';
+import { SendVerificationCommand } from './commands/impl/send-verification.command';
 import { SigninQuery } from './queries/impl/signin.query';
 import { SignupRequestDto } from './dtos/request/signup-request.dto';
 import { SigninRequestDto } from './dtos/request/signin-request.dto';
 import { SignupResponseDto } from './dtos/response/signup-response.dto';
 import { SigninResponseDto } from './dtos/response/signin-response.dto';
+import { SendVerificationRequestDto } from './dtos/request/send-verification-request.dto';
 
 @Controller('users')
 @ApiTags('Users')
@@ -27,7 +29,10 @@ export class UserController {
     const query = new SigninQuery(email, password);
     const result = await this.queryBus.execute(query);
 
-    return result;
+    return {
+      ...result,
+      message: 'Verification email sent. Check your email and confirm signup',
+    };
   }
 
   @Post('signin')
@@ -46,8 +51,13 @@ export class UserController {
   }
 
   @Post('verification')
-  sendVerification() {
-    // Send Verification Command
+  async sendVerification(@Body() { email }: SendVerificationRequestDto) {
+    const command = new SendVerificationCommand(email);
+    await this.commandBus.execute(command);
+
+    return {
+      message: 'Verification email sent. Check your email and confirm signup',
+    };
   }
 
   @Post('verification/:token')

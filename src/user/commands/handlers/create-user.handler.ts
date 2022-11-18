@@ -27,6 +27,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
       await this.repository.createUser(id, name, email, hash),
     );
 
+    user.createUser();
     user.commit();
   }
 }

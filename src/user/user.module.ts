@@ -4,6 +4,7 @@ import { APP_GUARD } from '@nestjs/core';
 
 import { DatabaseModule } from 'src/database/database.module';
 import { AuthModule } from 'src/auth/auth.module';
+import { EmailModule } from 'src/email/email.module';
 import { UserController } from './user.controller';
 import { UserMiddleware } from './middlewares/user.middleware';
 import { RoleGuard } from './guards/role.guard';
@@ -26,6 +27,7 @@ const GlobalRoleGuard = {
     CqrsModule,
     DatabaseModule.forFeature([UserEntity, SubscriptionEntity]),
     AuthModule,
+    EmailModule,
   ],
   controllers: [UserController],
   providers: [

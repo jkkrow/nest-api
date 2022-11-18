@@ -12,4 +12,7 @@ export class SignupResponseDto {
 
   @Expose()
   accessToken: string;
+
+  @Expose()
+  message: string;
 }

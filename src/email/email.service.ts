@@ -6,6 +6,8 @@ import { ServerClient } from 'postmark';
 import { ConfigService } from 'src/config/config.service';
 import { CreateBounceDto } from './dtos/create-bounce.dto';
 import { BounceEntity } from './db/entities/bounce.entity';
+import { From } from './constants/from.constant';
+import { Template } from 'aws-sdk/clients/appsync';
 
 export class EmailService {
   constructor(
@@ -19,7 +21,7 @@ export class EmailService {
   );
 
   async sendEmail(options: {
-    from: string;
+    from: From;
     to: string;
     subject: string;
     message: string;
@@ -38,9 +40,9 @@ export class EmailService {
   }
 
   async sendEmailWithTemplate(options: {
-    from: string;
+    from: From;
     to: string;
-    templateAlias: string;
+    template: Template;
     templateModel: object;
     messageStream?: string;
   }) {
@@ -50,7 +52,7 @@ export class EmailService {
     return this.client.sendEmailWithTemplate({
       From: sender.replace('@', options.from + '@'),
       To: options.to,
-      TemplateAlias: options.templateAlias,
+      TemplateAlias: options.template,
       TemplateModel: options.templateModel,
       MessageStream: options.messageStream,
     });
