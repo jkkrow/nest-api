@@ -1,3 +1,4 @@
+import { EventPublisher } from '@nestjs/cqrs';
 import { Injectable } from '@nestjs/common';
 
 import { BaseFactory } from 'src/database/factories/database.factory';
@@ -7,6 +8,8 @@ import { ICreateUserParams } from '../../interfaces/user.interface';
 
 @Injectable()
 export class UserFactory implements BaseFactory<UserEntity, User> {
+  constructor(private readonly publisher: EventPublisher) {}
+
   create(params: ICreateUserParams) {
     const user = new User({
       picture: '',
@@ -16,7 +19,7 @@ export class UserFactory implements BaseFactory<UserEntity, User> {
       ...params,
     });
 
-    return user;
+    return this.publisher.mergeObjectContext(user);
   }
 
   createEntity(model: User): UserEntity {
@@ -34,7 +37,7 @@ export class UserFactory implements BaseFactory<UserEntity, User> {
   }
 
   createFromEntity(entity: UserEntity): User {
-    return new User({
+    const user = new User({
       id: entity.id,
       type: entity.type,
       email: entity.email,
@@ -45,5 +48,7 @@ export class UserFactory implements BaseFactory<UserEntity, User> {
       admin: entity.admin,
       membership: entity.membership,
     });
+
+    return this.publisher.mergeObjectContext(user);
   }
 }

@@ -32,7 +32,7 @@ export class AuthService {
 
       return result;
     } catch (err) {
-      throw new UnauthorizedException('Invalid token');
+      throw new UnauthorizedException('Invalid or expired token');
     }
   }
 

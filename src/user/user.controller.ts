@@ -1,11 +1,21 @@
-import { Controller, Post, Get, Patch, Body, HttpCode } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Patch,
+  Body,
+  Param,
+  HttpCode,
+} from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger/dist';
 
 import { Serialize } from 'src/common/interceptors/serialize.interceptor';
+import { MessageResponseDto } from 'src/common/dtos/message-response.dto';
 import { CreateUserCommand } from './commands/impl/create-user.command';
 import { CreateGoogleUserCommand } from './commands/impl/create-google-user.command';
 import { SendVerificationCommand } from './commands/impl/send-verification.command';
+import { CheckVerificationCommand } from './commands/impl/check-verification.comand';
 import { SigninQuery } from './queries/impl/signin.query';
 import { GoogleSigninQuery } from './queries/impl/google-signin.query';
 import { SignupRequestDto } from './dtos/request/signup-request.dto';
@@ -15,7 +25,6 @@ import { SigninResponseDto } from './dtos/response/signin-response.dto';
 import { GoogleSigninRequestDto } from './dtos/request/google-signin-request.dto';
 import { GoogleSigninResponseDto } from './dtos/response/google-signin-response.dto';
 import { SendVerificationRequestDto } from './dtos/request/send-verification-request.dto';
-import { SendVerificationResponseDto } from './dtos/response/send-verification-response.dto';
 
 @Controller('users')
 @ApiTags('Users')
@@ -83,9 +92,9 @@ export class UserController {
   /*--------------------------------------------*/
   @Post('verification')
   @HttpCode(200)
-  @Serialize(SendVerificationResponseDto)
+  @Serialize(MessageResponseDto)
   @ApiOperation({ description: 'Send Verification' })
-  @ApiResponse({ type: SendVerificationResponseDto, status: 200 })
+  @ApiResponse({ type: MessageResponseDto, status: 200 })
   async sendVerification(@Body() { email }: SendVerificationRequestDto) {
     const command = new SendVerificationCommand(email);
     await this.commandBus.execute(command);
@@ -95,9 +104,20 @@ export class UserController {
     };
   }
 
+  /* Check Verification */
+  /*--------------------------------------------*/
   @Post('verification/:token')
-  checkVerification() {
-    // Check Verification Command
+  @HttpCode(200)
+  @Serialize(MessageResponseDto)
+  @ApiOperation({ description: 'Check Verification' })
+  @ApiResponse({ type: MessageResponseDto, status: 200 })
+  async checkVerification(@Param('token') token: string) {
+    const command = new CheckVerificationCommand(token);
+    await this.commandBus.execute(command);
+
+    return {
+      message: 'Your account has been successfully verified',
+    };
   }
 
   @Post('recovery')

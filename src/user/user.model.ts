@@ -1,6 +1,7 @@
 import { AggregateRoot } from '@nestjs/cqrs';
 
 import { UserCreatedEvent } from './events/impl/user-created.event';
+import { UserUpdatedEvent } from './events/impl/user-updated.event';
 import { UserDeletedEvent } from './events/impl/user-deleted.event';
 import { IUser, IMembership } from './interfaces/user.interface';
 import { UserType } from './constants/user.constant';
@@ -68,25 +69,31 @@ export class User extends AggregateRoot implements IUser {
 
   updateName(name: string) {
     this.props.name = name;
+    this.apply(new UserUpdatedEvent(this.id, { name }));
   }
 
   updatePassword(password: string) {
     this.props.password = password;
+    this.apply(new UserUpdatedEvent(this.id, { password }));
   }
 
   updatePicture(picture: string) {
     this.props.picture = picture;
+    this.apply(new UserUpdatedEvent(this.id, { picture }));
   }
 
   updateMembership(membership: IMembership | null) {
     this.props.membership = membership;
+    this.apply(new UserUpdatedEvent(this.id, { membership }));
   }
 
   updateVerified(verified: boolean) {
     this.props.verified = verified;
+    this.apply(new UserUpdatedEvent(this.id, { verified }));
   }
 
   updateAdmin(admin: boolean) {
     this.props.admin = admin;
+    this.apply(new UserUpdatedEvent(this.id, { admin }));
   }
 }

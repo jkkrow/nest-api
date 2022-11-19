@@ -6,7 +6,6 @@ import { BaseRepository } from 'src/database/repositories/database.repository';
 import { UserFactory } from '../factories/user.factory';
 import { UserEntity } from '../entities/user.entity';
 import { User } from '../../user.model';
-import { ICreateUserParams } from '../../interfaces/user.interface';
 
 @Injectable()
 export class UserRepository extends BaseRepository<UserEntity, User> {
@@ -19,22 +18,18 @@ export class UserRepository extends BaseRepository<UserEntity, User> {
   }
 
   findById(id: string) {
-    return this.findOne({ id });
+    return this._findOne({ id });
   }
 
   findByEmail(email: string) {
-    return this.findOne({ email });
+    return this._findOne({ email });
   }
 
-  createUser(params: ICreateUserParams) {
-    return this.create(params);
+  save(user: User) {
+    return this._save(user);
   }
 
-  updateUser(id: string, user: User) {
-    return this.update({ id }, user);
-  }
-
-  deleteUser(id: string) {
-    return this.delete({ id });
+  delete(user: User) {
+    return this._delete(user);
   }
 }
