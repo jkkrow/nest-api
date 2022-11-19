@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class usersTable1668498407756 implements MigrationInterface {
+export class usersTable1668851144977 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
       `CREATE TYPE user_type AS ENUM('native', 'google')`,
@@ -15,7 +15,6 @@ export class usersTable1668498407756 implements MigrationInterface {
           picture VARCHAR(200) NOT NULL DEFAULT '',
           verified BOOLEAN NOT NULL DEFAULT false,
           admin BOOLEAN NOT NULL DEFAULT false,
-          membership VARCHAR(100) REFERENCES memberships(id) ON DELETE CASCADE ON UPDATE CASCADE,
           created_at TIMESTAMP NOT NULL DEFAULT now(),
           updated_at TIMESTAMP NOT NULL DEFAULT now()
         )

@@ -1,4 +1,4 @@
-import { Entity, Column, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, OneToOne } from 'typeorm';
 
 import { BaseEntityWithTimestamp } from 'src/database/entities/database.entity';
 import { MembershipEntity } from './membership.entity';
@@ -28,7 +28,9 @@ export class UserEntity extends BaseEntityWithTimestamp implements IUser {
   @Column({ type: 'boolean', default: false })
   admin: boolean;
 
-  @OneToOne(() => MembershipEntity, { cascade: true, eager: true })
-  @JoinColumn({ name: 'membership' })
+  @OneToOne(() => MembershipEntity, (membership) => membership.user, {
+    cascade: true,
+    eager: true,
+  })
   membership: MembershipEntity | null;
 }

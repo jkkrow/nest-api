@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class subscriptionsTable1668505375548 implements MigrationInterface {
+export class subscriptionsTable1668851169929 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
         CREATE TABLE subscriptions (

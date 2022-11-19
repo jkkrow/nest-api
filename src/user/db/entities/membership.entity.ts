@@ -1,6 +1,7 @@
-import { Entity, Column, PrimaryColumn } from 'typeorm';
+import { Entity, Column, PrimaryColumn, OneToOne, JoinColumn } from 'typeorm';
 
 import { IMembership } from '../../interfaces/user.interface';
+import { UserEntity } from './user.entity';
 
 @Entity('memberships')
 export class MembershipEntity implements IMembership {
@@ -15,4 +16,10 @@ export class MembershipEntity implements IMembership {
 
   @Column({ type: 'boolean' })
   cancelled: boolean;
+
+  @OneToOne(() => UserEntity, (user) => user.membership, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn({ name: 'user_id' })
+  user: UserEntity;
 }
