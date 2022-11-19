@@ -5,8 +5,8 @@ import {
 } from '@nestjs/common';
 import { redisStore } from 'cache-manager-redis-store';
 
-import { ConfigService } from 'src/config/config.service';
-import { CacheService } from './cache.service';
+import { ConfigService } from 'src/config/services/config.service';
+import { CacheService } from './services/cache.service';
 
 @Module({
   imports: [

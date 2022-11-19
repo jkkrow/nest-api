@@ -1,8 +1,8 @@
 import { Module, Global } from '@nestjs/common';
 import { ConfigModule as BaseConfigModule } from '@nestjs/config';
 
-import { ConfigService } from './config.service';
-import { validate } from './config.validator';
+import { ConfigService } from './services/config.service';
+import { validate } from './validators/config.validator';
 
 @Global()
 @Module({

@@ -1,10 +1,10 @@
 import { AggregateRoot } from '@nestjs/cqrs';
 
-import { UserCreatedEvent } from './events/impl/user-created.event';
-import { UserUpdatedEvent } from './events/impl/user-updated.event';
-import { UserDeletedEvent } from './events/impl/user-deleted.event';
-import { IUser, IMembership } from './interfaces/user.interface';
-import { UserType } from './constants/user.constant';
+import { UserCreatedEvent } from '../events/impl/user-created.event';
+import { UserUpdatedEvent } from '../events/impl/user-updated.event';
+import { UserDeletedEvent } from '../events/impl/user-deleted.event';
+import { IUser, IMembership } from '../interfaces/user.interface';
+import { UserType } from '../constants/user.constant';
 
 export class User extends AggregateRoot implements IUser {
   constructor(

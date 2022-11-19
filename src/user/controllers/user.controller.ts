@@ -12,19 +12,19 @@ import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger/dist';
 
 import { Serialize } from 'src/common/interceptors/serialize.interceptor';
 import { MessageResponseDto } from 'src/common/dtos/message-response.dto';
-import { CreateUserCommand } from './commands/impl/create-user.command';
-import { CreateGoogleUserCommand } from './commands/impl/create-google-user.command';
-import { SendVerificationCommand } from './commands/impl/send-verification.command';
-import { CheckVerificationCommand } from './commands/impl/check-verification.comand';
-import { SigninQuery } from './queries/impl/signin.query';
-import { GoogleSigninQuery } from './queries/impl/google-signin.query';
-import { SignupRequestDto } from './dtos/request/signup-request.dto';
-import { SignupResponseDto } from './dtos/response/signup-response.dto';
-import { SigninRequestDto } from './dtos/request/signin-request.dto';
-import { SigninResponseDto } from './dtos/response/signin-response.dto';
-import { GoogleSigninRequestDto } from './dtos/request/google-signin-request.dto';
-import { GoogleSigninResponseDto } from './dtos/response/google-signin-response.dto';
-import { SendVerificationRequestDto } from './dtos/request/send-verification-request.dto';
+import { CreateUserCommand } from '../commands/impl/create-user.command';
+import { CreateGoogleUserCommand } from '../commands/impl/create-google-user.command';
+import { SendVerificationCommand } from '../commands/impl/send-verification.command';
+import { CheckVerificationCommand } from '../commands/impl/check-verification.comand';
+import { SigninQuery } from '../queries/impl/signin.query';
+import { GoogleSigninQuery } from '../queries/impl/google-signin.query';
+import { SignupRequestDto } from '../dtos/request/signup-request.dto';
+import { SignupResponseDto } from '../dtos/response/signup-response.dto';
+import { SigninRequestDto } from '../dtos/request/signin-request.dto';
+import { SigninResponseDto } from '../dtos/response/signin-response.dto';
+import { GoogleSigninRequestDto } from '../dtos/request/google-signin-request.dto';
+import { GoogleSigninResponseDto } from '../dtos/response/google-signin-response.dto';
+import { SendVerificationRequestDto } from '../dtos/request/send-verification-request.dto';
 
 @Controller('users')
 @ApiTags('Users')

@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { parse } from 'path';
 
-import { ConfigService } from 'src/config/config.service';
+import { ConfigService } from 'src/config/services/config.service';
 import { CloudService } from './cloud.service';
 
 @Injectable()

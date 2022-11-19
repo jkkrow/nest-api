@@ -3,7 +3,7 @@ import { Injectable } from '@nestjs/common';
 
 import { BaseFactory } from 'src/database/factories/database.factory';
 import { UserEntity } from '../entities/user.entity';
-import { User } from '../../user.model';
+import { User } from '../../models/user.model';
 import { ICreateUserParams } from '../../interfaces/user.interface';
 
 @Injectable()

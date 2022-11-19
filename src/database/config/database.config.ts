@@ -6,7 +6,7 @@ import { DataSource, DataSourceOptions } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import 'dotenv/config';
 
-import { ConfigService } from 'src/config/config.service';
+import { ConfigService } from 'src/config/services/config.service';
 
 const config = new ConfigService();
 

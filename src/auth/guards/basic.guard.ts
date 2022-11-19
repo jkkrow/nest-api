@@ -1,6 +1,6 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 
-import { ConfigService } from 'src/config/config.service';
+import { ConfigService } from 'src/config/services/config.service';
 
 @Injectable()
 export class BasicGuard implements CanActivate {

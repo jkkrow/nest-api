@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import AWS from 'aws-sdk';
 
-import { ConfigService } from 'src/config/config.service';
+import { ConfigService } from 'src/config/services/config.service';
 
 @Injectable()
 export class CloudService {

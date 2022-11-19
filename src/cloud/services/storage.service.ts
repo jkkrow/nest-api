@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 
-import { ConfigService } from 'src/config/config.service';
+import { ConfigService } from 'src/config/services/config.service';
 import { CloudService } from './cloud.service';
 
 @Injectable()

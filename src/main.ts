@@ -3,7 +3,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
 
 import { AppModule } from './app.module';
-import { ConfigService } from './config/config.service';
+import { ConfigService } from './config/services/config.service';
 
 export async function bootstrap(server = true) {
   const app = await NestFactory.create(AppModule);

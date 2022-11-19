@@ -5,7 +5,7 @@ import { Repository } from 'typeorm';
 import { BaseRepository } from 'src/database/repositories/database.repository';
 import { UserFactory } from '../factories/user.factory';
 import { UserEntity } from '../entities/user.entity';
-import { User } from '../../user.model';
+import { User } from '../../models/user.model';
 
 @Injectable()
 export class UserRepository extends BaseRepository<UserEntity, User> {

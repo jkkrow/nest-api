@@ -1,9 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 
-import { ConfigService } from 'src/config/config.service';
+import { ConfigService } from 'src/config/services/config.service';
 import { AuthService } from 'src/auth/services/auth.service';
-import { EmailService } from 'src/email/email.service';
+import { EmailService } from 'src/email/services/email.service';
 import { SendVerificationCommand } from '../impl/send-verification.command';
 import { UserRepository } from '../../db/repositories/user.repository';
 
