@@ -1,17 +1,17 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { JwtService } from '@nestjs/jwt';
+import { JwtService as BaseJwtService } from '@nestjs/jwt';
 
 import {
-  TokenPayload,
-  TokenSignOptions,
-  TokenVerifyOptions,
-} from '../interfaces/auth.interface';
+  JWTPayload,
+  JWTSignOptions,
+  JWTVerifyOptions,
+} from '../interfaces/jwt.interface';
 
 @Injectable()
-export class AuthService {
-  constructor(private readonly jwtService: JwtService) {}
+export class JWTService {
+  constructor(private readonly jwtService: BaseJwtService) {}
 
-  sign(userId: string, options: TokenSignOptions) {
+  sign(userId: string, options: JWTSignOptions) {
     return this.jwtService.sign(
       {
         userId,
@@ -23,9 +23,9 @@ export class AuthService {
     );
   }
 
-  verify(token: string, options?: TokenVerifyOptions) {
+  verify(token: string, options?: JWTVerifyOptions) {
     try {
-      const result = this.jwtService.verify<TokenPayload>(token, {
+      const result = this.jwtService.verify<JWTPayload>(token, {
         subject: options?.sub,
         ignoreExpiration: options?.ignoreExp,
       });
@@ -36,7 +36,7 @@ export class AuthService {
     }
   }
 
-  signAuthTokens(userId: string) {
+  signAuthToken(userId: string) {
     const refreshToken = this.sign(userId, { sub: 'refresh', exp: '7d' });
     const accessToken = this.sign(userId, { sub: 'access', exp: '15m' });
 

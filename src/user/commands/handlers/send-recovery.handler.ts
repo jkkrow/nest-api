@@ -1,15 +1,15 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { NotFoundException, BadRequestException } from '@nestjs/common';
+import { NotFoundException } from '@nestjs/common';
 
 import { ConfigService } from 'src/config/services/config.service';
 import { JWTService } from 'src/auth/services/jwt.service';
 import { EmailService } from 'src/email/services/email.service';
-import { SendVerificationCommand } from '../impl/send-verification.command';
+import { SendRecoveryCommand } from '../impl/send-recovery.command';
 import { UserRepository } from '../../db/repositories/user.repository';
 
-@CommandHandler(SendVerificationCommand)
-export class SendVerificationHandler
-  implements ICommandHandler<SendVerificationCommand>
+@CommandHandler(SendRecoveryCommand)
+export class SendRecoveryHandler
+  implements ICommandHandler<SendRecoveryCommand>
 {
   constructor(
     private readonly repository: UserRepository,
@@ -18,21 +18,17 @@ export class SendVerificationHandler
     private readonly emailService: EmailService,
   ) {}
 
-  async execute({ email }: SendVerificationCommand) {
+  async execute({ email }: SendRecoveryCommand) {
     const user = await this.repository.findByEmail(email);
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    if (user.verified) {
-      throw new BadRequestException('User already has been verified');
-    }
-
     const clientUrl = this.configService.get('CLIENT_URL');
     const token = this.jwtService.sign(user.id, {
-      sub: 'verification',
-      exp: '1d',
+      sub: 'recovery',
+      exp: '1h',
     });
 
     const actionUrl = `${clientUrl}/auth/verification/${token}`;
@@ -41,7 +37,7 @@ export class SendVerificationHandler
     await this.emailService.sendEmailWithTemplate({
       from: 'auth',
       to: email,
-      template: 'account-verification',
+      template: 'password-reset',
       templateModel: { actionUrl, retryUrl },
     });
   }

@@ -2,7 +2,7 @@ import { Injectable, NestMiddleware } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { Request, Response, NextFunction } from 'express';
 
-import { AuthService } from 'src/auth/services/auth.service';
+import { JWTService } from 'src/auth/services/jwt.service';
 import { GetUserQuery } from '../queries/impl/get-user.query';
 import { IUser } from '../interfaces/user.interface';
 
@@ -14,7 +14,7 @@ export interface RequestWithUser extends Request {
 export class UserMiddleware implements NestMiddleware {
   constructor(
     private readonly queryBus: QueryBus,
-    private readonly authService: AuthService,
+    private readonly jwtService: JWTService,
   ) {}
 
   async use(req: RequestWithUser, _: Response, next: NextFunction) {
@@ -27,7 +27,7 @@ export class UserMiddleware implements NestMiddleware {
     }
 
     const token = authorization.split(' ')[1] || '';
-    const result = this.authService.verify(token);
+    const result = this.jwtService.verify(token);
 
     if (result.sub !== 'access') {
       return next();

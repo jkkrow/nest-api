@@ -8,8 +8,8 @@ export class UserUpdatedHandler implements IEventHandler {
   handle(event: UserUpdatedEvent) {
     const result = {
       id: event.id,
-      updates: Object.keys(event),
+      updates: Object.keys(event.updates),
     };
-    Logger.log(JSON.stringify(result, null, 2), 'UserUpdatedEvent');
+    Logger.log(JSON.stringify(result), 'UserUpdatedEvent');
   }
 }

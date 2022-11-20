@@ -3,7 +3,7 @@ import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { AuthService } from 'src/auth/services/auth.service';
+import { JWTService } from 'src/auth/services/jwt.service';
 import { OAuthService } from 'src/cloud/services/oauth.service';
 import { GoogleSigninQuery } from '../impl/google-signin.query';
 import { UserEntity } from 'src/user/db/entities/user.entity';
@@ -13,7 +13,7 @@ export class GoogleSigninHandler implements IQueryHandler<GoogleSigninQuery> {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-    private readonly authService: AuthService,
+    private readonly jwtService: JWTService,
     private readonly oAuthService: OAuthService,
   ) {}
 
@@ -26,7 +26,7 @@ export class GoogleSigninHandler implements IQueryHandler<GoogleSigninQuery> {
       throw new NotFoundException('User not found');
     }
 
-    const { refreshToken, accessToken } = this.authService.signAuthTokens(
+    const { refreshToken, accessToken } = this.jwtService.signAuthToken(
       user.id,
     );
 

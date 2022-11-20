@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 
-import { AuthService } from 'src/auth/services/auth.service';
+import { JWTService } from 'src/auth/services/jwt.service';
 import { CheckVerificationCommand } from '../impl/check-verification.comand';
 import { UserRepository } from '../../db/repositories/user.repository';
 
@@ -11,16 +11,16 @@ export class CheckVerificationHandler
 {
   constructor(
     private readonly repository: UserRepository,
-    private readonly authService: AuthService,
+    private readonly jwtService: JWTService,
   ) {}
 
   async execute({ token }: CheckVerificationCommand) {
-    const { userId } = this.authService.verify(token, { sub: 'verification' });
+    const { userId } = this.jwtService.verify(token, { sub: 'verification' });
 
     const user = await this.repository.findById(userId);
 
     if (!user) {
-      throw new NotFoundException('User not found');
+      throw new NotFoundException('User not found for this token');
     }
 
     if (user.verified) {

@@ -16,6 +16,9 @@ import { CreateUserCommand } from '../commands/impl/create-user.command';
 import { CreateGoogleUserCommand } from '../commands/impl/create-google-user.command';
 import { SendVerificationCommand } from '../commands/impl/send-verification.command';
 import { CheckVerificationCommand } from '../commands/impl/check-verification.comand';
+import { SendRecoveryCommand } from '../commands/impl/send-recovery.command';
+import { CheckRecoveryCommand } from '../commands/impl/check-recovery.command';
+import { ResetPasswordCommand } from '../commands/impl/reset-password.command';
 import { SigninQuery } from '../queries/impl/signin.query';
 import { GoogleSigninQuery } from '../queries/impl/google-signin.query';
 import { SignupRequestDto } from '../dtos/request/signup-request.dto';
@@ -25,6 +28,8 @@ import { SigninResponseDto } from '../dtos/response/signin-response.dto';
 import { GoogleSigninRequestDto } from '../dtos/request/google-signin-request.dto';
 import { GoogleSigninResponseDto } from '../dtos/response/google-signin-response.dto';
 import { SendVerificationRequestDto } from '../dtos/request/send-verification-request.dto';
+import { SendRecoveryRequestDto } from '../dtos/request/send-recovery-request.dto';
+import { ResetPasswordRequestDto } from '../dtos/request/reset-password-request.dto';
 
 @Controller('users')
 @ApiTags('Users')
@@ -116,23 +121,58 @@ export class UserController {
     await this.commandBus.execute(command);
 
     return {
-      message: 'Your account has been successfully verified',
+      message: 'Account verified successfully',
     };
   }
 
+  /* Send Recovery */
+  /*--------------------------------------------*/
   @Post('recovery')
-  sendRecovery() {
-    // Send Recovery Command
+  @HttpCode(200)
+  @Serialize(MessageResponseDto)
+  @ApiOperation({ description: 'Send Recovery' })
+  @ApiResponse({ type: MessageResponseDto, status: 200 })
+  async sendRecovery(@Body() { email }: SendRecoveryRequestDto) {
+    const command = new SendRecoveryCommand(email);
+    await this.commandBus.execute(command);
+
+    return {
+      message: 'Recovery email sent. Check your email to reset password',
+    };
   }
 
+  /* Check Recovery */
+  /*--------------------------------------------*/
   @Post('recovery/:token')
-  checkRecovery() {
-    // Check Recovery Command
+  @HttpCode(200)
+  @Serialize(MessageResponseDto)
+  @ApiOperation({ description: 'Check Recovery' })
+  @ApiResponse({ type: MessageResponseDto, status: 200 })
+  async checkRecovery(@Param('token') token: string) {
+    const command = new CheckRecoveryCommand(token);
+    await this.commandBus.execute(command);
+
+    return {
+      message: 'Recovery token verified successfully',
+    };
   }
 
+  /* Reset Password */
+  /*--------------------------------------------*/
   @Patch('recovery/:token/password')
-  resetPassword() {
-    // Update Password Command
+  @Serialize(MessageResponseDto)
+  @ApiOperation({ description: 'Reset Password' })
+  @ApiResponse({ type: MessageResponseDto, status: 200 })
+  async resetPassword(
+    @Body() { password }: ResetPasswordRequestDto,
+    @Param('token') token: string,
+  ) {
+    const command = new ResetPasswordCommand(token, password);
+    await this.commandBus.execute(command);
+
+    return {
+      message: 'Password reset successfully',
+    };
   }
 
   @Get('refresh-token')

@@ -2,9 +2,9 @@ import { BadRequestException } from '@nestjs/common';
 import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import * as bcrypt from 'bcryptjs';
 
-import { AuthService } from 'src/auth/services/auth.service';
+import { JWTService } from 'src/auth/services/jwt.service';
+import { EncryptService } from 'src/auth/services/encrypt.service';
 import { SigninQuery } from '../impl/signin.query';
 import { UserEntity } from 'src/user/db/entities/user.entity';
 
@@ -13,23 +13,21 @@ export class SigninHandler implements IQueryHandler<SigninQuery> {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-    private readonly authService: AuthService,
+    private readonly jwtService: JWTService,
+    private readonly encryptService: EncryptService,
   ) {}
 
   async execute({ email, password }: SigninQuery) {
     const user = await this.userRepository.findOneBy({ email });
+    const errorMessage = 'Invalid email or password';
 
     if (!user || user.type !== 'native') {
-      throw new BadRequestException('Invalid email or password');
+      throw new BadRequestException(errorMessage);
     }
 
-    const isValid = bcrypt.compareSync(password, user.password);
+    await this.encryptService.verify(password, user.password, errorMessage);
 
-    if (!isValid) {
-      throw new BadRequestException('Invalid email or password');
-    }
-
-    const { refreshToken, accessToken } = this.authService.signAuthTokens(
+    const { refreshToken, accessToken } = this.jwtService.signAuthToken(
       user.id,
     );
 
