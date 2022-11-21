@@ -16,11 +16,16 @@ export async function bootstrap(server = true) {
   const documentOptions = new DocumentBuilder()
     .setTitle(`${appName} API`)
     .setDescription(`A REST API for ${appName}`)
+    .addBearerAuth()
+    .addBasicAuth()
+    .addApiKey()
     .build();
 
   const document = SwaggerModule.createDocument(app, documentOptions);
 
-  SwaggerModule.setup('api', app, document);
+  SwaggerModule.setup('api', app, document, {
+    swaggerOptions: { defaultModelsExpandDepth: false },
+  });
 
   app.enableCors({ origin });
   app.use(helmet());

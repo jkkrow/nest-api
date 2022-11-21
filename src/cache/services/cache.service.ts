@@ -5,11 +5,11 @@ import { Cache } from 'cache-manager';
 export class CacheService {
   constructor(@Inject(CACHE_MANAGER) private readonly cacheManager: Cache) {}
 
-  get(key: string) {
-    return this.cacheManager.get<string>(key);
+  get<T = any>(key: string) {
+    return this.cacheManager.get<T>(key);
   }
 
-  set(key: string, value: any, ttl?: number) {
+  set<T = any>(key: string, value: T, ttl: number) {
     return this.cacheManager.set(key, value, { ttl } as any);
   }
 

@@ -3,6 +3,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 
 import { ConfigService } from 'src/config/services/config.service';
+import { CacheModule } from 'src/cache/cache.module';
 import { JWTService } from './services/jwt.service';
 import { EncryptService } from './services/encrypt.service';
 import { RoleGuard } from './guards/role.guard';
@@ -26,6 +27,7 @@ const GlobalRoleGuard = {
         },
       }),
     }),
+    CacheModule,
   ],
   providers: [JWTService, EncryptService, GlobalRoleGuard],
   exports: [JWTService, EncryptService],

@@ -22,11 +22,12 @@ export class UserMiddleware implements NestMiddleware {
 
     const { authorization } = req.headers;
 
-    if (!authorization) {
+    const token = authorization ? authorization.split('Bearer ')[1] : '';
+
+    if (token) {
       return next();
     }
 
-    const token = authorization.split(' ')[1] || '';
     const result = this.jwtService.verify(token);
 
     if (result.sub !== 'access') {

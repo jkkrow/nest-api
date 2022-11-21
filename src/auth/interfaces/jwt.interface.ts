@@ -17,3 +17,7 @@ export interface JWTVerifyOptions {
   sub?: JWTSub;
   ignoreExp?: boolean;
 }
+
+export interface JWTInvalidation {
+  next: string | null;
+}

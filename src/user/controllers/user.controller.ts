@@ -4,11 +4,17 @@ import {
   Get,
   Patch,
   Body,
+  Headers,
   Param,
   HttpCode,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger/dist';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiResponse,
+  ApiBearerAuth,
+} from '@nestjs/swagger/dist';
 
 import { Serialize } from 'src/common/interceptors/serialize.interceptor';
 import { MessageResponseDto } from 'src/common/dtos/message-response.dto';
@@ -21,6 +27,7 @@ import { CheckRecoveryCommand } from '../commands/impl/check-recovery.command';
 import { ResetPasswordCommand } from '../commands/impl/reset-password.command';
 import { SigninQuery } from '../queries/impl/signin.query';
 import { GoogleSigninQuery } from '../queries/impl/google-signin.query';
+import { GetAuthTokenQuery } from '../queries/impl/get-auth-token.query';
 import { SignupRequestDto } from '../dtos/request/signup-request.dto';
 import { SignupResponseDto } from '../dtos/response/signup-response.dto';
 import { SigninRequestDto } from '../dtos/request/signin-request.dto';
@@ -30,6 +37,7 @@ import { GoogleSigninResponseDto } from '../dtos/response/google-signin-response
 import { SendVerificationRequestDto } from '../dtos/request/send-verification-request.dto';
 import { SendRecoveryRequestDto } from '../dtos/request/send-recovery-request.dto';
 import { ResetPasswordRequestDto } from '../dtos/request/reset-password-request.dto';
+import { GetAuthTokenResponseDto } from '../dtos/response/get-auth-token-response.dto';
 
 @Controller('users')
 @ApiTags('Users')
@@ -175,13 +183,18 @@ export class UserController {
     };
   }
 
-  @Get('refresh-token')
-  getRefreshToken() {
-    // Get Tokens Query
-  }
+  /* Get Auth Token */
+  /*--------------------------------------------*/
+  @Get('token')
+  @Serialize(GetAuthTokenResponseDto)
+  @ApiBearerAuth()
+  @ApiOperation({ description: 'Get Auth Token' })
+  @ApiResponse({ type: GetAuthTokenResponseDto, status: 200 })
+  async getToken(@Headers('authorization') authorization: string) {
+    const refreshToken = authorization ? authorization.split('Bearer ')[1] : '';
+    const query = new GetAuthTokenQuery(refreshToken);
+    const result = await this.queryBus.execute(query);
 
-  @Get('access-token')
-  getAccessToken() {
-    // Get Token Query
+    return result;
   }
 }
