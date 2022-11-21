@@ -24,7 +24,7 @@ export class UserMiddleware implements NestMiddleware {
 
     const token = authorization ? authorization.split('Bearer ')[1] : '';
 
-    if (token) {
+    if (!token) {
       return next();
     }
 
