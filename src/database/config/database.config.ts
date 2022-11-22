@@ -24,15 +24,19 @@ const typeOrmConfig: TypeOrmModuleOptions = {
 
   synchronize: false,
   namingStrategy: new SnakeNamingStrategy(),
-
-  entities: [__dirname + '/../../**/*.entity{.ts,.js}'],
-  migrations: [__dirname + '/../migrations/*{.ts,.js}'],
 };
 
 export const typeOrmAsyncConfig: TypeOrmModuleAsyncOptions = {
   useFactory: () => {
-    return typeOrmConfig;
+    return {
+      ...typeOrmConfig,
+      autoLoadEntities: true,
+    };
   },
 };
 
-export default new DataSource(typeOrmConfig as DataSourceOptions);
+export default new DataSource({
+  ...typeOrmConfig,
+  entities: [__dirname + '/../../**/*.entity.{ts,js}'],
+  migrations: [__dirname + '/../migrations/*.{ts,js}'],
+} as DataSourceOptions);

@@ -6,10 +6,16 @@ provider:
   region: ap-northeast-2
   stackName: watchtree-api
   apiName: watchtree-api
+  timeout: 15
 
 plugins:
   - serverless-plugin-typescript
+  - serverless-tscpaths
   - serverless-offline
+
+custom:
+  tscpaths:
+    src: src
 
 functions:
   app:
@@ -17,4 +23,4 @@ functions:
     handler: src/serverless.handler
     events:
       - http: ANY /
-      - http: 'ANY {proxy+}'
+      - http: 'ANY /{proxy+}'
