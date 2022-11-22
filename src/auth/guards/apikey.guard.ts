@@ -10,9 +10,9 @@ export class ApiKeyGuard implements CanActivate {
     const apiKey = this.config.get('AUTH_CREDENTIALS_API_KEY');
 
     const request = context.switchToHttp().getRequest();
-    const { secret } = request.headers;
+    const { api_key } = request.headers;
 
-    if (!secret || secret !== apiKey) {
+    if (!api_key || api_key !== apiKey) {
       return false;
     }
 

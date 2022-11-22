@@ -2,7 +2,7 @@ import { Entity, Column, OneToOne } from 'typeorm';
 
 import { BaseEntityWithTimestamp } from 'src/database/entities/database.entity';
 import { MembershipEntity } from './membership.entity';
-import { IUser } from 'src/user/interfaces/user.interface';
+import { IUser } from '../../interfaces/user.interface';
 import { UserType } from '../../constants/user.constant';
 
 @Entity('users')

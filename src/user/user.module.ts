@@ -12,6 +12,7 @@ import { QueryHandlers } from './queries/handler';
 import { EventHandlers } from './events/handlers';
 import { UserSaga } from './sagas/user.saga';
 import { UserEntity } from './db/entities/user.entity';
+import { MembershipEntity } from './db/entities/membership.entity';
 import { SubscriptionEntity } from './db/entities/subscription.entity';
 import { UserRepository } from './db/repositories/user.repository';
 import { UserFactory } from './db/factories/user.factory';
@@ -19,7 +20,11 @@ import { UserFactory } from './db/factories/user.factory';
 @Module({
   imports: [
     CqrsModule,
-    DatabaseModule.forFeature([UserEntity, SubscriptionEntity]),
+    DatabaseModule.forFeature([
+      UserEntity,
+      MembershipEntity,
+      SubscriptionEntity,
+    ]),
     AuthModule,
     CloudModule,
     EmailModule,

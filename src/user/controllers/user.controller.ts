@@ -9,15 +9,11 @@ import {
   HttpCode,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import {
-  ApiTags,
-  ApiOperation,
-  ApiResponse,
-  ApiBearerAuth,
-} from '@nestjs/swagger/dist';
+import { ApiTags, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 
 import { Serialize } from 'src/common/interceptors/serialize.interceptor';
 import { MessageResponseDto } from 'src/common/dtos/message-response.dto';
+import { CurrentUser } from '../decorators/current-user.decorator';
 import { CreateUserCommand } from '../commands/impl/create-user.command';
 import { CreateGoogleUserCommand } from '../commands/impl/create-google-user.command';
 import { SendVerificationCommand } from '../commands/impl/send-verification.command';
@@ -38,6 +34,7 @@ import { SendVerificationRequestDto } from '../dtos/request/send-verification-re
 import { SendRecoveryRequestDto } from '../dtos/request/send-recovery-request.dto';
 import { ResetPasswordRequestDto } from '../dtos/request/reset-password-request.dto';
 import { GetAuthTokenResponseDto } from '../dtos/response/get-auth-token-response.dto';
+import { UserDto } from '../dtos/user.dto';
 
 @Controller('users')
 @ApiTags('Users')
@@ -51,7 +48,6 @@ export class UserController {
   /*--------------------------------------------*/
   @Post('signup')
   @Serialize(SignupResponseDto)
-  @ApiOperation({ description: 'Signup User' })
   @ApiResponse({ type: SignupResponseDto, status: 201 })
   async signup(@Body() { name, email, password }: SignupRequestDto) {
     const command = new CreateUserCommand(name, email, password);
@@ -75,9 +71,8 @@ export class UserController {
   @Post('signin')
   @HttpCode(200)
   @Serialize(SigninResponseDto)
-  @ApiOperation({ description: 'Signin User' })
   @ApiResponse({ type: SigninResponseDto, status: 200 })
-  async siginin(@Body() { email, password }: SigninRequestDto) {
+  async signin(@Body() { email, password }: SigninRequestDto) {
     const query = new SigninQuery(email, password);
     const result = await this.queryBus.execute(query);
 
@@ -89,7 +84,6 @@ export class UserController {
   @Post('signin/google')
   @HttpCode(200)
   @Serialize(GoogleSigninResponseDto)
-  @ApiOperation({ description: 'Signin Google User' })
   @ApiResponse({ type: SigninResponseDto, status: 200 })
   async googleSignin(@Body() { token }: GoogleSigninRequestDto) {
     const command = new CreateGoogleUserCommand(token);
@@ -106,7 +100,6 @@ export class UserController {
   @Post('verification')
   @HttpCode(200)
   @Serialize(MessageResponseDto)
-  @ApiOperation({ description: 'Send Verification' })
   @ApiResponse({ type: MessageResponseDto, status: 200 })
   async sendVerification(@Body() { email }: SendVerificationRequestDto) {
     const command = new SendVerificationCommand(email);
@@ -122,7 +115,6 @@ export class UserController {
   @Post('verification/:token')
   @HttpCode(200)
   @Serialize(MessageResponseDto)
-  @ApiOperation({ description: 'Check Verification' })
   @ApiResponse({ type: MessageResponseDto, status: 200 })
   async checkVerification(@Param('token') token: string) {
     const command = new CheckVerificationCommand(token);
@@ -138,7 +130,6 @@ export class UserController {
   @Post('recovery')
   @HttpCode(200)
   @Serialize(MessageResponseDto)
-  @ApiOperation({ description: 'Send Recovery' })
   @ApiResponse({ type: MessageResponseDto, status: 200 })
   async sendRecovery(@Body() { email }: SendRecoveryRequestDto) {
     const command = new SendRecoveryCommand(email);
@@ -154,7 +145,6 @@ export class UserController {
   @Post('recovery/:token')
   @HttpCode(200)
   @Serialize(MessageResponseDto)
-  @ApiOperation({ description: 'Check Recovery' })
   @ApiResponse({ type: MessageResponseDto, status: 200 })
   async checkRecovery(@Param('token') token: string) {
     const command = new CheckRecoveryCommand(token);
@@ -169,7 +159,6 @@ export class UserController {
   /*--------------------------------------------*/
   @Patch('recovery/:token/password')
   @Serialize(MessageResponseDto)
-  @ApiOperation({ description: 'Reset Password' })
   @ApiResponse({ type: MessageResponseDto, status: 200 })
   async resetPassword(
     @Body() { password }: ResetPasswordRequestDto,
@@ -187,14 +176,23 @@ export class UserController {
   /*--------------------------------------------*/
   @Get('token')
   @Serialize(GetAuthTokenResponseDto)
-  @ApiBearerAuth()
-  @ApiOperation({ description: 'Get Auth Token' })
   @ApiResponse({ type: GetAuthTokenResponseDto, status: 200 })
+  @ApiBearerAuth()
   async getToken(@Headers('authorization') authorization: string) {
     const refreshToken = authorization ? authorization.split('Bearer ')[1] : '';
     const query = new GetAuthTokenQuery(refreshToken);
     const result = await this.queryBus.execute(query);
 
     return result;
+  }
+
+  /* Get Current User */
+  /*--------------------------------------------*/
+  @Get('current')
+  @Serialize(UserDto)
+  @ApiResponse({ type: UserDto, status: 200 })
+  @ApiBearerAuth()
+  async getCurrentUser(@CurrentUser() user: UserDto) {
+    return user;
   }
 }
