@@ -1,4 +1,5 @@
 import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { APP_GUARD } from '@nestjs/core';
 import { CqrsModule } from '@nestjs/cqrs';
 
 import { DatabaseModule } from 'src/database/database.module';
@@ -7,6 +8,7 @@ import { CloudModule } from 'src/cloud/cloud.module';
 import { EmailModule } from 'src/email/email.module';
 import { UserController } from './controllers/user.controller';
 import { UserMiddleware } from './middlewares/user.middleware';
+import { RoleGuard } from './guards/role.guard';
 import { CommandHandlers } from './commands/handlers';
 import { QueryHandlers } from './queries/handler';
 import { EventHandlers } from './events/handlers';
@@ -16,6 +18,11 @@ import { MembershipEntity } from './db/entities/membership.entity';
 import { SubscriptionEntity } from './db/entities/subscription.entity';
 import { UserRepository } from './db/repositories/user.repository';
 import { UserFactory } from './db/factories/user.factory';
+
+const GlobalRoleGuard = {
+  provide: APP_GUARD,
+  useClass: RoleGuard,
+};
 
 @Module({
   imports: [
@@ -37,6 +44,7 @@ import { UserFactory } from './db/factories/user.factory';
     UserSaga,
     UserRepository,
     UserFactory,
+    GlobalRoleGuard,
   ],
 })
 export class UserModule {

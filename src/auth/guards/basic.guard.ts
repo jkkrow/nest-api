@@ -13,11 +13,12 @@ export class BasicGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const { authorization } = request.headers;
 
-    if (!authorization) {
+    const hash = authorization ? authorization.split('Basic ')[1] : '';
+
+    if (!hash) {
       return false;
     }
 
-    const hash = authorization.split(' ')[1];
     const [decodedUsername, decodedPassword] = Buffer.from(hash, 'base64')
       .toString('utf-8')
       .split(':');

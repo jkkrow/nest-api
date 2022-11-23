@@ -1,6 +1,7 @@
 export const ROLE_KEY = 'role';
 
 export const ROLE_NAME = {
+  USER: 'user',
   VERIFIED: 'verified',
   MEMBER: 'member',
   ADMIN: 'admin',
