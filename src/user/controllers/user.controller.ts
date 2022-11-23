@@ -24,6 +24,8 @@ import { ResetPasswordCommand } from '../commands/impl/reset-password.command';
 import { UpdateNameCommand } from '../commands/impl/update-name.command';
 import { UpdatePasswordCommand } from '../commands/impl/update-password.command';
 import { UpdatePictureCommand } from '../commands/impl/update-picture.command';
+import { DeleteUserCommand } from '../commands/impl/delete-user.command';
+import { DeleteGoogleUserCommand } from '../commands/impl/delete-google-user.command';
 import { SigninQuery } from '../queries/impl/signin.query';
 import { GoogleSigninQuery } from '../queries/impl/google-signin.query';
 import { GetAuthTokenQuery } from '../queries/impl/get-auth-token.query';
@@ -43,6 +45,8 @@ import { GetMembershipResponseDto } from '../dtos/response/get-membership-respon
 import { UpdateNameRequestDto } from '../dtos/request/update-name-request.dto';
 import { UpdatePasswordRequestDto } from '../dtos/request/update-password-request.dto';
 import { UpdatePictureRequestDto } from '../dtos/request/update-picture-request.dto';
+import { DeleteUserRequestDto } from '../dtos/request/delete-user.request.dto';
+import { DeleteGoogleUserRequestDto } from '../dtos/request/delete-google-user-request.dto';
 
 @Controller('users')
 @ApiTags('Users')
@@ -85,7 +89,7 @@ export class UserController {
 
   /* Signin Google User */
   /*--------------------------------------------*/
-  @Post('signin/google')
+  @Post('signin-google')
   @HttpCode(200)
   @Serialize(GoogleSigninResponseDto)
   @ApiResponse({ type: SigninResponseDto, status: 200 })
@@ -261,6 +265,44 @@ export class UserController {
 
     return {
       message: 'User picture updated successfully',
+    };
+  }
+
+  /* Delete User */
+  /*--------------------------------------------*/
+  @Post('current/deletion')
+  @HttpCode(200)
+  @Serialize(MessageResponseDto)
+  @ApiResponse({ type: MessageResponseDto, status: 200 })
+  @ApiBearerAuth()
+  async deleteUser(
+    @Body() { email, password }: DeleteUserRequestDto,
+    @CurrentUser() { id }: UserDto,
+  ) {
+    const command = new DeleteUserCommand(id, email, password);
+    await this.commandBus.execute(command);
+
+    return {
+      message: 'User deleted successfully',
+    };
+  }
+
+  /* Delete Google User */
+  /*--------------------------------------------*/
+  @Post('current/deletion-google')
+  @HttpCode(200)
+  @Serialize(MessageResponseDto)
+  @ApiResponse({ type: MessageResponseDto, status: 200 })
+  @ApiBearerAuth()
+  async deleteGoogleUser(
+    @Body() { token }: DeleteGoogleUserRequestDto,
+    @CurrentUser() { id }: UserDto,
+  ) {
+    const command = new DeleteGoogleUserCommand(id, token);
+    await this.commandBus.execute(command);
+
+    return {
+      message: 'User deleted successfully',
     };
   }
 }

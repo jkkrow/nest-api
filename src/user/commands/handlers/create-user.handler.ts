@@ -33,9 +33,10 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
       password: hash,
     });
 
+    user.create();
+
     await this.repository.save(user);
 
-    user.create();
     user.commit();
   }
 }

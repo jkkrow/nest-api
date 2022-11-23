@@ -8,6 +8,8 @@ import { ResetPasswordHandler } from './reset-password.handler';
 import { UpdateNameHandler } from './update-name.handler';
 import { UpdatePasswordHandler } from './update-password.handler';
 import { UpdatePictureHandler } from './update-picture.handler';
+import { DeleteUserHandler } from './delete-user.handler';
+import { DeleteGoogleUserHandler } from './delete-google-user.handler';
 
 export const CommandHandlers = [
   CreateUserHandler,
@@ -20,4 +22,6 @@ export const CommandHandlers = [
   UpdateNameHandler,
   UpdatePasswordHandler,
   UpdatePictureHandler,
+  DeleteUserHandler,
+  DeleteGoogleUserHandler,
 ];

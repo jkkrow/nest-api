@@ -45,9 +45,10 @@ export class CreateUserHandler
       verified: true,
     });
 
+    user.create();
+
     await this.repository.save(user);
 
-    user.create();
     user.commit();
   }
 }
