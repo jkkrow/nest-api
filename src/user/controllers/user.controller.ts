@@ -21,9 +21,13 @@ import { CheckVerificationCommand } from '../commands/impl/check-verification.co
 import { SendRecoveryCommand } from '../commands/impl/send-recovery.command';
 import { CheckRecoveryCommand } from '../commands/impl/check-recovery.command';
 import { ResetPasswordCommand } from '../commands/impl/reset-password.command';
+import { UpdateNameCommand } from '../commands/impl/update-name.command';
+import { UpdatePasswordCommand } from '../commands/impl/update-password.command';
+import { UpdatePictureCommand } from '../commands/impl/update-picture.command';
 import { SigninQuery } from '../queries/impl/signin.query';
 import { GoogleSigninQuery } from '../queries/impl/google-signin.query';
 import { GetAuthTokenQuery } from '../queries/impl/get-auth-token.query';
+import { UserDto } from '../dtos/user.dto';
 import { SignupRequestDto } from '../dtos/request/signup-request.dto';
 import { SignupResponseDto } from '../dtos/response/signup-response.dto';
 import { SigninRequestDto } from '../dtos/request/signin-request.dto';
@@ -34,7 +38,11 @@ import { SendVerificationRequestDto } from '../dtos/request/send-verification-re
 import { SendRecoveryRequestDto } from '../dtos/request/send-recovery-request.dto';
 import { ResetPasswordRequestDto } from '../dtos/request/reset-password-request.dto';
 import { GetAuthTokenResponseDto } from '../dtos/response/get-auth-token-response.dto';
-import { UserDto } from '../dtos/user.dto';
+import { GetUserResponseDto } from '../dtos/response/get-user-response.dto';
+import { GetMembershipResponseDto } from '../dtos/response/get-membership-response.dto';
+import { UpdateNameRequestDto } from '../dtos/request/update-name-request.dto';
+import { UpdatePasswordRequestDto } from '../dtos/request/update-password-request.dto';
+import { UpdatePictureRequestDto } from '../dtos/request/update-picture-request.dto';
 
 @Controller('users')
 @ApiTags('Users')
@@ -54,14 +62,10 @@ export class UserController {
     await this.commandBus.execute(command);
 
     const query = new SigninQuery(email, password);
-    const { user, refreshToken, accessToken } = await this.queryBus.execute(
-      query,
-    );
+    const result = await this.queryBus.execute(query);
 
     return {
-      user,
-      refreshToken,
-      accessToken,
+      ...result,
       message: 'Verification email sent. Check your email and confirm signup',
     };
   }
@@ -186,13 +190,77 @@ export class UserController {
     return result;
   }
 
-  /* Get Current User */
+  /* Get User */
   /*--------------------------------------------*/
   @Get('current')
-  @Serialize(UserDto)
-  @ApiResponse({ type: UserDto, status: 200 })
+  @Serialize(GetUserResponseDto)
+  @ApiResponse({ type: GetUserResponseDto, status: 200 })
   @ApiBearerAuth()
-  async getCurrentUser(@CurrentUser() user: UserDto) {
-    return user;
+  async getUser(@CurrentUser() user: UserDto) {
+    return { user };
+  }
+
+  /* Get User Membership */
+  /*--------------------------------------------*/
+  @Get('current/membership')
+  @Serialize(GetMembershipResponseDto)
+  @ApiResponse({ type: GetMembershipResponseDto, status: 200 })
+  @ApiBearerAuth()
+  async getMembership(@CurrentUser() { membership }: UserDto) {
+    return { membership };
+  }
+
+  /* Update User Name */
+  /*--------------------------------------------*/
+  @Patch('current/name')
+  @Serialize(MessageResponseDto)
+  @ApiResponse({ type: MessageResponseDto, status: 200 })
+  @ApiBearerAuth()
+  async updateName(
+    @Body() { name }: UpdateNameRequestDto,
+    @CurrentUser() { id }: UserDto,
+  ) {
+    const command = new UpdateNameCommand(id, name);
+    await this.commandBus.execute(command);
+
+    return {
+      message: 'User name updated successfully',
+    };
+  }
+
+  /* Update User Password */
+  /*--------------------------------------------*/
+  @Patch('current/password')
+  @Serialize(MessageResponseDto)
+  @ApiResponse({ type: MessageResponseDto, status: 200 })
+  @ApiBearerAuth()
+  async updatePassword(
+    @Body() { password, newPassword }: UpdatePasswordRequestDto,
+    @CurrentUser() { id }: UserDto,
+  ) {
+    const command = new UpdatePasswordCommand(id, password, newPassword);
+    await this.commandBus.execute(command);
+
+    return {
+      message: 'User password updated successfully',
+    };
+  }
+
+  /* Update User Picture */
+  /*--------------------------------------------*/
+  @Patch('current/picture')
+  @Serialize(MessageResponseDto)
+  @ApiResponse({ type: MessageResponseDto, status: 200 })
+  @ApiBearerAuth()
+  async updatePicture(
+    @Body() { picture }: UpdatePictureRequestDto,
+    @CurrentUser() { id }: UserDto,
+  ) {
+    const command = new UpdatePictureCommand(id, picture);
+    await this.commandBus.execute(command);
+
+    return {
+      message: 'User picture updated successfully',
+    };
   }
 }

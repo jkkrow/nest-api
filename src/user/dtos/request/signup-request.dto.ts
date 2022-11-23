@@ -14,12 +14,10 @@ export class SignupRequestDto {
   email: string;
 
   @IsString()
-  @MaxLength(50)
   @IsStrongPassword()
   password: string;
 
   @IsString()
-  @MaxLength(50)
   @IsEqualTo('password')
   confirmPassword: string;
 }

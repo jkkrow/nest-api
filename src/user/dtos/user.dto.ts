@@ -1,7 +1,8 @@
 import { Expose, Type } from 'class-transformer';
 
-import { IUser, IMembership } from '../interfaces/user.interface';
-import { MembershipName, UserType } from '../constants/user.constant';
+import { IUser } from '../interfaces/user.interface';
+import { UserType } from '../constants/user.constant';
+import { MembershipDto } from './membership.dto';
 
 export class UserDto implements Omit<IUser, 'password'> {
   @Expose()
@@ -27,19 +28,5 @@ export class UserDto implements Omit<IUser, 'password'> {
 
   @Expose()
   @Type(() => MembershipDto)
-  membership: IMembership | null;
-}
-
-class MembershipDto implements IMembership {
-  @Expose()
-  id: string;
-
-  @Expose()
-  name: MembershipName;
-
-  @Expose()
-  expiredAt: Date;
-
-  @Expose()
-  cancelled: boolean;
+  membership: MembershipDto | null;
 }
