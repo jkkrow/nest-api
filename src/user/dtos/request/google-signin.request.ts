@@ -1,6 +1,6 @@
 import { IsString } from 'class-validator';
 
-export class DeleteGoogleUserRequestDto {
+export class GoogleSigninRequest {
   @IsString()
   token: string;
 }

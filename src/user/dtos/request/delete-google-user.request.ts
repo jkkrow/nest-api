@@ -1,6 +1,6 @@
 import { IsString } from 'class-validator';
 
-export class UpdatePictureRequestDto {
+export class DeleteGoogleUserRequest {
   @IsString()
-  picture: string;
+  token: string;
 }

@@ -3,7 +3,7 @@ import { IsString, MaxLength } from 'class-validator';
 import { IsEqualTo } from 'src/common/decorators/validator.decorator';
 import { IsStrongPassword } from '../../decorators/validator.decorator';
 
-export class ResetPasswordRequestDto {
+export class ResetPasswordRequest {
   @IsString()
   @MaxLength(50)
   @IsStrongPassword()

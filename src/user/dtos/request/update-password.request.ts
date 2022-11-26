@@ -3,7 +3,7 @@ import { IsString } from 'class-validator';
 import { IsEqualTo } from 'src/common/decorators/validator.decorator';
 import { IsStrongPassword } from '../../decorators/validator.decorator';
 
-export class UpdatePasswordRequestDto {
+export class UpdatePasswordRequest {
   @IsString()
   password: string;
 

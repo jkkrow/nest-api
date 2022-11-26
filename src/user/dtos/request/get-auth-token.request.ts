@@ -1,6 +1,6 @@
 import { IsString } from 'class-validator';
 
-export class GoogleSigninRequestDto {
+export class GetAuthTokenRequest {
   @IsString()
-  token: string;
+  refreshToken: string;
 }

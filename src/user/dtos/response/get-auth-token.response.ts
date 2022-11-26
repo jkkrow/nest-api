@@ -1,6 +1,6 @@
 import { Expose } from 'class-transformer';
 
-export class GetAuthTokenResponseDto {
+export class GetAuthTokenResponse {
   @Expose()
   refreshToken: string;
 

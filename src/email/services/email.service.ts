@@ -1,24 +1,21 @@
-import { NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm/dist';
-import { Repository } from 'typeorm';
+import { NotFoundException, Injectable } from '@nestjs/common';
 import { ServerClient } from 'postmark';
 
 import { ConfigService } from 'src/config/services/config.service';
-import { CreateBounceDto } from '../dtos/create-bounce.dto';
-import { BounceEntity } from '../db/entities/bounce.entity';
+import { BounceService } from './bounce.service';
 import { From } from '../constants/email.constant';
 import { Template } from '../constants/email.constant';
 
+@Injectable()
 export class EmailService {
-  constructor(
-    @InjectRepository(BounceEntity)
-    private readonly bounceRepository: Repository<BounceEntity>,
-    private readonly config: ConfigService,
-  ) {}
+  private readonly client: ServerClient;
 
-  private readonly client = new ServerClient(
-    this.config.get('EMAIL_SERVER_API_TOKEN'),
-  );
+  constructor(
+    private readonly config: ConfigService,
+    private readonly bounceService: BounceService,
+  ) {
+    this.client = new ServerClient(this.config.get('EMAIL_SERVER_API_TOKEN'));
+  }
 
   async sendEmail(options: {
     from: From;
@@ -58,23 +55,8 @@ export class EmailService {
     });
   }
 
-  createBounce(createBounceDto: CreateBounceDto) {
-    const bounce = this.bounceRepository.create(createBounceDto);
-    return this.bounceRepository.save(bounce);
-  }
-
-  async deleteBounce(email: string) {
-    const bounce = await this.bounceRepository.findOneBy({ email });
-
-    if (!bounce) {
-      throw new NotFoundException('Bounce not found');
-    }
-
-    return await this.bounceRepository.remove(bounce);
-  }
-
-  async checkBounce(email: string) {
-    const bounce = await this.bounceRepository.findOneBy({ email });
+  private async checkBounce(email: string) {
+    const bounce = await this.bounceService.findOneByEmail(email);
 
     if (bounce) {
       throw new NotFoundException('Invalid email: Bounced');

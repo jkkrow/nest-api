@@ -3,7 +3,7 @@ import { IsString, IsEmail, MinLength, MaxLength } from 'class-validator';
 import { IsEqualTo } from 'src/common/decorators/validator.decorator';
 import { IsStrongPassword } from '../../decorators/validator.decorator';
 
-export class SignupRequestDto {
+export class SignupRequest {
   @IsString()
   @MinLength(4)
   @MaxLength(30)

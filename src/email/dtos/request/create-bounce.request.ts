@@ -1,7 +1,7 @@
 import { IsString, IsDate } from 'class-validator';
 import { Expose } from 'class-transformer';
 
-export class CreateBounceDto {
+export class CreateBounceRequest {
   @IsString()
   @Expose({ name: 'Email' })
   readonly email: string;
