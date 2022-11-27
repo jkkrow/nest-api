@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { NotFoundException, BadRequestException } from '@nestjs/common';
 
 import { ConfigService } from 'src/config/services/config.service';
-import { JWTService } from 'src/auth/services/jwt.service';
+import { JwtService } from 'src/auth/services/jwt.service';
 import { EmailService } from 'src/email/services/email.service';
 import { SendVerificationCommand } from '../impl/send-verification.command';
 import { UserRepository } from '../../db/repositories/user.repository';
@@ -14,7 +14,7 @@ export class SendVerificationHandler
   constructor(
     private readonly repository: UserRepository,
     private readonly configService: ConfigService,
-    private readonly jwtService: JWTService,
+    private readonly jwtService: JwtService,
     private readonly emailService: EmailService,
   ) {}
 

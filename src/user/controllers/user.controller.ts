@@ -183,7 +183,7 @@ export class UserController {
 
   /* Get Auth Token */
   /*--------------------------------------------*/
-  @Get('token')
+  @Post('token')
   @Serialize(GetAuthTokenResponse)
   async getToken(@Body() { refreshToken: token }: GetAuthTokenRequest) {
     const query = new GetAuthTokenQuery(token);

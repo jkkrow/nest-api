@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { NotFoundException } from '@nestjs/common';
 
-import { JWTService } from 'src/auth/services/jwt.service';
+import { JwtService } from 'src/auth/services/jwt.service';
 import { CheckRecoveryCommand } from '../impl/check-recovery.command';
 import { UserRepository } from '../../db/repositories/user.repository';
 
@@ -11,7 +11,7 @@ export class CheckRecoveryHandler
 {
   constructor(
     private readonly repository: UserRepository,
-    private readonly jwtService: JWTService,
+    private readonly jwtService: JwtService,
   ) {}
 
   async execute({ token }: CheckRecoveryCommand) {

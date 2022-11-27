@@ -10,7 +10,7 @@ import {
 } from '../interfaces/jwt.interface';
 
 @Injectable()
-export class JWTService {
+export class JwtService {
   constructor(
     private readonly jwtService: BaseJwtService,
     private readonly cacheService: CacheService,

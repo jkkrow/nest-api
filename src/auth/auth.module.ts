@@ -3,7 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 
 import { ConfigService } from 'src/config/services/config.service';
 import { CacheModule } from 'src/cache/cache.module';
-import { JWTService } from './services/jwt.service';
+import { JwtService } from './services/jwt.service';
 import { EncryptService } from './services/encrypt.service';
 
 @Module({
@@ -22,7 +22,7 @@ import { EncryptService } from './services/encrypt.service';
     }),
     CacheModule,
   ],
-  providers: [JWTService, EncryptService],
-  exports: [JWTService, EncryptService],
+  providers: [JwtService, EncryptService],
+  exports: [JwtService, EncryptService],
 })
 export class AuthModule {}

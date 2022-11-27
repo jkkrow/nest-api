@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { NotFoundException } from '@nestjs/common';
 
-import { JWTService } from 'src/auth/services/jwt.service';
+import { JwtService } from 'src/auth/services/jwt.service';
 import { EncryptService } from 'src/auth/services/encrypt.service';
 import { ResetPasswordCommand } from '../impl/reset-password.command';
 import { UserRepository } from '../../db/repositories/user.repository';
@@ -12,7 +12,7 @@ export class ResetPasswordHandler
 {
   constructor(
     private readonly repository: UserRepository,
-    private readonly jwtService: JWTService,
+    private readonly jwtService: JwtService,
     private readonly encryptService: EncryptService,
   ) {}
 

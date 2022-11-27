@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { APP_GUARD } from '@nestjs/core';
 import { CqrsModule } from '@nestjs/cqrs';
 
@@ -7,7 +7,6 @@ import { AuthModule } from 'src/auth/auth.module';
 import { CloudModule } from 'src/cloud/cloud.module';
 import { EmailModule } from 'src/email/email.module';
 import { UserController } from './controllers/user.controller';
-import { UserMiddleware } from './middlewares/user.middleware';
 import { RoleGuard } from './guards/role.guard';
 import { CommandHandlers } from './commands/handlers';
 import { QueryHandlers } from './queries/handler';
@@ -15,7 +14,6 @@ import { EventHandlers } from './events/handlers';
 import { UserSaga } from './sagas/user.saga';
 import { UserEntity } from './db/entities/user.entity';
 import { MembershipEntity } from './db/entities/membership.entity';
-import { SubscriptionEntity } from './db/entities/subscription.entity';
 import { UserRepository } from './db/repositories/user.repository';
 import { UserFactory } from './db/factories/user.factory';
 
@@ -27,11 +25,7 @@ const GlobalRoleGuard = {
 @Module({
   imports: [
     CqrsModule,
-    DatabaseModule.forFeature([
-      UserEntity,
-      MembershipEntity,
-      SubscriptionEntity,
-    ]),
+    DatabaseModule.forFeature([UserEntity, MembershipEntity]),
     AuthModule,
     CloudModule,
     EmailModule,
@@ -47,8 +41,4 @@ const GlobalRoleGuard = {
     GlobalRoleGuard,
   ],
 })
-export class UserModule {
-  configure(consumer: MiddlewareConsumer) {
-    consumer.apply(UserMiddleware).forRoutes('*');
-  }
-}
+export class UserModule {}

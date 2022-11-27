@@ -1,18 +1,23 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { Injectable, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { QueryBus } from '@nestjs/cqrs';
 
+import { BearerGuard } from 'src/auth/guards/bearer.guard';
+import { JwtService } from 'src/auth/services/jwt.service';
 import { RoleName, ROLE_KEY } from '../constants/role.constant';
 import { RequestWithUser } from '../interfaces/request.interface';
 import { GetUserQuery } from '../queries/impl/get-user.query';
 import { IUser } from '../interfaces/user.interface';
 
 @Injectable()
-export class RoleGuard implements CanActivate {
+export class RoleGuard extends BearerGuard {
   constructor(
     private readonly reflector: Reflector,
     private readonly queryBus: QueryBus,
-  ) {}
+    jwtService: JwtService,
+  ) {
+    super(jwtService);
+  }
 
   private readonly roles: Record<RoleName, boolean> = {
     user: false,
@@ -22,6 +27,7 @@ export class RoleGuard implements CanActivate {
   };
 
   async canActivate(context: ExecutionContext) {
+    await super.canActivate(context);
     const request = context.switchToHttp().getRequest<RequestWithUser>();
     const requiredRole = this.reflector.getAllAndOverride<RoleName>(ROLE_KEY, [
       context.getClass(),
