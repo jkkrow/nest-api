@@ -1,7 +1,9 @@
 import { IsString } from 'class-validator';
 
-import { IsEqualTo } from 'src/common/decorators/validator.decorator';
-import { IsStrongPassword } from '../../decorators/validator.decorator';
+import {
+  IsEqualTo,
+  IsStrongPassword,
+} from 'src/common/decorators/validator.decorator';
 
 export class UpdatePasswordRequest {
   @IsString()

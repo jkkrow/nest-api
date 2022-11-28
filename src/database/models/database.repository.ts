@@ -2,7 +2,7 @@ import { AggregateRoot } from '@nestjs/cqrs';
 import { FindOptionsWhere, Repository } from 'typeorm';
 
 import { BaseEntity } from '../entities/database.entity';
-import { BaseFactory } from '../factories/database.factory';
+import { BaseFactory } from './database.factory';
 
 export abstract class BaseRepository<
   TEntity extends BaseEntity,

@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryColumn, OneToOne, JoinColumn } from 'typeorm';
 
-import { IMembership } from '../../interfaces/user.interface';
+import { IMembership } from '../interfaces/user.interface';
 import { UserEntity } from './user.entity';
 
 @Entity('memberships')

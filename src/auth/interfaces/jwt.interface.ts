@@ -1,23 +1,23 @@
-import { JWTSub, JWTExp } from '../constants/jwt.constants';
+import { JwtSub, JwtExp } from '../constants/jwt.constants';
 
-export interface JWTPayload {
+export interface JwtPayload {
   userId: string;
   iat: number;
   exp: number;
   iss: string;
-  sub: JWTSub;
+  sub: JwtSub;
 }
 
-export interface JWTSignOptions {
-  sub: JWTSub;
-  exp: JWTExp;
+export interface JwtSignOptions {
+  sub: JwtSub;
+  exp: JwtExp;
 }
 
-export interface JWTVerifyOptions {
-  sub?: JWTSub;
+export interface JwtVerifyOptions {
+  sub?: JwtSub;
   ignoreExp?: boolean;
 }
 
-export interface JWTInvalidation {
+export interface JwtInvalidation {
   next: string | null;
 }

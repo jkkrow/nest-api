@@ -1,12 +1,12 @@
 import { Entity, Column, OneToOne } from 'typeorm';
 
-import { BaseEntityWithTimestamp } from 'src/database/entities/database.entity';
+import { BaseEntityWithTimestamps } from 'src/database/entities/database.entity';
 import { MembershipEntity } from './membership.entity';
-import { IUser } from '../../interfaces/user.interface';
-import { UserType } from '../../constants/user.constant';
+import { IUser } from '../interfaces/user.interface';
+import { UserType } from '../constants/user.constant';
 
 @Entity('users')
-export class UserEntity extends BaseEntityWithTimestamp implements IUser {
+export class UserEntity extends BaseEntityWithTimestamps implements IUser {
   @Column({ type: 'varchar', length: 30 })
   name: string;
 

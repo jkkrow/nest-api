@@ -2,12 +2,12 @@ import { Injectable, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { QueryBus } from '@nestjs/cqrs';
 
-import { BearerGuard } from 'src/auth/guards/bearer.guard';
-import { JwtService } from 'src/auth/services/jwt.service';
+import { GetUserQuery } from 'src/user/queries/impl/get-user.query';
+import { BearerGuard } from './bearer.guard';
+import { JwtService } from '../services/jwt.service';
 import { RoleName, ROLE_KEY } from '../constants/role.constant';
-import { RequestWithUser } from '../interfaces/request.interface';
-import { GetUserQuery } from '../queries/impl/get-user.query';
-import { IUser } from '../interfaces/user.interface';
+import { IRequestWithUser } from '../interfaces/user.interface';
+import { IRequestUser } from '../interfaces/user.interface';
 
 @Injectable()
 export class RoleGuard extends BearerGuard {
@@ -28,7 +28,7 @@ export class RoleGuard extends BearerGuard {
 
   async canActivate(context: ExecutionContext) {
     await super.canActivate(context);
-    const request = context.switchToHttp().getRequest<RequestWithUser>();
+    const request = context.switchToHttp().getRequest<IRequestWithUser>();
     const requiredRole = this.reflector.getAllAndOverride<RoleName>(ROLE_KEY, [
       context.getClass(),
       context.getHandler(),
@@ -49,7 +49,7 @@ export class RoleGuard extends BearerGuard {
 
   private async validateRole(userId: string) {
     const query = new GetUserQuery(userId);
-    const user = await this.queryBus.execute<GetUserQuery, IUser>(query);
+    const user = await this.queryBus.execute<GetUserQuery, IRequestUser>(query);
 
     if (!user) {
       return;
@@ -63,7 +63,7 @@ export class RoleGuard extends BearerGuard {
     return user;
   }
 
-  private validateMembership(user: IUser) {
+  private validateMembership(user: IRequestUser) {
     const isMember = user.membership
       ? new Date(user.membership.expiredAt) > new Date()
       : false;

@@ -18,15 +18,3 @@ export interface IMembership {
   expiredAt: Date;
   cancelled: boolean;
 }
-
-export interface ICreateUserParams {
-  id: IUser['id'];
-  type: IUser['type'];
-  name: IUser['name'];
-  email: IUser['email'];
-  password: IUser['password'];
-  picture?: IUser['picture'];
-  verified?: IUser['verified'];
-  admin?: IUser['admin'];
-  membership?: IUser['membership'];
-}

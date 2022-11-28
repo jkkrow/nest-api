@@ -3,7 +3,7 @@ import { NotFoundException, BadRequestException } from '@nestjs/common';
 
 import { EncryptService } from 'src/auth/services/encrypt.service';
 import { DeleteUserCommand } from '../impl/delete-user.command';
-import { UserRepository } from '../../db/repositories/user.repository';
+import { UserRepository } from '../../models/user.repository';
 
 @CommandHandler(DeleteUserCommand)
 export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand> {

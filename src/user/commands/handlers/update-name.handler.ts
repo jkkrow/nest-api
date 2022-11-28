@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { NotFoundException } from '@nestjs/common';
 
 import { UpdateNameCommand } from '../impl/update-name.command';
-import { UserRepository } from '../../db/repositories/user.repository';
+import { UserRepository } from '../../models/user.repository';
 
 @CommandHandler(UpdateNameCommand)
 export class UpdateNameHandler implements ICommandHandler<UpdateNameCommand> {

@@ -12,5 +12,5 @@ export const JWT_EXP = {
   ACCESS: '15m',
 } as const;
 
-export type JWTSub = typeof JWT_SUB[keyof typeof JWT_SUB];
-export type JWTExp = typeof JWT_EXP[keyof typeof JWT_EXP];
+export type JwtSub = typeof JWT_SUB[keyof typeof JWT_SUB];
+export type JwtExp = typeof JWT_EXP[keyof typeof JWT_EXP];

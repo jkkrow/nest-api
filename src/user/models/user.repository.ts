@@ -2,10 +2,10 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { BaseRepository } from 'src/database/repositories/database.repository';
-import { UserFactory } from '../factories/user.factory';
+import { BaseRepository } from 'src/database/models/database.repository';
 import { UserEntity } from '../entities/user.entity';
-import { User } from '../../models/user.model';
+import { User } from './user';
+import { UserFactory } from './user.factory';
 
 @Injectable()
 export class UserRepository extends BaseRepository<UserEntity, User> {

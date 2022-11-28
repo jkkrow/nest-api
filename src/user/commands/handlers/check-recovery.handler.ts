@@ -3,7 +3,7 @@ import { NotFoundException } from '@nestjs/common';
 
 import { JwtService } from 'src/auth/services/jwt.service';
 import { CheckRecoveryCommand } from '../impl/check-recovery.command';
-import { UserRepository } from '../../db/repositories/user.repository';
+import { UserRepository } from '../../models/user.repository';
 
 @CommandHandler(CheckRecoveryCommand)
 export class CheckRecoveryHandler

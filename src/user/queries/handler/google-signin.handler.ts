@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 import { JwtService } from 'src/auth/services/jwt.service';
 import { OAuthService } from 'src/cloud/services/oauth.service';
 import { GoogleSigninQuery } from '../impl/google-signin.query';
-import { UserEntity } from '../../db/entities/user.entity';
+import { UserEntity } from '../../entities/user.entity';
 
 @QueryHandler(GoogleSigninQuery)
 export class GoogleSigninHandler implements IQueryHandler<GoogleSigninQuery> {

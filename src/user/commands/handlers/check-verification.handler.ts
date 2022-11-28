@@ -3,7 +3,7 @@ import { NotFoundException, BadRequestException } from '@nestjs/common';
 
 import { JwtService } from 'src/auth/services/jwt.service';
 import { CheckVerificationCommand } from '../impl/check-verification.comand';
-import { UserRepository } from '../../db/repositories/user.repository';
+import { UserRepository } from '../../models/user.repository';
 
 @CommandHandler(CheckVerificationCommand)
 export class CheckVerificationHandler

@@ -4,19 +4,19 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 
-import { RequestWithUser } from '../interfaces/request.interface';
+import { IRequestWithUser } from '../interfaces/user.interface';
 
-export const CurrentUserId = createParamDecorator(
+export const RequestUserId = createParamDecorator(
   (data: never, context: ExecutionContext) => {
-    const { userId } = context.switchToHttp().getRequest<RequestWithUser>();
+    const { userId } = context.switchToHttp().getRequest<IRequestWithUser>();
 
     return userId;
   },
 );
 
-export const CurrentUser = createParamDecorator(
+export const RequestUser = createParamDecorator(
   (data: never, context: ExecutionContext) => {
-    const { user } = context.switchToHttp().getRequest<RequestWithUser>();
+    const { user } = context.switchToHttp().getRequest<IRequestWithUser>();
 
     if (!user) {
       throw new NotFoundException('Require user authentication');

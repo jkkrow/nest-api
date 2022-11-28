@@ -1,9 +1,9 @@
 import { Entity, Column } from 'typeorm';
 
-import { BaseEntityWithTimestamp } from 'src/database/entities/database.entity';
+import { BaseEntityWithTimestamps } from 'src/database/entities/database.entity';
 
 @Entity('bounces')
-export class BounceEntity extends BaseEntityWithTimestamp {
+export class BounceEntity extends BaseEntityWithTimestamps {
   @Column({ type: 'varchar', length: 30, unique: true })
   email: string;
 

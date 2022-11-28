@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 import { JwtService } from 'src/auth/services/jwt.service';
 import { EncryptService } from 'src/auth/services/encrypt.service';
 import { SigninQuery } from '../impl/signin.query';
-import { UserEntity } from '../../db/entities/user.entity';
+import { UserEntity } from '../../entities/user.entity';
 
 @QueryHandler(SigninQuery)
 export class SigninHandler implements IQueryHandler<SigninQuery> {

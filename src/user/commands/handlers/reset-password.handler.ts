@@ -4,7 +4,7 @@ import { NotFoundException } from '@nestjs/common';
 import { JwtService } from 'src/auth/services/jwt.service';
 import { EncryptService } from 'src/auth/services/encrypt.service';
 import { ResetPasswordCommand } from '../impl/reset-password.command';
-import { UserRepository } from '../../db/repositories/user.repository';
+import { UserRepository } from '../../models/user.repository';
 
 @CommandHandler(ResetPasswordCommand)
 export class ResetPasswordHandler

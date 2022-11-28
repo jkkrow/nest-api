@@ -3,10 +3,10 @@ import { JwtService as BaseJwtService } from '@nestjs/jwt';
 
 import { CacheService } from 'src/cache/services/cache.service';
 import {
-  JWTPayload,
-  JWTSignOptions,
-  JWTVerifyOptions,
-  JWTInvalidation,
+  JwtPayload,
+  JwtSignOptions,
+  JwtVerifyOptions,
+  JwtInvalidation,
 } from '../interfaces/jwt.interface';
 
 @Injectable()
@@ -16,7 +16,7 @@ export class JwtService {
     private readonly cacheService: CacheService,
   ) {}
 
-  sign(userId: string, options: JWTSignOptions) {
+  sign(userId: string, options: JwtSignOptions) {
     return this.jwtService.sign(
       {
         userId,
@@ -28,9 +28,9 @@ export class JwtService {
     );
   }
 
-  verify(token: string, options?: JWTVerifyOptions) {
+  verify(token: string, options?: JwtVerifyOptions) {
     try {
-      const result = this.jwtService.verify<JWTPayload>(token, {
+      const result = this.jwtService.verify<JwtPayload>(token, {
         subject: options?.sub,
         ignoreExpiration: options?.ignoreExp,
       });
@@ -54,7 +54,7 @@ export class JwtService {
     exp: number,
   ) {
     const ttl = exp - Math.round(new Date().getTime() / 1000);
-    await this.cacheService.set<JWTInvalidation>(refreshToken, { next }, ttl);
+    await this.cacheService.set<JwtInvalidation>(refreshToken, { next }, ttl);
   }
 
   async rotateRefreshToken(refreshToken: string) {
@@ -76,7 +76,7 @@ export class JwtService {
     const result = this.verify(refreshToken, { sub: 'refresh' });
 
     // Check if it's invalidated
-    const invalidatedToken = await this.cacheService.get<JWTInvalidation>(
+    const invalidatedToken = await this.cacheService.get<JwtInvalidation>(
       refreshToken,
     );
 
@@ -89,7 +89,7 @@ export class JwtService {
     let currentToken = invalidatedToken.next;
 
     while (currentToken) {
-      const result = await this.cacheService.get<JWTInvalidation>(currentToken);
+      const result = await this.cacheService.get<JwtInvalidation>(currentToken);
 
       if (!result) {
         const { exp } = this.verify(currentToken, { sub: 'refresh' });

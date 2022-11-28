@@ -3,7 +3,7 @@ import { NotFoundException, BadRequestException } from '@nestjs/common';
 
 import { OAuthService } from 'src/cloud/services/oauth.service';
 import { DeleteGoogleUserCommand } from '../impl/delete-google-user.command';
-import { UserRepository } from '../../db/repositories/user.repository';
+import { UserRepository } from '../../models/user.repository';
 
 @CommandHandler(DeleteGoogleUserCommand)
 export class DeleteGoogleUserHandler

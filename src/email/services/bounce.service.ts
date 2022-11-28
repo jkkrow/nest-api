@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm/dist';
 import { Repository } from 'typeorm';
 
 import { CreateBounceRequest } from '../dtos/request/create-bounce.request';
-import { BounceEntity } from '../db/entities/bounce.entity';
+import { BounceEntity } from '../entities/bounce.entity';
 
 @Injectable()
 export class BounceService {

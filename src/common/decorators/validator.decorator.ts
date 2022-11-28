@@ -2,6 +2,7 @@ import {
   registerDecorator,
   ValidationArguments,
   ValidationOptions,
+  Matches,
 } from 'class-validator';
 
 export function IsEqualTo(
@@ -30,3 +31,8 @@ export function IsEqualTo(
     });
   };
 }
+
+export const IsStrongPassword = () =>
+  Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*])(?=.{8,})/, {
+    message: 'password too weak',
+  });

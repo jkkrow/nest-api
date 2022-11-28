@@ -3,7 +3,7 @@ import { NotFoundException } from '@nestjs/common';
 
 import { EncryptService } from 'src/auth/services/encrypt.service';
 import { UpdatePasswordCommand } from '../impl/update-password.command';
-import { UserRepository } from '../../db/repositories/user.repository';
+import { UserRepository } from '../../models/user.repository';
 
 @CommandHandler(UpdatePasswordCommand)
 export class UpdatePasswordHandler

@@ -4,8 +4,8 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { EncryptService } from 'src/auth/services/encrypt.service';
 import { CreateUserCommand } from '../impl/create-user.command';
-import { UserRepository } from '../../db/repositories/user.repository';
-import { UserFactory } from '../../db/factories/user.factory';
+import { UserRepository } from '../../models/user.repository';
+import { UserFactory } from '../../models/user.factory';
 
 @CommandHandler(CreateUserCommand)
 export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
@@ -32,8 +32,6 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
       email,
       password: hash,
     });
-
-    user.create();
 
     await this.repository.save(user);
 

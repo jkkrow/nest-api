@@ -5,7 +5,7 @@ import { ConfigService } from 'src/config/services/config.service';
 import { JwtService } from 'src/auth/services/jwt.service';
 import { EmailService } from 'src/email/services/email.service';
 import { SendRecoveryCommand } from '../impl/send-recovery.command';
-import { UserRepository } from '../../db/repositories/user.repository';
+import { UserRepository } from '../../models/user.repository';
 
 @CommandHandler(SendRecoveryCommand)
 export class SendRecoveryHandler

@@ -12,9 +12,9 @@ import { ApiTags } from '@nestjs/swagger';
 
 import { Serialize } from 'src/common/interceptors/serialize.interceptor';
 import { MessageResponse } from 'src/common/dtos/response/message.response';
-import { IUser } from '../interfaces/user.interface';
-import { Role } from '../decorators/role.decorator';
-import { CurrentUser, CurrentUserId } from '../decorators/request.decorator';
+import { Role } from 'src/auth/decorators/role.decorator';
+import { RequestUser, RequestUserId } from 'src/auth/decorators/user.decorator';
+import { IRequestUser } from 'src/auth/interfaces/user.interface';
 import { CreateUserCommand } from '../commands/impl/create-user.command';
 import { CreateGoogleUserCommand } from '../commands/impl/create-google-user.command';
 import { SendVerificationCommand } from '../commands/impl/send-verification.command';
@@ -197,7 +197,7 @@ export class UserController {
   @Get('current')
   @Role('user')
   @Serialize(GetUserResponse)
-  async getUser(@CurrentUser() user: IUser) {
+  async getUser(@RequestUser() user: IRequestUser) {
     return { user };
   }
 
@@ -206,7 +206,7 @@ export class UserController {
   @Get('current/membership')
   @Role('user')
   @Serialize(GetMembershipResponse)
-  async getMembership(@CurrentUser() { membership }: IUser) {
+  async getMembership(@RequestUser() { membership }: IRequestUser) {
     return { membership };
   }
 
@@ -217,7 +217,7 @@ export class UserController {
   @Serialize(MessageResponse)
   async updateName(
     @Body() { name }: UpdateNameRequest,
-    @CurrentUserId() id: string,
+    @RequestUserId() id: string,
   ) {
     const command = new UpdateNameCommand(id, name);
     await this.commandBus.execute(command);
@@ -234,7 +234,7 @@ export class UserController {
   @Serialize(MessageResponse)
   async updatePassword(
     @Body() { password, newPassword }: UpdatePasswordRequest,
-    @CurrentUserId() id: string,
+    @RequestUserId() id: string,
   ) {
     const command = new UpdatePasswordCommand(id, password, newPassword);
     await this.commandBus.execute(command);
@@ -251,7 +251,7 @@ export class UserController {
   @Serialize(MessageResponse)
   async updatePicture(
     @Body() { picture }: UpdatePictureRequest,
-    @CurrentUserId() id: string,
+    @RequestUserId() id: string,
   ) {
     const command = new UpdatePictureCommand(id, picture);
     await this.commandBus.execute(command);
@@ -269,7 +269,7 @@ export class UserController {
   @Serialize(MessageResponse)
   async deleteUser(
     @Body() { email, password }: DeleteUserRequest,
-    @CurrentUserId() id: string,
+    @RequestUserId() id: string,
   ) {
     const command = new DeleteUserCommand(id, email, password);
     await this.commandBus.execute(command);
@@ -287,7 +287,7 @@ export class UserController {
   @Serialize(MessageResponse)
   async deleteGoogleUser(
     @Body() { token }: DeleteGoogleUserRequest,
-    @CurrentUserId() id: string,
+    @RequestUserId() id: string,
   ) {
     const command = new DeleteGoogleUserCommand(id, token);
     await this.commandBus.execute(command);

@@ -9,7 +9,7 @@ export abstract class BaseEntity {
   id: string;
 }
 
-export abstract class BaseEntityWithTimestamp extends BaseEntity {
+export abstract class BaseEntityWithTimestamps extends BaseEntity {
   @CreateDateColumn()
   createdAt: Date;
 

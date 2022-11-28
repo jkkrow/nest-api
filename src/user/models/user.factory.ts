@@ -1,25 +1,34 @@
 import { EventPublisher } from '@nestjs/cqrs';
 import { Injectable } from '@nestjs/common';
+import { Optional } from 'utility-types';
 
-import { BaseFactory } from 'src/database/factories/database.factory';
+import { BaseFactory } from 'src/database/models/database.factory';
 import { UserEntity } from '../entities/user.entity';
-import { User } from '../../models/user.model';
-import { ICreateUserParams } from '../../interfaces/user.interface';
+import { User } from './user';
+
+type CreateUserParams = Optional<
+  User['props'],
+  'picture' | 'verified' | 'admin' | 'membership'
+>;
 
 @Injectable()
 export class UserFactory implements BaseFactory<UserEntity, User> {
   constructor(private readonly publisher: EventPublisher) {}
 
-  create(params: ICreateUserParams) {
-    const user = new User({
-      picture: '',
-      verified: false,
-      admin: false,
-      membership: null,
-      ...params,
-    });
+  create(params: CreateUserParams) {
+    const user = this.publisher.mergeObjectContext(
+      new User({
+        picture: '',
+        verified: false,
+        admin: false,
+        membership: null,
+        ...params,
+      }),
+    );
 
-    return this.publisher.mergeObjectContext(user);
+    user.create();
+
+    return user;
   }
 
   createEntity(model: User): UserEntity {

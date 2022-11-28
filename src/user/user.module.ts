@@ -7,15 +7,15 @@ import { AuthModule } from 'src/auth/auth.module';
 import { CloudModule } from 'src/cloud/cloud.module';
 import { EmailModule } from 'src/email/email.module';
 import { UserController } from './controllers/user.controller';
-import { RoleGuard } from './guards/role.guard';
+import { RoleGuard } from '../auth/guards/role.guard';
 import { CommandHandlers } from './commands/handlers';
 import { QueryHandlers } from './queries/handler';
 import { EventHandlers } from './events/handlers';
 import { UserSaga } from './sagas/user.saga';
-import { UserEntity } from './db/entities/user.entity';
-import { MembershipEntity } from './db/entities/membership.entity';
-import { UserRepository } from './db/repositories/user.repository';
-import { UserFactory } from './db/factories/user.factory';
+import { UserEntity } from './entities/user.entity';
+import { MembershipEntity } from './entities/membership.entity';
+import { UserFactory } from './models/user.factory';
+import { UserRepository } from './models/user.repository';
 
 const GlobalRoleGuard = {
   provide: APP_GUARD,
@@ -36,8 +36,8 @@ const GlobalRoleGuard = {
     ...QueryHandlers,
     ...EventHandlers,
     UserSaga,
-    UserRepository,
     UserFactory,
+    UserRepository,
     GlobalRoleGuard,
   ],
 })
