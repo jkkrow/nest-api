@@ -3,7 +3,7 @@ import { ConflictException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
 import { EncryptService } from 'src/auth/services/encrypt.service';
-import { OAuthService } from 'src/cloud/services/oauth.service';
+import { OAuthService } from 'src/providers/gcp/oauth/oauth.service';
 import { CreateGoogleUserCommand } from '../impl/create-google-user.command';
 import { UserRepository } from '../../models/user.repository';
 import { UserFactory } from '../../models/user.factory';

@@ -1,18 +1,15 @@
+import AWS from 'aws-sdk';
 import { Injectable } from '@nestjs/common';
 
 import { ConfigService } from 'src/config/services/config.service';
-import { CloudService } from './cloud.service';
 
 @Injectable()
-export class StorageService {
+export class S3Service {
   private readonly storage: AWS.S3;
   private readonly sourceBucket: string;
 
-  constructor(
-    private readonly cloudService: CloudService,
-    private readonly config: ConfigService,
-  ) {
-    this.storage = new this.cloudService.AWS.S3();
+  constructor(private readonly config: ConfigService) {
+    this.storage = new AWS.S3();
     this.sourceBucket = this.config.get('AWS_S3_BUCKET_SOURCE');
   }
 

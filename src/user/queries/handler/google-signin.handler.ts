@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { JwtService } from 'src/auth/services/jwt.service';
-import { OAuthService } from 'src/cloud/services/oauth.service';
+import { OAuthService } from 'src/providers/gcp/oauth/oauth.service';
 import { GoogleSigninQuery } from '../impl/google-signin.query';
 import { UserEntity } from '../../entities/user.entity';
 

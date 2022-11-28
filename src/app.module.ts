@@ -5,11 +5,12 @@ import { CqrsModule } from '@nestjs/cqrs';
 import { ConfigModule } from './config/config.module';
 import { DatabaseModule } from './database/database.module';
 import { CacheModule } from './cache/cache.module';
-import { CloudModule } from './cloud/cloud.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { ChannelModule } from './channel/channel.module';
 import { EmailModule } from './email/email.module';
+import { AwsModule } from './providers/aws/aws.module';
+import { GcpModule } from './providers/gcp/gcp.module';
 import { SerializeInterceptor } from './common/interceptors/serialize.interceptor';
 
 const GlobalValidationPipe = {
@@ -23,11 +24,12 @@ const GlobalValidationPipe = {
     ConfigModule,
     DatabaseModule,
     CacheModule,
-    CloudModule,
     AuthModule,
     UserModule,
     ChannelModule,
     EmailModule,
+    AwsModule,
+    GcpModule,
   ],
   providers: [GlobalValidationPipe, SerializeInterceptor],
 })
