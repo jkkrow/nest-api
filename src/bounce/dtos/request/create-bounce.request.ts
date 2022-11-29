@@ -1,8 +1,8 @@
-import { IsString, IsDate } from 'class-validator';
+import { IsString, IsEmail, IsDateString } from 'class-validator';
 import { Expose } from 'class-transformer';
 
 export class CreateBounceRequest {
-  @IsString()
+  @IsEmail()
   @Expose({ name: 'Email' })
   readonly email: string;
 
@@ -26,7 +26,7 @@ export class CreateBounceRequest {
   @Expose({ name: 'MessageStream' })
   readonly messageStream: string;
 
-  @IsDate()
+  @IsDateString()
   @Expose({ name: 'BouncedAt' })
-  readonly bouncedAt: Date;
+  readonly bouncedAt: string;
 }

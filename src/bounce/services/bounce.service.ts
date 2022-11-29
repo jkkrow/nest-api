@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm/dist';
 import { Repository } from 'typeorm';
 
@@ -23,5 +23,15 @@ export class BounceService {
 
   delete(email: string) {
     return this.repository.delete({ email });
+  }
+
+  async check(email: string) {
+    const bounce = await this.findOneByEmail(email);
+
+    if (bounce) {
+      throw new BadRequestException('Invalid email: Bounced');
+    }
+
+    return;
   }
 }

@@ -8,11 +8,11 @@ import {
 export class SignupRequest {
   @IsString()
   @MinLength(4)
-  @MaxLength(30)
+  @MaxLength(50)
   name: string;
 
   @IsEmail()
-  @MaxLength(30)
+  @MaxLength(50)
   email: string;
 
   @IsString()

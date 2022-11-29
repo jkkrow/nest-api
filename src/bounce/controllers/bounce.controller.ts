@@ -1,20 +1,29 @@
-import { Body, Controller, Post, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Delete,
+  UseGuards,
+  Body,
+  Query,
+} from '@nestjs/common';
 import { ApiTags, ApiBasicAuth } from '@nestjs/swagger';
 
 import { Serialize } from 'src/common/interceptors/serialize.interceptor';
 import { BasicGuard } from 'src/auth/guards/basic.guard';
+import { Role } from 'src/auth/decorators/role.decorator';
 import { MessageResponse } from 'src/common/dtos/response/message.response';
 import { BounceService } from '../services/bounce.service';
 import { CreateBounceRequest } from '../dtos/request/create-bounce.request';
+import { DeleteBounceRequest } from '../dtos/request/delete-bounce.request';
 
-@ApiTags('Email')
-@Controller('email')
-export class EmailController {
+@ApiTags('Bounces')
+@Controller('bounces')
+export class BounceController {
   constructor(private readonly bounceService: BounceService) {}
 
   /* Create Bounce */
   /*--------------------------------------------*/
-  @Post('bounces')
+  @Post()
   @UseGuards(BasicGuard)
   @Serialize(MessageResponse, { status: 201 })
   @ApiBasicAuth()
@@ -23,6 +32,19 @@ export class EmailController {
 
     return {
       message: 'Bounced email stored in database successfully',
+    };
+  }
+
+  /* Delete Bounce */
+  /*--------------------------------------------*/
+  @Delete()
+  @Role('admin')
+  @Serialize(MessageResponse)
+  async deleteBounce(@Query() { email }: DeleteBounceRequest) {
+    await this.bounceService.delete(email);
+
+    return {
+      message: 'Bounced email deleted from database successfully',
     };
   }
 }

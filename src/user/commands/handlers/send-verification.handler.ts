@@ -3,7 +3,7 @@ import { NotFoundException, BadRequestException } from '@nestjs/common';
 
 import { ConfigService } from 'src/config/services/config.service';
 import { JwtService } from 'src/auth/services/jwt.service';
-import { EmailService } from 'src/email/services/email.service';
+import { EmailService } from 'src/providers/email/services/email.service';
 import { SendVerificationCommand } from '../impl/send-verification.command';
 import { UserRepository } from '../../models/user.repository';
 

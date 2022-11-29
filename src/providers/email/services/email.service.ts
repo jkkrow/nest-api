@@ -1,8 +1,8 @@
-import { NotFoundException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { ServerClient } from 'postmark';
 
 import { ConfigService } from 'src/config/services/config.service';
-import { BounceService } from './bounce.service';
+import { BounceService } from 'src/bounce/services/bounce.service';
 import { From } from '../constants/email.constant';
 import { Template } from '../constants/email.constant';
 
@@ -24,7 +24,7 @@ export class EmailService {
     message: string;
     messageStream?: string;
   }) {
-    await this.checkBounce(options.to);
+    await this.bounceService.check(options.to);
     const sender = this.config.get('EMAIL_FROM');
 
     return this.client.sendEmail({
@@ -43,7 +43,7 @@ export class EmailService {
     templateModel: object;
     messageStream?: string;
   }) {
-    await this.checkBounce(options.to);
+    await this.bounceService.check(options.to);
     const sender = this.config.get('EMAIL_FROM');
 
     return this.client.sendEmailWithTemplate({
@@ -53,15 +53,5 @@ export class EmailService {
       TemplateModel: options.templateModel,
       MessageStream: options.messageStream,
     });
-  }
-
-  private async checkBounce(email: string) {
-    const bounce = await this.bounceService.findOneByEmail(email);
-
-    if (bounce) {
-      throw new NotFoundException('Invalid email: Bounced');
-    }
-
-    return;
   }
 }

@@ -7,13 +7,13 @@ import { UserType } from '../constants/user.constant';
 
 @Entity('users')
 export class UserEntity extends BaseEntityWithTimestamps implements IUser {
-  @Column({ type: 'varchar', length: 30 })
+  @Column({ type: 'varchar', length: 50 })
   name: string;
 
   @Column({ type: 'enum', enum: ['native', 'google'] })
   type: UserType;
 
-  @Column({ type: 'varchar', length: 30, unique: true })
+  @Column({ type: 'varchar', length: 50, unique: true })
   email: string;
 
   @Column({ type: 'varchar', length: 200 })

@@ -1,4 +1,4 @@
-import { IsString, MaxLength } from 'class-validator';
+import { IsString } from 'class-validator';
 
 import {
   IsEqualTo,
@@ -7,12 +7,10 @@ import {
 
 export class ResetPasswordRequest {
   @IsString()
-  @MaxLength(50)
   @IsStrongPassword()
   password: string;
 
   @IsString()
-  @MaxLength(50)
   @IsEqualTo('password')
   confirmPassword: string;
 }

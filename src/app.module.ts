@@ -8,9 +8,10 @@ import { CacheModule } from './cache/cache.module';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { ChannelModule } from './channel/channel.module';
-import { EmailModule } from './email/email.module';
+import { BounceModule } from './bounce/bounce.module';
 import { AwsModule } from './providers/aws/aws.module';
 import { GcpModule } from './providers/gcp/gcp.module';
+import { EmailModule } from './providers/email/email.module';
 import { SerializeInterceptor } from './common/interceptors/serialize.interceptor';
 
 const GlobalValidationPipe = {
@@ -27,9 +28,10 @@ const GlobalValidationPipe = {
     AuthModule,
     UserModule,
     ChannelModule,
-    EmailModule,
+    BounceModule,
     AwsModule,
     GcpModule,
+    EmailModule,
   ],
   providers: [GlobalValidationPipe, SerializeInterceptor],
 })

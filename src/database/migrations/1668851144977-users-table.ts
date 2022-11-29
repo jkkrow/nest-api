@@ -8,9 +8,9 @@ export class usersTable1668851144977 implements MigrationInterface {
     await queryRunner.query(`
         CREATE TABLE users (
           id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-          name VARCHAR(30) NOT NULL,
+          name VARCHAR(50) NOT NULL,
           type user_type NOT NULL,
-          email VARCHAR(30) NOT NULL UNIQUE,
+          email VARCHAR(50) NOT NULL UNIQUE,
           password VARCHAR(200) NOT NULL,
           picture VARCHAR(200) NOT NULL DEFAULT '',
           verified BOOLEAN NOT NULL DEFAULT false,

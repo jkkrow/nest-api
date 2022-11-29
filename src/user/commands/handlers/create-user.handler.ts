@@ -2,6 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { ConflictException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
+import { BounceService } from 'src/bounce/services/bounce.service';
 import { EncryptService } from 'src/auth/services/encrypt.service';
 import { CreateUserCommand } from '../impl/create-user.command';
 import { UserRepository } from '../../models/user.repository';
@@ -12,10 +13,12 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
   constructor(
     private readonly repository: UserRepository,
     private readonly factory: UserFactory,
+    private readonly bounceService: BounceService,
     private readonly encryptService: EncryptService,
   ) {}
 
   async execute({ name, email, password }: CreateUserCommand) {
+    await this.bounceService.check(email);
     const existingUser = await this.repository.findByEmail(email);
 
     if (existingUser) {
