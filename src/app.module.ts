@@ -12,6 +12,7 @@ import { BounceModule } from './bounce/bounce.module';
 import { AwsModule } from './providers/aws/aws.module';
 import { GcpModule } from './providers/gcp/gcp.module';
 import { EmailModule } from './providers/email/email.module';
+import { PaymentModule } from './payment/payment.module';
 import { SerializeInterceptor } from './common/interceptors/serialize.interceptor';
 
 const GlobalValidationPipe = {
@@ -32,6 +33,7 @@ const GlobalValidationPipe = {
     AwsModule,
     GcpModule,
     EmailModule,
+    PaymentModule,
   ],
   providers: [GlobalValidationPipe, SerializeInterceptor],
 })

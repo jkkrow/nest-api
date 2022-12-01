@@ -13,8 +13,8 @@ import {
   CreateSubscription,
   CancelSubscription,
   VerifyWebhookSignature,
-  WebhookSignatureBody,
-  WebhookSignatureHeaders,
+  WebhookBody,
+  WebhookHeaders,
 } from '../interfaces/payment.interface';
 
 @Injectable()
@@ -100,10 +100,7 @@ export class PaymentService {
     return data;
   }
 
-  async verifyWebhookSignature(
-    body: WebhookSignatureBody,
-    headers: WebhookSignatureHeaders,
-  ) {
+  async verifyWebhookSignature(body: WebhookBody, headers: WebhookHeaders) {
     const accessToken = await this.getAccessToken();
     const { data } = await this.httpService.axiosRef<VerifyWebhookSignature>({
       url: '/v1/notifications/verify-webhook-signature',

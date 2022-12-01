@@ -1,12 +1,11 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { CanActivate, ExecutionContext } from '@nestjs/common';
 
 import { ConfigService } from 'src/config/services/config.service';
 
-@Injectable()
 export class BasicGuard implements CanActivate {
   constructor(private readonly config: ConfigService) {}
 
-  canActivate(context: ExecutionContext) {
+  async canActivate(context: ExecutionContext) {
     const username = this.config.get('AUTH_CREDENTIALS_USERNAME');
     const password = this.config.get('AUTH_CREDENTIALS_PASSWORD');
 

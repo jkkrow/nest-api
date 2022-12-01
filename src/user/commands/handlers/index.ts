@@ -8,6 +8,9 @@ import { ResetPasswordHandler } from './reset-password.handler';
 import { UpdateNameHandler } from './update-name.handler';
 import { UpdatePasswordHandler } from './update-password.handler';
 import { UpdatePictureHandler } from './update-picture.handler';
+import { CreateMembershipHandler } from './create-membership.handler';
+import { CancelMembershipHandler } from './cancel-membership.handler';
+import { UpdateMembershipHandler } from './update-membership-handler';
 import { DeleteUserHandler } from './delete-user.handler';
 import { DeleteGoogleUserHandler } from './delete-google-user.handler';
 
@@ -22,6 +25,9 @@ export const CommandHandlers = [
   UpdateNameHandler,
   UpdatePasswordHandler,
   UpdatePictureHandler,
+  CreateMembershipHandler,
+  CancelMembershipHandler,
+  UpdateMembershipHandler,
   DeleteUserHandler,
   DeleteGoogleUserHandler,
 ];

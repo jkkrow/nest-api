@@ -58,18 +58,18 @@ export interface VerifyWebhookSignature {
   verification_status: VerificationStatus;
 }
 
-export interface WebhookSignatureBody {
+export interface WebhookBody {
   id: string;
   create_time: DateTime;
   resource_type: string;
   event_version: string;
   event_type: EventType;
   summary: string;
-  resource: Resource;
+  resource: any;
   links: LinkDescription[];
 }
 
-export interface WebhookSignatureHeaders {
+export interface WebhookHeaders {
   'paypal-auth-algo': string;
   'paypal-cert-url': string;
   'paypal-transmission-id': string;
@@ -246,25 +246,6 @@ export interface PaymentPreferences {
   payment_failure_threshold: number;
   setup_fee: Money;
   setup_fee_failure_action: SetupFeeFailureAction;
-}
-
-export interface Resource {
-  id: string;
-  state: string;
-  create_time: DateTime;
-  update_time: DateTime;
-  amount: ResourceAmount;
-  parent_payment: string;
-  valid_until: DateTime;
-  links: LinkDescription[];
-}
-
-export interface ResourceAmount {
-  total: string;
-  currency: string;
-  details: {
-    subtotal: string;
-  };
 }
 
 export type DateTime = string;
