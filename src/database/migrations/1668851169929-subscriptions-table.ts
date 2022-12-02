@@ -8,7 +8,7 @@ export class subscriptionsTable1668851169929 implements MigrationInterface {
             publisher_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
             subscriber_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
             created_at TIMESTAMP NOT NULL DEFAULT now(),
-            UNIQUE(publisher, subscriber)
+            UNIQUE(publisher_id, subscriber_id)
         )
     `);
   }

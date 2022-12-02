@@ -10,15 +10,15 @@ import { BaseEntity } from 'src/database/entities/database.entity';
 import { UserEntity } from '../../user/entities/user.entity';
 
 @Entity('subscriptions')
-@Unique(['publisher', 'subscriber'])
+@Unique(['publisherId', 'subscriberId'])
 export class SubscriptionEntity extends BaseEntity {
   @ManyToOne(() => UserEntity, (user) => user.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'publisher_id' })
-  publisher: UserEntity;
+  publisherId: string;
 
   @ManyToOne(() => UserEntity, (user) => user.id, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'subscriber_id' })
-  subscriber: UserEntity;
+  subscriberId: string;
 
   @CreateDateColumn()
   createdAt: Date;
