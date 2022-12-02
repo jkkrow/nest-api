@@ -1,18 +1,21 @@
 import { ViewEntity, ViewColumn } from 'typeorm';
 
+import { IChannel } from '../interfaces/channel.interface';
+
 @ViewEntity({
   name: 'channels',
   expression: `
-    SELECT users.id AS id,
-           name, 
-           picture, 
-           COUNT(DISTINCT subscriber_id) AS subscribers
+    SELECT
+      users.id AS id,
+      users.name AS name,
+      users.picture AS picture,
+      COUNT(DISTINCT subscriptions.subscriber_id) AS subscribers
     FROM users
-    JOIN subscriptions ON subscriptions.publisher_id = users.id
+    LEFT JOIN subscriptions ON subscriptions.publisher_id = users.id
     GROUP BY users.id
   `,
 })
-export class ChannelEntity {
+export class ChannelEntity implements Omit<IChannel, 'subscribed'> {
   @ViewColumn()
   id: string;
 
