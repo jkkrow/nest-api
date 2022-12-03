@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 
-import { DatabaseModule } from 'src/database/database.module';
+import { DatabaseModule } from 'src/providers/database/database.module';
 import { BounceController } from './controllers/bounce.controller';
 import { BounceService } from './services/bounce.service';
 import { BounceEntity } from './entities/bounce.entity';

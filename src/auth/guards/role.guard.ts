@@ -2,7 +2,7 @@ import { Injectable, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { QueryBus } from '@nestjs/cqrs';
 
-import { GetUserQuery } from 'src/user/queries/impl/get-user.query';
+import { GetUserQuery } from 'src/modules/user/queries/impl/get-user.query';
 import { BearerGuard } from './bearer.guard';
 import { JwtService } from '../services/jwt.service';
 import { RoleName, ROLE_KEY } from '../constants/role.constant';

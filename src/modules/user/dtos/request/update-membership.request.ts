@@ -4,8 +4,8 @@ import {
   PaymentEventType,
   PaymentSubscriptionId,
   PaymentSubscriptionCustomId,
-} from 'src/payment/decorators/payment.decorator';
-import { EventType } from 'src/payment/interfaces/payment.interface';
+} from 'src/modules/payment/decorators/payment.decorator';
+import { EventType } from 'src/modules/payment/interfaces/payment.interface';
 
 export class UpdateMembershipRequest {
   @IsString()

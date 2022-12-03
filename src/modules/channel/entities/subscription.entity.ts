@@ -6,7 +6,7 @@ import {
   Unique,
 } from 'typeorm';
 
-import { BaseEntity } from 'src/database/entities/database.entity';
+import { BaseEntity } from 'src/providers/database/entities/database.entity';
 import { UserEntity } from '../../user/entities/user.entity';
 
 @Entity('subscriptions')

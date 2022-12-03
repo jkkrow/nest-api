@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { ServerClient } from 'postmark';
 
 import { ConfigService } from 'src/config/services/config.service';
-import { BounceService } from 'src/bounce/services/bounce.service';
+import { BounceService } from 'src/modules/bounce/services/bounce.service';
 import { From } from '../constants/email.constant';
 import { Template } from '../constants/email.constant';
 

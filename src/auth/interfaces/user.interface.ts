@@ -1,6 +1,6 @@
 import { Request } from 'express';
 
-import { IUser } from 'src/user/interfaces/user.interface';
+import { IUser } from 'src/modules/user/interfaces/user.interface';
 
 export interface IRequestWithUser extends Request {
   userId?: string;

@@ -17,7 +17,7 @@ import { MessageResponse } from 'src/common/dtos/response/message.response';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { RequestUser, RequestUserId } from 'src/auth/decorators/user.decorator';
 import { IRequestUser } from 'src/auth/interfaces/user.interface';
-import { PaymentGuard } from 'src/payment/guards/payment.guard';
+import { PaymentGuard } from 'src/modules/payment/guards/payment.guard';
 
 import { CreateUserCommand } from '../commands/impl/create-user.command';
 import { CreateGoogleUserCommand } from '../commands/impl/create-google-user.command';

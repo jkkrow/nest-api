@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 
-import { BounceModule } from 'src/bounce/bounce.module';
+import { BounceModule } from 'src/modules/bounce/bounce.module';
 import { EmailService } from './services/email.service';
 
 @Module({

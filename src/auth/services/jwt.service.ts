@@ -1,7 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService as BaseJwtService } from '@nestjs/jwt';
 
-import { CacheService } from 'src/cache/services/cache.service';
+import { CacheService } from 'src/providers/cache/services/cache.service';
 import {
   JwtPayload,
   JwtSignOptions,

@@ -4,7 +4,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtModule } from '@nestjs/jwt';
 
 import { ConfigService } from 'src/config/services/config.service';
-import { CacheModule } from 'src/cache/cache.module';
+import { CacheModule } from 'src/providers/cache/cache.module';
 import { JwtService } from './services/jwt.service';
 import { EncryptService } from './services/encrypt.service';
 import { RoleGuard } from './guards/role.guard';

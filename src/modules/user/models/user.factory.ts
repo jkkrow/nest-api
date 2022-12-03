@@ -2,7 +2,7 @@ import { EventPublisher } from '@nestjs/cqrs';
 import { Injectable } from '@nestjs/common';
 import { Optional } from 'utility-types';
 
-import { BaseFactory } from 'src/database/models/database.factory';
+import { BaseFactory } from 'src/providers/database/models/database.factory';
 import { UserEntity } from '../entities/user.entity';
 import { User } from './user';
 

@@ -1,6 +1,6 @@
 import { Entity, Column } from 'typeorm';
 
-import { BaseEntityWithTimestamps } from 'src/database/entities/database.entity';
+import { BaseEntityWithTimestamps } from 'src/providers/database/entities/database.entity';
 
 @Entity('bounces')
 export class BounceEntity extends BaseEntityWithTimestamps {
