@@ -1,13 +1,16 @@
-import { Controller, Get, Post, Param, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Param, Query, HttpCode } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { ApiTags } from '@nestjs/swagger';
 
 import { Serialize } from 'src/common/interceptors/serialize.interceptor';
+import { PaginationRequest } from 'src/common/dtos/request/pagination.request';
 import { MessageResponse } from 'src/common/dtos/response/message.response';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { RequestUserId } from 'src/auth/decorators/user.decorator';
 import { SubscriptionService } from '../services/subscription.service';
 import { GetChannelQuery } from '../queries/impl/get-channel.query';
+import { GetSubscribersQuery } from '../queries/impl/get-subscribers.query';
+import { GetSubscribesQuery } from '../queries/impl/get-subscribes.query';
 import { GetChannelResponse } from '../dtos/response/get-channel.response';
 
 @ApiTags('Channels')
@@ -27,6 +30,34 @@ export class ChannelController {
     const channel = await this.queryBus.execute(query);
 
     return { channel };
+  }
+
+  /* Get Subscribers */
+  /*--------------------------------------------*/
+  @Get('current/subscribers')
+  @Role('user')
+  async getSubscribers(
+    @Query() { page, max }: PaginationRequest,
+    @RequestUserId() userId: string,
+  ) {
+    const query = new GetSubscribersQuery(userId, page, max);
+    const channels = await this.queryBus.execute(query);
+
+    return { channels };
+  }
+
+  /* Get Subscribes */
+  /*--------------------------------------------*/
+  @Get('current/subscribes')
+  @Role('user')
+  async getSubscribes(
+    @Query() { page, max }: PaginationRequest,
+    @RequestUserId() userId: string,
+  ) {
+    const query = new GetSubscribesQuery(userId, page, max);
+    const channels = await this.queryBus.execute(query);
+
+    return { channels };
   }
 
   /* Subscribe to Channel */

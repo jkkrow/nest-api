@@ -1,35 +1,76 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { InjectDataSource } from '@nestjs/typeorm';
+import { DataSource } from 'typeorm';
 
-import { ChannelEntity } from '../entities/channel.entity';
-import { SubscriptionEntity } from '../entities/subscription.entity';
 import { IChannel } from '../interfaces/channel.interface';
 
 @Injectable()
 export class ChannelRepository {
   constructor(
-    @InjectRepository(ChannelEntity)
-    private readonly channelRepository: Repository<ChannelEntity>,
-    @InjectRepository(SubscriptionEntity)
-    private readonly subscriptionRepository: Repository<SubscriptionEntity>,
+    @InjectDataSource()
+    private readonly dataSource: DataSource,
   ) {}
 
-  async findOneById(id: string, userId?: string) {
-    const subscribed = this.subscriptionRepository
-      .createQueryBuilder('subscription')
-      .select('subscription.id')
-      .where('publisher_id = :publisherId', { publisherId: id })
-      .andWhere('subscriber_id = :subscriberId', { subscriberId: userId });
-
-    const result = await this.channelRepository
-      .createQueryBuilder('channel')
-      .select('channel.*')
-      .addSelect(`EXISTS (${subscribed.getQuery()})`, 'subscribed')
-      .where('channel.id = :id', { id })
-      .setParameters(subscribed.getParameters())
+  findOneById(id: string, userId?: string) {
+    return this.getChannelQuery(userId)
+      .where('u_channel.id = :id', { id })
       .getRawOne<IChannel>();
+  }
 
-    return result;
+  findByPublisherId(id: string, page = 1, max = 12) {
+    return this.getChannelQuery(id)
+      .innerJoin('subscriptions', 's', 's.subscriber_id = u_channel.id')
+      .where('s.publisher_id = :id', { id })
+      .addGroupBy('s.created_at')
+      .orderBy('s.created_at', 'DESC')
+      .limit(max)
+      .offset(max * (page - 1))
+      .getRawMany<IChannel>();
+  }
+
+  findBySubscriberId(id: string, page = 1, max = 12) {
+    return this.getChannelQuery(id)
+      .innerJoin('subscriptions', 's', 's.publisher_id = u_channel.id')
+      .where('s.subscriber_id = :id', { id })
+      .addGroupBy('s.created_at')
+      .orderBy('s.created_at', 'DESC')
+      .limit(max)
+      .offset(max * (page - 1))
+      .getRawMany<IChannel>();
+  }
+
+  private getChannelQuery(userId?: string) {
+    const subscribedQuery = this.dataSource
+      .createQueryBuilder()
+      .select('s_subscribed.id')
+      .from('subscriptions', 's_subscribed')
+      .innerJoin(
+        'users',
+        'u_subscribed',
+        'u_subscribed.id = s_subscribed.subscriber_id AND s_subscribed.publisher_id = u_channel.id',
+      )
+      .where('s_subscribed.subscriber_id = :subscriberId', {
+        subscriberId: userId,
+      });
+
+    const channelQuery = this.dataSource
+      .createQueryBuilder()
+      .select([
+        'u_channel.id AS id',
+        'u_channel.name AS name',
+        'u_channel.picture AS picture',
+        'COUNT(DISTINCT s_channel.subscriber_id) AS subscribers',
+        `EXISTS(${subscribedQuery.getQuery()}) AS subscribed`,
+      ])
+      .from('users', 'u_channel')
+      .leftJoin(
+        'subscriptions',
+        's_channel',
+        's_channel.publisher_id = u_channel.id',
+      )
+      .groupBy('u_channel.id')
+      .setParameters(subscribedQuery.getParameters());
+
+    return channelQuery;
   }
 }
