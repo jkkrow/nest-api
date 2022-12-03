@@ -11,32 +11,44 @@ export class ChannelRepository {
     private readonly dataSource: DataSource,
   ) {}
 
-  findOneById(id: string, userId?: string) {
+  async findOneById(id: string, userId?: string) {
     return this.getChannelQuery(userId)
       .where('u_channel.id = :id', { id })
       .getRawOne<IChannel>();
   }
 
-  findByPublisherId(id: string, page = 1, max = 12) {
-    return this.getChannelQuery(id)
+  async findByPublisherId(id: string, page = 1, max = 12) {
+    const query = this.getChannelQuery(id)
       .innerJoin('subscriptions', 's', 's.subscriber_id = u_channel.id')
       .where('s.publisher_id = :id', { id })
       .addGroupBy('s.created_at')
       .orderBy('s.created_at', 'DESC')
       .limit(max)
-      .offset(max * (page - 1))
-      .getRawMany<IChannel>();
+      .offset(max * (page - 1));
+
+    const [channels, count] = await Promise.all([
+      query.getRawMany<IChannel>(),
+      query.getCount(),
+    ]);
+
+    return { channels, count };
   }
 
-  findBySubscriberId(id: string, page = 1, max = 12) {
-    return this.getChannelQuery(id)
+  async findBySubscriberId(id: string, page = 1, max = 12) {
+    const query = this.getChannelQuery(id)
       .innerJoin('subscriptions', 's', 's.publisher_id = u_channel.id')
       .where('s.subscriber_id = :id', { id })
       .addGroupBy('s.created_at')
       .orderBy('s.created_at', 'DESC')
       .limit(max)
-      .offset(max * (page - 1))
-      .getRawMany<IChannel>();
+      .offset(max * (page - 1));
+
+    const [channels, count] = await Promise.all([
+      query.getRawMany<IChannel>(),
+      query.getCount(),
+    ]);
+
+    return { channels, count };
   }
 
   private getChannelQuery(userId?: string) {

@@ -12,6 +12,7 @@ import { GetChannelQuery } from '../queries/impl/get-channel.query';
 import { GetSubscribersQuery } from '../queries/impl/get-subscribers.query';
 import { GetSubscribesQuery } from '../queries/impl/get-subscribes.query';
 import { GetChannelResponse } from '../dtos/response/get-channel.response';
+import { GetChannelsResponse } from '../dtos/response/get-channels.response';
 
 @ApiTags('Channels')
 @Controller('channels')
@@ -36,28 +37,30 @@ export class ChannelController {
   /*--------------------------------------------*/
   @Get('current/subscribers')
   @Role('user')
+  @Serialize(GetChannelsResponse)
   async getSubscribers(
     @Query() { page, max }: PaginationRequest,
     @RequestUserId() userId: string,
   ) {
     const query = new GetSubscribersQuery(userId, page, max);
-    const channels = await this.queryBus.execute(query);
+    const { channels, count } = await this.queryBus.execute(query);
 
-    return { channels };
+    return { channels, count };
   }
 
   /* Get Subscribes */
   /*--------------------------------------------*/
   @Get('current/subscribes')
   @Role('user')
+  @Serialize(GetChannelsResponse)
   async getSubscribes(
     @Query() { page, max }: PaginationRequest,
     @RequestUserId() userId: string,
   ) {
     const query = new GetSubscribesQuery(userId, page, max);
-    const channels = await this.queryBus.execute(query);
+    const { channels, count } = await this.queryBus.execute(query);
 
-    return { channels };
+    return { channels, count };
   }
 
   /* Subscribe to Channel */
