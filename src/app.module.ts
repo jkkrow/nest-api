@@ -14,7 +14,6 @@ import { GcpModule } from './providers/gcp/gcp.module';
 import { EmailModule } from './providers/email/email.module';
 import { PaymentModule } from './modules/payment/payment.module';
 import { UploadModule } from './modules/upload/upload.module';
-import { SerializeInterceptor } from './common/interceptors/serialize.interceptor';
 
 const GlobalValidationPipe = {
   provide: APP_PIPE,
@@ -37,6 +36,6 @@ const GlobalValidationPipe = {
     PaymentModule,
     UploadModule,
   ],
-  providers: [GlobalValidationPipe, SerializeInterceptor],
+  providers: [GlobalValidationPipe],
 })
 export class AppModule {}

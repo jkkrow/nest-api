@@ -1,7 +1,7 @@
 import { Module, forwardRef } from '@nestjs/common';
 
 import { AwsModule } from '../aws.module';
-import { S3Service } from './s3.service';
+import { S3Service } from './services/s3.service';
 
 @Module({
   imports: [forwardRef(() => AwsModule)],
