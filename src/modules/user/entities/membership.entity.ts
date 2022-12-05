@@ -1,15 +1,15 @@
 import { Entity, Column, PrimaryColumn, OneToOne, JoinColumn } from 'typeorm';
 
-import { IMembership } from '../interfaces/user.interface';
 import { UserEntity } from './user.entity';
+import { MEMBERSHIP_NAME, MembershipName } from '../constants/user.constant';
 
 @Entity('memberships')
-export class MembershipEntity implements IMembership {
+export class MembershipEntity {
   @PrimaryColumn({ type: 'varchar', length: 100 })
   id: string;
 
-  @Column({ type: 'enum', enum: ['standard', 'business', 'enterprise'] })
-  name: IMembership['name'];
+  @Column({ type: 'enum', enum: Object.values(MEMBERSHIP_NAME) })
+  name: MembershipName;
 
   @Column({ type: 'timestamp' })
   expiredAt: Date;
