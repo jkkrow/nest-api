@@ -12,9 +12,9 @@ export class UserRepository extends BaseRepository<UserEntity, User> {
   constructor(
     @InjectRepository(UserEntity)
     readonly repository: Repository<UserEntity>,
-    readonly userFactory: UserFactory,
+    readonly factory: UserFactory,
   ) {
-    super(repository, userFactory);
+    super(repository, factory);
   }
 
   findById(id: string) {

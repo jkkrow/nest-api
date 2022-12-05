@@ -24,7 +24,11 @@ export async function bootstrap(server = true) {
   const document = SwaggerModule.createDocument(app, documentOptions);
 
   SwaggerModule.setup('api', app, document, {
-    swaggerOptions: { defaultModelsExpandDepth: false },
+    swaggerOptions: {
+      defaultModelsExpandDepth: false,
+      tagsSorter: 'alpha',
+      operationsSorter: 'alpha',
+    },
   });
 
   app.enableCors({ origin });
