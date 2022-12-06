@@ -1,9 +1,6 @@
-import {
-  createParamDecorator,
-  ExecutionContext,
-  NotFoundException,
-} from '@nestjs/common';
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 
+import { NotFoundException } from 'src/common/exceptions';
 import { IRequestWithUser } from '../interfaces/user.interface';
 
 export const RequestUserId = createParamDecorator(

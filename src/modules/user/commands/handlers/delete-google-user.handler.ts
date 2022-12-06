@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { NotFoundException, BadRequestException } from '@nestjs/common';
 
+import { NotFoundException, BadRequestException } from 'src/common/exceptions';
 import { OAuthService } from 'src/providers/gcp/oauth/oauth.service';
 import { DeleteGoogleUserCommand } from '../impl/delete-google-user.command';
 import { UserRepository } from '../../models/user.repository';

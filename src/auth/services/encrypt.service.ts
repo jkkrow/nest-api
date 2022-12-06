@@ -1,5 +1,7 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import * as bcryptjs from 'bcryptjs';
+
+import { BadRequestException } from 'src/common/exceptions';
 
 @Injectable()
 export class EncryptService {

@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { NotFoundException } from '@nestjs/common';
 
+import { NotFoundException } from 'src/common/exceptions';
 import { JwtService } from 'src/auth/services/jwt.service';
 import { EncryptService } from 'src/auth/services/encrypt.service';
 import { ResetPasswordCommand } from '../impl/reset-password.command';

@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { NotFoundException } from '@nestjs/common';
 
+import { NotFoundException } from 'src/common/exceptions';
 import { UpdateNameCommand } from '../impl/update-name.command';
 import { UserRepository } from '../../models/user.repository';
 

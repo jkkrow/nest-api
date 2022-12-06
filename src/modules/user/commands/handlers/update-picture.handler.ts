@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { NotFoundException } from '@nestjs/common';
 
+import { NotFoundException } from 'src/common/exceptions';
 import { UpdatePictureCommand } from '../impl/update-picture.command';
 import { UserRepository } from '../../models/user.repository';
 

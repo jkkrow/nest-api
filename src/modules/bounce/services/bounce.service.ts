@@ -1,7 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm/dist';
 import { Repository } from 'typeorm';
 
+import { BadRequestException } from 'src/common/exceptions';
 import { CreateBounceRequest } from '../dtos/request/create-bounce.request';
 import { BounceEntity } from '../entities/bounce.entity';
 

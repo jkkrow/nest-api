@@ -1,6 +1,6 @@
-import { NotFoundException, BadRequestException } from '@nestjs/common';
 import { AggregateRoot } from '@nestjs/cqrs';
 
+import { NotFoundException, BadRequestException } from 'src/common/exceptions';
 import { VideoTreeCreatedEvent } from '../events/impl/video-tree-created.event';
 import { IVideoTree } from '../interfaces/video-tree';
 import { IVideoNode } from '../interfaces/video-node';

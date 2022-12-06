@@ -1,10 +1,7 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 
+import { NotFoundException, BadRequestException } from 'src/common/exceptions';
 import { ConfigService } from 'src/config/services/config.service';
 import {
   GetAccessToken,

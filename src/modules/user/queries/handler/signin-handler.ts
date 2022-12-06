@@ -1,8 +1,8 @@
-import { BadRequestException } from '@nestjs/common';
 import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
+import { BadRequestException } from 'src/common/exceptions';
 import { JwtService } from 'src/auth/services/jwt.service';
 import { EncryptService } from 'src/auth/services/encrypt.service';
 import { SigninQuery } from '../impl/signin.query';

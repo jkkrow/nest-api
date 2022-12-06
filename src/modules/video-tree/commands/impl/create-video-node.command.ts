@@ -5,5 +5,6 @@ export class CreateVideoNodeCommand implements ICommand {
     public readonly id: string,
     public readonly treeId: string,
     public readonly parentId: string,
+    public readonly userId: string,
   ) {}
 }

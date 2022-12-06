@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { ConflictException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
+import { ConflictException } from 'src/common/exceptions';
 import { BounceService } from 'src/modules/bounce/services/bounce.service';
 import { EncryptService } from 'src/auth/services/encrypt.service';
 import { CreateUserCommand } from '../impl/create-user.command';

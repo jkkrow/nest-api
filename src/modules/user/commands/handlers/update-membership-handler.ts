@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { NotFoundException } from '@nestjs/common';
 
+import { NotFoundException } from 'src/common/exceptions';
 import { PaymentService } from 'src/modules/payment/services/payment.service';
 import { UpdateMembershipCommand } from '../impl/update-membership.command';
 import { UserRepository } from '../../models/user.repository';

@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { ConflictException } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
+import { ConflictException } from 'src/common/exceptions';
 import { EncryptService } from 'src/auth/services/encrypt.service';
 import { OAuthService } from 'src/providers/gcp/oauth/oauth.service';
 import { CreateGoogleUserCommand } from '../impl/create-google-user.command';

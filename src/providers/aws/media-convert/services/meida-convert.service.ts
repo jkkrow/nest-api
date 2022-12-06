@@ -1,7 +1,8 @@
 import AWS from 'aws-sdk';
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { parse } from 'path';
 
+import { NotFoundException } from 'src/common/exceptions';
 import { ConfigService } from 'src/config/services/config.service';
 
 @Injectable()

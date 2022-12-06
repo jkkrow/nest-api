@@ -1,4 +1,11 @@
-import { Controller, Post, Redirect, Body, Param } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Delete,
+  Redirect,
+  Body,
+  Param,
+} from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiTags } from '@nestjs/swagger';
 import { v4 as uuidv4 } from 'uuid';
@@ -6,6 +13,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { RequestUserId } from 'src/auth/decorators/user.decorator';
 import { Serialize } from 'src/common/interceptors/serialize.interceptor';
+import { MessageResponse } from 'src/common/dtos/response/message.response';
 import { CreateVideoTreeCommand } from '../commands/impl/create-video-tree.command';
 import { CreateVideoNodeCommand } from '../commands/impl/create-video-node.command';
 import { CreateVideoNodeRequest } from '../dtos/request/create-video-node.request';
@@ -40,11 +48,21 @@ export class VideoTreeController {
   async createVideoNode(
     @Param('treeId') treeId: string,
     @Body() { parentId }: CreateVideoNodeRequest,
+    @RequestUserId() userId: string,
   ) {
     const id = uuidv4();
-    const command = new CreateVideoNodeCommand(id, treeId, parentId);
+    const command = new CreateVideoNodeCommand(id, treeId, parentId, userId);
     await this.commandBus.execute(command);
 
     return { id };
+  }
+
+  /* Delete VideoNode */
+  /*--------------------------------------------*/
+  @Delete(':treeId/video-nodes')
+  @Role('verified')
+  @Serialize(MessageResponse)
+  async deleteVideoNode() {
+    return { message: 'VideoNode deleted successfully' };
   }
 }

@@ -6,13 +6,13 @@ import {
   Body,
   Param,
   HttpCode,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Serialize } from 'src/common/interceptors/serialize.interceptor';
 import { MessageResponse } from 'src/common/dtos/response/message.response';
+import { UnauthorizedException } from 'src/common/exceptions';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { RequestUserId } from 'src/auth/decorators/user.decorator';
 import { S3Service } from 'src/providers/aws/s3/services/s3.service';
@@ -112,7 +112,7 @@ export class UploadController {
     @RequestUserId() userId: string,
   ) {
     if (key && key.split('/')[1] !== userId) {
-      throw new UnauthorizedException('Invalid image');
+      throw new UnauthorizedException('Image not belong to user');
     }
 
     const ext = fileType.split('/')[1];
@@ -136,7 +136,7 @@ export class UploadController {
     @RequestUserId() userId: string,
   ) {
     if (key.split('/')[1] !== userId) {
-      throw new UnauthorizedException('Invalid image');
+      throw new UnauthorizedException('Image not belong to user');
     }
 
     await this.s3Service.deleteObject(key);

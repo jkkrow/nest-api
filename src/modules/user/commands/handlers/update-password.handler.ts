@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { NotFoundException } from '@nestjs/common';
 
+import { NotFoundException } from 'src/common/exceptions';
 import { EncryptService } from 'src/auth/services/encrypt.service';
 import { UpdatePasswordCommand } from '../impl/update-password.command';
 import { UserRepository } from '../../models/user.repository';

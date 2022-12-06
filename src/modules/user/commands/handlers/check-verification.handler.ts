@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { NotFoundException, BadRequestException } from '@nestjs/common';
 
+import { NotFoundException, BadRequestException } from 'src/common/exceptions';
 import { JwtService } from 'src/auth/services/jwt.service';
 import { CheckVerificationCommand } from '../impl/check-verification.comand';
 import { UserRepository } from '../../models/user.repository';

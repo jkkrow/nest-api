@@ -1,6 +1,6 @@
-import { NotFoundException } from '@nestjs/common';
 import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
 
+import { NotFoundException } from 'src/common/exceptions';
 import { GetChannelQuery } from '../impl/get-channel.query';
 import { ChannelRepository } from '../../repositories/channel.repository';
 

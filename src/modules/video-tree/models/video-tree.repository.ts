@@ -1,7 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, TreeRepository } from 'typeorm';
 
+import { NotFoundException } from 'src/common/exceptions';
 import { BaseRepository } from 'src/providers/database/models/database.repository';
 import { VideoNodeEntity } from '../entities/video-node.entity';
 import { VideoTreeEntity } from '../entities/video-tree.entity';

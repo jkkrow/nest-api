@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { NotFoundException, BadRequestException } from '@nestjs/common';
 
+import { NotFoundException, BadRequestException } from 'src/common/exceptions';
 import { ConfigService } from 'src/config/services/config.service';
 import { JwtService } from 'src/auth/services/jwt.service';
 import { EmailService } from 'src/providers/email/services/email.service';

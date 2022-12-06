@@ -1,8 +1,8 @@
-import { NotFoundException } from '@nestjs/common';
 import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
+import { NotFoundException } from 'src/common/exceptions';
 import { JwtService } from 'src/auth/services/jwt.service';
 import { OAuthService } from 'src/providers/gcp/oauth/oauth.service';
 import { GoogleSigninQuery } from '../impl/google-signin.query';
