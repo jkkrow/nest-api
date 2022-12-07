@@ -22,7 +22,7 @@ const typeOrmConfig: TypeOrmModuleOptions = {
     options: config.get('DB_OPTIONS'),
   },
 
-  synchronize: true,
+  synchronize: false,
   namingStrategy: new SnakeNamingStrategy(),
 };
 
