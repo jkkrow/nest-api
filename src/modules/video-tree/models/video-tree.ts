@@ -2,6 +2,7 @@ import { AggregateRoot } from '@nestjs/cqrs';
 
 import { NotFoundException, BadRequestException } from 'src/common/exceptions';
 import { VideoTreeCreatedEvent } from '../events/impl/video-tree-created.event';
+import { VideoTreeDeletedEvent } from '../events/impl/video-tree-deleted.event';
 import { VideoNodeCreatedEvent } from '../events/impl/video-node-created.event';
 import { VideoNodeDeletedEvent } from '../events/impl/video-node-deleted.event';
 import { IVideoTree } from '../interfaces/video-tree';
@@ -78,6 +79,10 @@ export class VideoTree extends AggregateRoot implements IVideoTree {
 
   create() {
     this.apply(new VideoTreeCreatedEvent(this.id));
+  }
+
+  delete() {
+    this.apply(new VideoTreeDeletedEvent(this.id, this.userId));
   }
 
   createNode(id: string, parentId: string) {

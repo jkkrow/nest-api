@@ -49,9 +49,10 @@ export class VideoTreeEntity extends BaseEntityWithTimestamps {
   @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
   user: UserEntity;
 
-  @OneToOne(() => VideoNodeEntity, (videoNode) => videoNode.tree, {
+  @OneToOne(() => VideoNodeEntity, {
     cascade: true,
     eager: true,
+    onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'root_id' })
   root: VideoNodeEntity;
