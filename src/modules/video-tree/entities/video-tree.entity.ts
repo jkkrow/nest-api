@@ -57,6 +57,10 @@ export class VideoTreeEntity extends BaseEntityWithTimestamps {
   root: VideoNodeEntity;
 
   @ManyToMany(() => CategoryEntity, { cascade: true, eager: true })
-  @JoinTable({ name: 'categories_video_trees' })
+  @JoinTable({
+    name: 'categories_video_trees',
+    joinColumn: { name: 'video_tree_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'category_id', referencedColumnName: 'id' },
+  })
   categories: CategoryEntity[];
 }

@@ -11,7 +11,11 @@ import { BaseEntity } from 'src/providers/database/entities/database.entity';
 import { VideoTreeEntity } from './video-tree.entity';
 
 @Entity('video_nodes')
-@Tree('materialized-path')
+@Tree('closure-table', {
+  closureTableName: 'video_nodes',
+  ancestorColumnName: () => 'ancestor_id',
+  descendantColumnName: () => 'descendant_id',
+})
 export class VideoNodeEntity extends BaseEntity {
   @Column({ type: 'varchar', length: 100 })
   name: string;
@@ -22,7 +26,7 @@ export class VideoNodeEntity extends BaseEntity {
   @Column({ type: 'varchar', length: 200 })
   url: string;
 
-  @Column({ type: 'int' })
+  @Column({ type: 'integer' })
   level: number;
 
   @Column({ type: 'real' })
@@ -37,7 +41,7 @@ export class VideoNodeEntity extends BaseEntity {
   @Column({ type: 'real' })
   selectionTimeEnd: number;
 
-  @TreeParent({ onDelete: 'CASCADE' })
+  @TreeParent({ onDelete: 'CASCADE', orphanedRowAction: 'delete' } as any)
   parent: VideoNodeEntity;
 
   @TreeChildren({ cascade: true })

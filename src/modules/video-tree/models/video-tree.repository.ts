@@ -38,8 +38,12 @@ export class VideoTreeRepository extends BaseRepository<
     return this.factory.createFromEntity(videoTree);
   }
 
-  save(videoTree: VideoTree) {
-    return this._save(videoTree);
+  async save(videoTree: VideoTree) {
+    const videoTreeEntity = this.factory.createEntity(videoTree);
+
+    await this.repository.save(videoTreeEntity);
+    await this.treeRepository.save(videoTreeEntity.root);
+    // return this._save(videoTree);
   }
 
   delete(videoTree: VideoTree) {

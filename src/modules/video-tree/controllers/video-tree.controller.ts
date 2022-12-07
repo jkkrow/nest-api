@@ -16,6 +16,7 @@ import { Serialize } from 'src/common/interceptors/serialize.interceptor';
 import { MessageResponse } from 'src/common/dtos/response/message.response';
 import { CreateVideoTreeCommand } from '../commands/impl/create-video-tree.command';
 import { CreateVideoNodeCommand } from '../commands/impl/create-video-node.command';
+import { DeleteVideoNodeCommand } from '../commands/impl/delete-video-node.command';
 import { CreateVideoNodeRequest } from '../dtos/request/create-video-node.request';
 import { CreateVideoNodeResponse } from '../dtos/response/create-video-node.response';
 
@@ -59,10 +60,17 @@ export class VideoTreeController {
 
   /* Delete VideoNode */
   /*--------------------------------------------*/
-  @Delete(':treeId/video-nodes')
+  @Delete(':treeId/video-nodes/:nodeId')
   @Role('verified')
   @Serialize(MessageResponse)
-  async deleteVideoNode() {
+  async deleteVideoNode(
+    @Param('treeId') treeId: string,
+    @Param('nodeId') nodeId: string,
+    @RequestUserId() userId: string,
+  ) {
+    const command = new DeleteVideoNodeCommand(nodeId, treeId, userId);
+    await this.commandBus.execute(command);
+
     return { message: 'VideoNode deleted successfully' };
   }
 }

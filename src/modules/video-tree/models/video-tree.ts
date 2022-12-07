@@ -2,6 +2,8 @@ import { AggregateRoot } from '@nestjs/cqrs';
 
 import { NotFoundException, BadRequestException } from 'src/common/exceptions';
 import { VideoTreeCreatedEvent } from '../events/impl/video-tree-created.event';
+import { VideoNodeCreatedEvent } from '../events/impl/video-node-created.event';
+import { VideoNodeDeletedEvent } from '../events/impl/video-node-deleted.event';
 import { IVideoTree } from '../interfaces/video-tree';
 import { IVideoNode } from '../interfaces/video-node';
 import { VideoTreeStatus } from '../constants/video-tree.contstant';
@@ -71,18 +73,18 @@ export class VideoTree extends AggregateRoot implements IVideoTree {
   }
 
   get root() {
-    return this.props.root;
+    return JSON.parse(JSON.stringify(this.props.root)) as IVideoNode;
   }
 
   create() {
     this.apply(new VideoTreeCreatedEvent(this.id));
   }
 
-  addNode(id: string, parentId: string) {
+  createNode(id: string, parentId: string) {
     const parentNode = this.findNodeById(parentId);
 
     if (!parentNode) {
-      throw new NotFoundException('Invalid nodeId');
+      throw new NotFoundException('ParentNode not found');
     }
 
     if (parentNode.children.length >= 4) {
@@ -103,26 +105,51 @@ export class VideoTree extends AggregateRoot implements IVideoTree {
     };
 
     parentNode.children.push(node);
+    this.apply(new VideoNodeCreatedEvent(id));
+  }
+
+  deleteNode(id: string) {
+    const deletedNode = this.findNodeById(id);
+    const parentNode = this.findNodeByChildId(id);
+
+    if (!deletedNode || !parentNode) {
+      throw new NotFoundException('VideoNode not found');
+    }
+
+    parentNode.children = parentNode.children.filter(
+      (child) => child.id !== id,
+    );
+
+    this.traverseNodes(deletedNode).forEach((node) => {
+      this.apply(new VideoNodeDeletedEvent(node.id, node.url));
+    });
   }
 
   private findNodeById(nodeId: string) {
-    let currentNode = this.root;
-    const queue: this['root'][] = [];
+    return this.traverseNodes().find((node) => node.id === nodeId);
+  }
 
-    queue.push(currentNode);
+  private findNodeByChildId(nodeId: string) {
+    return this.traverseNodes().find((node) =>
+      node.children.find((child) => child.id === nodeId),
+    );
+  }
 
-    while (queue.length) {
-      currentNode = queue.shift() as this['root'];
+  private traverseNodes(root = this.props.root) {
+    let currentNode = root;
+    const queue: typeof root[] = [];
+    const nodes: typeof root[] = [];
 
-      if (currentNode.id === nodeId) {
-        return currentNode;
-      }
+    while (currentNode) {
+      nodes.push(currentNode);
 
       if (currentNode.children.length) {
         currentNode.children.forEach((child) => queue.push(child));
       }
+
+      currentNode = queue.shift() as typeof root;
     }
 
-    return null;
+    return nodes;
   }
 }

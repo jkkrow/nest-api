@@ -17,7 +17,7 @@ export class CreateVideoNodeHandler
       throw new UnauthorizedException('VideoTree not belong to user');
     }
 
-    videoTree.addNode(id, parentId);
+    videoTree.createNode(id, parentId);
 
     await this.repository.save(videoTree);
 
