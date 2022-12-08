@@ -2,12 +2,13 @@ import { AggregateRoot } from '@nestjs/cqrs';
 
 import { NotFoundException, BadRequestException } from 'src/common/exceptions';
 import { VideoTreeCreatedEvent } from '../events/impl/video-tree-created.event';
+import { VideoTreeUpdatedEvent } from '../events/impl/video-tree-updated.event';
 import { VideoTreeDeletedEvent } from '../events/impl/video-tree-deleted.event';
 import { VideoNodeCreatedEvent } from '../events/impl/video-node-created.event';
 import { VideoNodeUpdatedEvent } from '../events/impl/video-node-updated.event';
 import { VideoNodeDeletedEvent } from '../events/impl/video-node-deleted.event';
 import { IVideoTree } from '../interfaces/video-tree';
-import { IVideoNode, UpdateVideoNodeParams } from '../interfaces/video-node';
+import { IVideoNode } from '../interfaces/video-node';
 import { VideoTreeStatus } from '../constants/video-tree.contstant';
 
 export class VideoTree extends AggregateRoot implements IVideoTree {
@@ -82,6 +83,37 @@ export class VideoTree extends AggregateRoot implements IVideoTree {
     this.apply(new VideoTreeCreatedEvent(this.id));
   }
 
+  update(updates: IVideoTree) {
+    this.props.title = updates.title;
+    this.props.description = updates.description;
+    this.props.categories = updates.categories;
+    this.props.thumbnail = updates.thumbnail;
+    this.props.status = updates.status;
+    this.props.editing = updates.editing;
+
+    const savedNodes = this.traverseNodes();
+    const newNodes = this.traverseNodes(updates.root);
+
+    savedNodes.forEach((savedNode) => {
+      newNodes.forEach((newNode) => {
+        if (savedNode.id !== newNode.id) return;
+
+        savedNode.label = newNode.label;
+        savedNode.selectionTimeStart = newNode.selectionTimeStart;
+        savedNode.selectionTimeEnd = newNode.selectionTimeEnd;
+      });
+    });
+
+    const isTitleMissing = !this.title;
+    const isNodeUrlMissing = !!savedNodes.find((node) => !node.url);
+
+    if (isTitleMissing || isNodeUrlMissing) {
+      this.props.editing = true;
+    }
+
+    this.apply(new VideoTreeUpdatedEvent(this.id));
+  }
+
   delete() {
     this.apply(new VideoTreeDeletedEvent(this.id, this.userId));
   }
@@ -97,7 +129,7 @@ export class VideoTree extends AggregateRoot implements IVideoTree {
       throw new BadRequestException('Max length of children exceeded (max: 4)');
     }
 
-    const node: this['root'] = {
+    const node: IVideoNode = {
       id,
       level: parentNode.level + 1,
       name: '',
@@ -114,16 +146,23 @@ export class VideoTree extends AggregateRoot implements IVideoTree {
     this.apply(new VideoNodeCreatedEvent(id));
   }
 
-  updateNode(id: string, updates: UpdateVideoNodeParams) {
+  updateNode(id: string, updates: IVideoNode) {
     const videoNode = this.findNodeById(id);
 
     if (!videoNode) {
       throw new NotFoundException('VideoNode not found');
     }
 
-    for (const key in updates) {
-      videoNode[key] = updates[key];
-    }
+    videoNode.name = updates.name;
+    videoNode.url = updates.url;
+    videoNode.size = updates.size;
+    videoNode.duration = updates.duration;
+    videoNode.label = updates.label;
+    videoNode.selectionTimeStart = updates.selectionTimeStart;
+    videoNode.selectionTimeEnd = updates.selectionTimeEnd;
+
+    this.updateTotalSize();
+    this.updateMinMaxDuration();
 
     this.apply(new VideoNodeUpdatedEvent(id));
   }
@@ -139,6 +178,9 @@ export class VideoTree extends AggregateRoot implements IVideoTree {
     parentNode.children = parentNode.children.filter(
       (child) => child.id !== id,
     );
+
+    this.updateTotalSize();
+    this.updateMinMaxDuration();
 
     this.traverseNodes(deletedNode).forEach((node) => {
       this.apply(new VideoNodeDeletedEvent(node.id, node.url));
@@ -171,5 +213,52 @@ export class VideoTree extends AggregateRoot implements IVideoTree {
     }
 
     return nodes;
+  }
+
+  private updateTotalSize() {
+    const nodes = this.traverseNodes();
+    const filteredNodes: IVideoNode[] = [];
+    const seen: { [key: string]: boolean } = {};
+
+    for (const node of nodes) {
+      const duplicated = seen.hasOwnProperty(node.name);
+
+      if (!duplicated) {
+        filteredNodes.push(node);
+        seen[node.name] = true;
+      }
+    }
+
+    this.props.size = filteredNodes.reduce((acc, cur) => acc + cur.size, 0);
+  }
+
+  private updateMinMaxDuration() {
+    const paths = this.getPaths();
+    const possibleDurations = paths.map((path) =>
+      path.reduce((acc, cur) => acc + cur.duration, 0),
+    );
+
+    this.props.maxDuration = Math.max(...possibleDurations);
+    this.props.minDuration = Math.min(...possibleDurations);
+  }
+
+  private getPaths() {
+    const paths: IVideoNode[][] = [];
+
+    const iterate = (currentNode: IVideoNode, path: IVideoNode[]) => {
+      const newPath = path.concat(currentNode);
+
+      if (currentNode.children.length) {
+        return currentNode.children.forEach((child) => {
+          iterate(child, newPath);
+        });
+      }
+
+      paths.push(newPath);
+    };
+
+    iterate(this.props.root, []);
+
+    return paths;
   }
 }

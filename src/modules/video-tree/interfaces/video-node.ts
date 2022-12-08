@@ -10,8 +10,3 @@ export interface IVideoNode {
   selectionTimeEnd: number;
   children: IVideoNode[];
 }
-
-export type UpdateVideoNodeParams = Omit<
-  IVideoNode,
-  'id' | 'level' | 'children'
->;
