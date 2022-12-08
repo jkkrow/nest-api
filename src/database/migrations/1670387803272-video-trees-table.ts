@@ -13,13 +13,14 @@ export class videoTreesTable1670387803272 implements MigrationInterface {
         title VARCHAR(50) NOT NULL,
         description VARCHAR(1000) NOT NULL,
         thumbnail VARCHAR(200) NOT NULL,
-        size REAL NOT NULL,
-        max_duration REAL NOT NULL,
-        min_duration REAL NOT NULL,
+        size REAL NOT NULL CHECK (size >= 0),
+        max_duration REAL NOT NULL CHECK (max_duration >= 0),
+        min_duration REAL NOT NULL CHECK (min_duration >= 0),
         status video_tree_status NOT NULL,
         editing BOOLEAN NOT NULL,
         created_at TIMESTAMP NOT NULL DEFAULT now(),
         updated_at TIMESTAMP NOT NULL DEFAULT now()
+        CHECK (max_duration >= min_duration)
       )
     `);
   }

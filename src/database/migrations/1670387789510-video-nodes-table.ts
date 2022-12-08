@@ -9,11 +9,13 @@ export class videoNodesTable1670387789510 implements MigrationInterface {
         name VARCHAR(100) NOT NULL,
         label VARCHAR(100) NOT NULL,
         url VARCHAR(200) NOT NULL,
-        level INTEGER NOT NULL,
-        size REAL NOT NULL,
-        duration REAL NOT NULL,
-        selection_time_start REAL NOT NULL,
-        selection_time_end REAL NOT NULL
+        level INTEGER NOT NULL CHECK (level >= 0),
+        size REAL NOT NULL CHECK (size >= 0),
+        duration REAL NOT NULL CHECK (duration >= 0),
+        selection_time_start REAL NOT NULL CHECK (selection_time_start >= 0),
+        selection_time_end REAL NOT NULL CHECK (selection_time_end >= 0),
+        CHECK (selection_time_end >= selection_time_start),
+        CHECK (duration >= selection_time_end)
       )
     `);
   }

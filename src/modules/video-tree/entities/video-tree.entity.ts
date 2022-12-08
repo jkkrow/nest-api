@@ -1,5 +1,6 @@
 import {
   Entity,
+  Check,
   Column,
   OneToOne,
   ManyToOne,
@@ -18,6 +19,10 @@ import {
 } from '../constants/video-tree.contstant';
 
 @Entity('video_trees')
+@Check('size >= 0')
+@Check('max_duration >= 0')
+@Check('min_duration >= 0')
+@Check('max_duration >= min_duration')
 export class VideoTreeEntity extends BaseEntityWithTimestamps {
   @Column({ type: 'varchar', length: 50 })
   title: string;
