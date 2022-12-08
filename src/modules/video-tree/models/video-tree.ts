@@ -4,9 +4,10 @@ import { NotFoundException, BadRequestException } from 'src/common/exceptions';
 import { VideoTreeCreatedEvent } from '../events/impl/video-tree-created.event';
 import { VideoTreeDeletedEvent } from '../events/impl/video-tree-deleted.event';
 import { VideoNodeCreatedEvent } from '../events/impl/video-node-created.event';
+import { VideoNodeUpdatedEvent } from '../events/impl/video-node-updated.event';
 import { VideoNodeDeletedEvent } from '../events/impl/video-node-deleted.event';
 import { IVideoTree } from '../interfaces/video-tree';
-import { IVideoNode } from '../interfaces/video-node';
+import { IVideoNode, UpdateVideoNodeParams } from '../interfaces/video-node';
 import { VideoTreeStatus } from '../constants/video-tree.contstant';
 
 export class VideoTree extends AggregateRoot implements IVideoTree {
@@ -111,6 +112,20 @@ export class VideoTree extends AggregateRoot implements IVideoTree {
 
     parentNode.children.push(node);
     this.apply(new VideoNodeCreatedEvent(id));
+  }
+
+  updateNode(id: string, updates: UpdateVideoNodeParams) {
+    const videoNode = this.findNodeById(id);
+
+    if (!videoNode) {
+      throw new NotFoundException('VideoNode not found');
+    }
+
+    for (const key in updates) {
+      videoNode[key] = updates[key];
+    }
+
+    this.apply(new VideoNodeUpdatedEvent(id));
   }
 
   deleteNode(id: string) {

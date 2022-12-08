@@ -17,7 +17,7 @@ export class VideoTreeFactory
     const videoTree = this.publisher.mergeObjectContext(
       new VideoTree({
         ...params,
-        title: '',
+        title: 'Untitled',
         categories: [],
         description: '',
         thumbnail: '',

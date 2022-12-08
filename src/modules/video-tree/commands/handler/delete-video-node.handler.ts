@@ -1,8 +1,9 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import {
-  BadRequestException,
+  NotFoundException,
   UnauthorizedException,
+  BadRequestException,
 } from 'src/common/exceptions';
 import { DeleteVideoNodeCommand } from '../impl/delete-video-node.command';
 import { VideoTreeRepository } from '../../models/video-tree.repository';
@@ -15,6 +16,10 @@ export class DeleteVideoNodeHandler
 
   async execute({ id, treeId, userId }: DeleteVideoNodeCommand) {
     const videoTree = await this.repository.findById(treeId);
+
+    if (!videoTree) {
+      throw new NotFoundException('VideoTree not found');
+    }
 
     if (videoTree.userId !== userId) {
       throw new UnauthorizedException('VideoTree not belong to user');

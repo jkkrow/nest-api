@@ -4,16 +4,16 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from 'src/common/exceptions';
-import { CreateVideoNodeCommand } from '../impl/create-video-node.command';
+import { UpdateVideoNodeCommand } from '../impl/update-video-node.command';
 import { VideoTreeRepository } from '../../models/video-tree.repository';
 
-@CommandHandler(CreateVideoNodeCommand)
-export class CreateVideoNodeHandler
-  implements ICommandHandler<CreateVideoNodeCommand>
+@CommandHandler(UpdateVideoNodeCommand)
+export class UpdateVideoNodeHandler
+  implements ICommandHandler<UpdateVideoNodeCommand>
 {
   constructor(private readonly repository: VideoTreeRepository) {}
 
-  async execute({ id, treeId, parentId, userId }: CreateVideoNodeCommand) {
+  async execute({ id, treeId, updates, userId }: UpdateVideoNodeCommand) {
     const videoTree = await this.repository.findById(treeId);
 
     if (!videoTree) {
@@ -24,7 +24,9 @@ export class CreateVideoNodeHandler
       throw new UnauthorizedException('VideoTree not belong to user');
     }
 
-    videoTree.createNode(id, parentId);
+    // TODO: Validate data by comparing to uploaded video in s3
+
+    videoTree.updateNode(id, updates);
 
     await this.repository.save(videoTree);
 

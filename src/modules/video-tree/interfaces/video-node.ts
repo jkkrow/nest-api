@@ -1,4 +1,4 @@
-export class IVideoNode {
+export interface IVideoNode {
   id: string;
   name: string;
   url: string;
@@ -10,3 +10,8 @@ export class IVideoNode {
   selectionTimeEnd: number;
   children: IVideoNode[];
 }
+
+export type UpdateVideoNodeParams = Omit<
+  IVideoNode,
+  'id' | 'level' | 'children'
+>;

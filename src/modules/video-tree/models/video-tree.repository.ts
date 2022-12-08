@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, TreeRepository } from 'typeorm';
 
-import { NotFoundException } from 'src/common/exceptions';
 import { BaseRepository } from 'src/providers/database/models/database.repository';
 import { VideoNodeEntity } from '../entities/video-node.entity';
 import { VideoTreeEntity } from '../entities/video-tree.entity';
@@ -15,11 +14,11 @@ export class VideoTreeRepository extends BaseRepository<
   VideoTree
 > {
   constructor(
-    @InjectRepository(VideoNodeEntity)
-    private readonly treeRepository: TreeRepository<VideoNodeEntity>,
     @InjectRepository(VideoTreeEntity)
     readonly repository: Repository<VideoTreeEntity>,
     readonly factory: VideoTreeFactory,
+    @InjectRepository(VideoNodeEntity)
+    private readonly treeRepository: TreeRepository<VideoNodeEntity>,
   ) {
     super(repository, factory);
   }
@@ -28,12 +27,11 @@ export class VideoTreeRepository extends BaseRepository<
     const videoTree = await this.repository.findOneBy({ id });
 
     if (!videoTree) {
-      throw new NotFoundException('VideoTree not found');
+      return null;
     }
 
-    videoTree.root = await this.treeRepository.findDescendantsTree(
-      videoTree.root,
-    );
+    const node = await this.treeRepository.findDescendantsTree(videoTree.root);
+    videoTree.root = node;
 
     return this.factory.createFromEntity(videoTree);
   }

@@ -1,6 +1,7 @@
 import {
   Controller,
   Post,
+  Patch,
   Delete,
   Redirect,
   Body,
@@ -17,9 +18,11 @@ import { MessageResponse } from 'src/common/dtos/response/message.response';
 import { CreateVideoTreeCommand } from '../commands/impl/create-video-tree.command';
 import { DeleteVideoTreeCommand } from '../commands/impl/delete-video-tree.command';
 import { CreateVideoNodeCommand } from '../commands/impl/create-video-node.command';
+import { UpdateVideoNodeCommand } from '../commands/impl/update-video-node.command';
 import { DeleteVideoNodeCommand } from '../commands/impl/delete-video-node.command';
 import { CreateVideoNodeRequest } from '../dtos/request/create-video-node.request';
 import { CreateVideoNodeResponse } from '../dtos/response/create-video-node.response';
+import { UpdateVideoNodeRequest } from '../dtos/request/update-video-node.request';
 
 @ApiTags('VideoTrees')
 @Controller('video-trees')
@@ -63,8 +66,8 @@ export class VideoTreeController {
   @Role('verified')
   @Serialize(CreateVideoNodeResponse, { status: 201 })
   async createVideoNode(
-    @Param('treeId') treeId: string,
     @Body() { parentId }: CreateVideoNodeRequest,
+    @Param('treeId') treeId: string,
     @RequestUserId() userId: string,
   ) {
     const id = uuidv4();
@@ -72,6 +75,23 @@ export class VideoTreeController {
     await this.commandBus.execute(command);
 
     return { id };
+  }
+
+  /* Update VideoNode */
+  /*--------------------------------------------*/
+  @Patch(':treeId/video-nodes/:nodeId')
+  @Role('verified')
+  @Serialize(MessageResponse)
+  async updateVideoNode(
+    @Body() updates: UpdateVideoNodeRequest,
+    @Param('treeId') treeId: string,
+    @Param('nodeId') nodeId: string,
+    @RequestUserId() userId: string,
+  ) {
+    const command = new UpdateVideoNodeCommand(nodeId, treeId, updates, userId);
+    await this.commandBus.execute(command);
+
+    return { message: 'VideoNode updated successfully' };
   }
 
   /* Delete VideoNode */
