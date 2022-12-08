@@ -1,3 +1,5 @@
+import { Optional } from 'utility-types';
+
 import { UserType, MembershipName } from '../constants/user.constant';
 
 export interface IUser {
@@ -18,3 +20,8 @@ export interface IMembership {
   expiredAt: Date;
   cancelled: boolean;
 }
+
+export type CreateUserParams = Optional<
+  IUser,
+  'picture' | 'verified' | 'admin' | 'membership'
+>;

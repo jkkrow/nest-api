@@ -1,15 +1,10 @@
 import { EventPublisher } from '@nestjs/cqrs';
 import { Injectable } from '@nestjs/common';
-import { Optional } from 'utility-types';
 
 import { BaseFactory } from 'src/providers/database/models/database.factory';
+import { CreateUserParams } from '../interfaces/user.interface';
 import { UserEntity } from '../entities/user.entity';
 import { User } from './user';
-
-type CreateUserParams = Optional<
-  User['props'],
-  'picture' | 'verified' | 'admin' | 'membership'
->;
 
 @Injectable()
 export class UserFactory implements BaseFactory<UserEntity, User> {
