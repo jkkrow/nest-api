@@ -5,7 +5,6 @@ import {
   OneToOne,
   ManyToOne,
   ManyToMany,
-  JoinColumn,
   JoinTable,
 } from 'typeorm';
 
@@ -51,15 +50,13 @@ export class VideoTreeEntity extends BaseEntityWithTimestamps {
   @Column({ type: 'uuid' })
   userId: string;
 
-  @ManyToOne(() => UserEntity, { onDelete: 'CASCADE' })
+  @ManyToOne(() => UserEntity, (user) => user.id, { onDelete: 'CASCADE' })
   user: UserEntity;
 
-  @OneToOne(() => VideoNodeEntity, {
+  @OneToOne(() => VideoNodeEntity, (node) => node.tree, {
     cascade: true,
     eager: true,
-    onDelete: 'CASCADE',
   })
-  @JoinColumn({ name: 'root_id' })
   root: VideoNodeEntity;
 
   @ManyToMany(() => CategoryEntity, { cascade: true, eager: true })

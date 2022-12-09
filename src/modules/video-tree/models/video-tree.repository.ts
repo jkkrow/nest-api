@@ -41,7 +41,6 @@ export class VideoTreeRepository extends BaseRepository<
   }
 
   async delete(videoTree: VideoTree) {
-    const videoTreeEntity = this.factory.createEntity(videoTree);
-    await this.treeRepository.remove(videoTreeEntity.root);
+    await this._delete(videoTree);
   }
 }

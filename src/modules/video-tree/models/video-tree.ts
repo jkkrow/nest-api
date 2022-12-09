@@ -75,8 +75,8 @@ export class VideoTree extends AggregateRoot implements IVideoTree {
     return this.props.editing;
   }
 
-  get root() {
-    return JSON.parse(JSON.stringify(this.props.root)) as IVideoNode;
+  get root(): IVideoNode {
+    return JSON.parse(JSON.stringify(this.props.root));
   }
 
   create() {

@@ -1,6 +1,16 @@
-import { Entity, Check, Column, Tree, TreeParent, TreeChildren } from 'typeorm';
+import {
+  Entity,
+  Check,
+  Column,
+  Tree,
+  TreeParent,
+  TreeChildren,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
 
 import { BaseEntity } from 'src/providers/database/entities/database.entity';
+import { VideoTreeEntity } from './video-tree.entity';
 
 @Entity('video_nodes')
 @Tree('closure-table', {
@@ -45,4 +55,8 @@ export class VideoNodeEntity extends BaseEntity {
 
   @TreeChildren({ cascade: true })
   children: VideoNodeEntity[];
+
+  @OneToOne(() => VideoTreeEntity, (tree) => tree.root, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'tree_id' })
+  tree: VideoTreeEntity;
 }
