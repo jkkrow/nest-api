@@ -15,3 +15,19 @@ export interface IVideoTree {
   userId: string;
   root: IVideoNode;
 }
+
+export interface UpdateVideoTreeProps {
+  title: string;
+  categories: string[];
+  description: string;
+  thumbnail: string;
+  status: VideoTreeStatus;
+  editing: boolean;
+  root: {
+    id: string;
+    label: string;
+    selectionTimeStart: number;
+    selectionTimeEnd: number;
+    children: UpdateVideoTreeProps['root'][];
+  };
+}

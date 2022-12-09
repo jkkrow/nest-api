@@ -1,18 +1,9 @@
-import { Allow, IsString, Min } from 'class-validator';
+import { IsString, Min } from 'class-validator';
 
 import { IsLessThanOrEqualTo } from 'src/common/decorators/validator.decorator';
-import { IVideoNode } from '../../interfaces/video-node';
+import { UpdateVideoNodeProps } from '../../interfaces/video-node';
 
-export class UpdateVideoNodeRequest implements IVideoNode {
-  @Allow()
-  id: string;
-
-  @Allow()
-  level: number;
-
-  @Allow()
-  children: IVideoNode[];
-
+export class UpdateVideoNodeRequest implements UpdateVideoNodeProps {
   @IsString()
   name: string;
 

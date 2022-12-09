@@ -10,3 +10,13 @@ export interface IVideoNode {
   selectionTimeEnd: number;
   children: IVideoNode[];
 }
+
+export interface UpdateVideoNodeProps {
+  name: string;
+  url: string;
+  duration: number;
+  size: number;
+  label: string;
+  selectionTimeStart: number;
+  selectionTimeEnd: number;
+}

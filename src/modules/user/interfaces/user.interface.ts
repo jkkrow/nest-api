@@ -1,5 +1,3 @@
-import { Optional } from 'utility-types';
-
 import { UserType, MembershipName } from '../constants/user.constant';
 
 export interface IUser {
@@ -21,7 +19,10 @@ export interface IMembership {
   cancelled: boolean;
 }
 
-export type CreateUserParams = Optional<
-  IUser,
-  'picture' | 'verified' | 'admin' | 'membership'
->;
+export interface CreateUserParams extends Partial<IUser> {
+  id: string;
+  type: UserType;
+  name: string;
+  email: string;
+  password: string;
+}

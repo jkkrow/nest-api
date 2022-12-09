@@ -1,5 +1,4 @@
 import {
-  Allow,
   IsString,
   IsNumber,
   IsBoolean,
@@ -12,26 +11,11 @@ import {
   VideoTreeStatus,
   VIDEO_TREE_STATUS,
 } from '../../constants/video-tree.contstant';
-import { IVideoTree } from '../../interfaces/video-tree';
+import { UpdateVideoTreeProps } from '../../interfaces/video-tree';
 
 class UpdateVideoTreeRoot {
-  @Allow()
+  @IsString()
   id: string;
-
-  @Allow()
-  level: number;
-
-  @Allow()
-  name: string;
-
-  @Allow()
-  url: string;
-
-  @Allow()
-  size: number;
-
-  @Allow()
-  duration: number;
 
   @IsString()
   label: string;
@@ -47,22 +31,7 @@ class UpdateVideoTreeRoot {
   children: UpdateVideoTreeRoot[];
 }
 
-export class UpdateVideoTreeRequest implements IVideoTree {
-  @Allow()
-  id: string;
-
-  @Allow()
-  userId: string;
-
-  @Allow()
-  size: number;
-
-  @Allow()
-  maxDuration: number;
-
-  @Allow()
-  minDuration: number;
-
+export class UpdateVideoTreeRequest implements UpdateVideoTreeProps {
   @IsString()
   title: string;
 

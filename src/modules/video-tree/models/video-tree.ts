@@ -7,8 +7,8 @@ import { VideoTreeDeletedEvent } from '../events/impl/video-tree-deleted.event';
 import { VideoNodeCreatedEvent } from '../events/impl/video-node-created.event';
 import { VideoNodeUpdatedEvent } from '../events/impl/video-node-updated.event';
 import { VideoNodeDeletedEvent } from '../events/impl/video-node-deleted.event';
-import { IVideoTree } from '../interfaces/video-tree';
-import { IVideoNode } from '../interfaces/video-node';
+import { IVideoTree, UpdateVideoTreeProps } from '../interfaces/video-tree';
+import { IVideoNode, UpdateVideoNodeProps } from '../interfaces/video-node';
 import { VideoTreeStatus } from '../constants/video-tree.contstant';
 
 export class VideoTree extends AggregateRoot implements IVideoTree {
@@ -83,7 +83,7 @@ export class VideoTree extends AggregateRoot implements IVideoTree {
     this.apply(new VideoTreeCreatedEvent(this.id));
   }
 
-  update(updates: IVideoTree) {
+  update(updates: UpdateVideoTreeProps) {
     this.props.title = updates.title;
     this.props.description = updates.description;
     this.props.categories = updates.categories;
@@ -92,7 +92,7 @@ export class VideoTree extends AggregateRoot implements IVideoTree {
     this.props.editing = updates.editing;
 
     const savedNodes = this.traverseNodes();
-    const newNodes = this.traverseNodes(updates.root);
+    const newNodes = this.traverseNodes(updates.root as IVideoNode);
 
     savedNodes.forEach((savedNode) => {
       newNodes.forEach((newNode) => {
@@ -146,7 +146,7 @@ export class VideoTree extends AggregateRoot implements IVideoTree {
     this.apply(new VideoNodeCreatedEvent(id));
   }
 
-  updateNode(id: string, updates: IVideoNode) {
+  updateNode(id: string, updates: UpdateVideoNodeProps) {
     const videoNode = this.findNodeById(id);
 
     if (!videoNode) {
