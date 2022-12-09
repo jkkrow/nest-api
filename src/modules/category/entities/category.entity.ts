@@ -1,9 +1,7 @@
-import { Entity, Column } from 'typeorm';
-
-import { BaseEntity } from 'src/providers/database/entities/database.entity';
+import { PrimaryColumn, Entity } from 'typeorm';
 
 @Entity('categories')
-export class CategoryEntity extends BaseEntity {
-  @Column({ type: 'varchar', length: 30 })
+export class CategoryEntity {
+  @PrimaryColumn({ type: 'varchar', length: 30 })
   name: string;
 }

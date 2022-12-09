@@ -66,7 +66,7 @@ export class VideoTreeEntity extends BaseEntityWithTimestamps {
   @JoinTable({
     name: 'categories_video_trees',
     joinColumn: { name: 'video_tree_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'category_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'category_name', referencedColumnName: 'name' },
   })
   categories: CategoryEntity[];
 }

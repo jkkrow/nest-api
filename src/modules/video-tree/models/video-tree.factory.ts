@@ -3,7 +3,6 @@ import { Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 
 import { BaseFactory } from 'src/providers/database/models/database.factory';
-import { CategoryEntity } from '../../category/entities/category.entity';
 import { VideoTreeEntity } from '../entities/video-tree.entity';
 import { VideoTree } from './video-tree';
 
@@ -47,17 +46,11 @@ export class VideoTreeFactory
   }
 
   createEntity(model: VideoTree): VideoTreeEntity {
-    const categories = model.categories.map((name) => {
-      const category = new CategoryEntity();
-      category.name = name;
-      return category;
-    });
-
     return {
       id: model.id,
       userId: model.userId,
       title: model.title,
-      categories,
+      categories: model.categories.map((name) => ({ name })),
       description: model.description,
       thumbnail: model.thumbnail,
       size: model.size,

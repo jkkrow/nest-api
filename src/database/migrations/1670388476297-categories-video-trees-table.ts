@@ -6,9 +6,9 @@ export class categoriesVideoTreesTable1670388476297
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
       CREATE TABLE categories_video_trees (
-        category_id UUID NOT NULL REFERENCES categories(id) ON DELETE CASCADE,
+        category_name VARCHAR NOT NULL REFERENCES categories(name) ON DELETE CASCADE,
         video_tree_id UUID NOT NULL REFERENCES video_trees(id) ON DELETE CASCADE,
-        PRIMARY KEY(category_id, video_tree_id)
+        PRIMARY KEY(category_name, video_tree_id)
       )
     `);
   }
