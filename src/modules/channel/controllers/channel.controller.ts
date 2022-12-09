@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Query, HttpCode } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Query } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
 import { ApiTags } from '@nestjs/swagger';
 
@@ -66,7 +66,7 @@ export class ChannelController {
   /* Subscribe to Channel */
   /*--------------------------------------------*/
   @Post(':id/subscriptions')
-  @Role('user')
+  @Role('verified')
   @Serialize(MessageResponse, { status: 201 })
   async subscribe(@Param('id') id: string, @RequestUserId() userId: string) {
     await this.subscriptionService.subscribe(id, userId);
@@ -78,9 +78,8 @@ export class ChannelController {
 
   /* Unsubscribe from Channel */
   /*--------------------------------------------*/
-  @Post(':id/subscriptions/cancel')
-  @HttpCode(200)
-  @Role('user')
+  @Delete(':id/subscriptions')
+  @Role('verified')
   @Serialize(MessageResponse)
   async unsubscribe(@Param('id') id: string, @RequestUserId() userId: string) {
     await this.subscriptionService.unsubscribe(id, userId);
@@ -88,5 +87,13 @@ export class ChannelController {
     return {
       message: 'Unsubscribed from channel successfully',
     };
+  }
+
+  /* Get Current Channel Videos */
+  /*--------------------------------------------*/
+  @Get('current/video-trees/:id')
+  @Role('user')
+  async getCurrentChannelVideoTrees() {
+    return {};
   }
 }

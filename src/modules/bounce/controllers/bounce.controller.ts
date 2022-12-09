@@ -4,7 +4,7 @@ import {
   Delete,
   UseGuards,
   Body,
-  Query,
+  Param,
 } from '@nestjs/common';
 import { ApiTags, ApiBasicAuth } from '@nestjs/swagger';
 
@@ -14,7 +14,6 @@ import { Role } from 'src/auth/decorators/role.decorator';
 import { MessageResponse } from 'src/common/dtos/response/message.response';
 import { BounceService } from '../services/bounce.service';
 import { CreateBounceRequest } from '../dtos/request/create-bounce.request';
-import { DeleteBounceRequest } from '../dtos/request/delete-bounce.request';
 
 @ApiTags('Bounces')
 @Controller('bounces')
@@ -37,10 +36,10 @@ export class BounceController {
 
   /* Delete Bounce */
   /*--------------------------------------------*/
-  @Delete()
+  @Delete(':email')
   @Role('admin')
   @Serialize(MessageResponse)
-  async deleteBounce(@Query() { email }: DeleteBounceRequest) {
+  async deleteBounce(@Param('email') email: string) {
     await this.bounceService.delete(email);
 
     return {

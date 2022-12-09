@@ -15,6 +15,7 @@ import { Role } from 'src/auth/decorators/role.decorator';
 import { RequestUserId } from 'src/auth/decorators/user.decorator';
 import { Serialize } from 'src/common/interceptors/serialize.interceptor';
 import { MessageResponse } from 'src/common/dtos/response/message.response';
+import { RedirectResponse } from 'src/common/dtos/response/redirect.response';
 import { CreateVideoTreeCommand } from '../commands/impl/create-video-tree.command';
 import { UpdateVideoTreeCommand } from '../commands/impl/update-video-tree.command';
 import { DeleteVideoTreeCommand } from '../commands/impl/delete-video-tree.command';
@@ -37,27 +38,28 @@ export class VideoTreeController {
   /* Create VideoTree */
   /*--------------------------------------------*/
   @Post()
-  @Role('verified')
   @Redirect()
+  @Role('verified')
+  @Serialize(RedirectResponse, { status: 302 })
   async createVideoTree(@RequestUserId() userId: string) {
     const id = uuidv4();
     const command = new CreateVideoTreeCommand(id, userId);
     await this.commandBus.execute(command);
 
-    return { url: `/users/current/video-trees/${id}` };
+    return { url: `/channels/current/video-trees/${id}` };
   }
 
   /* Update VideoTree */
   /*--------------------------------------------*/
-  @Patch(':treeId')
+  @Patch(':id')
   @Role('verified')
   @Serialize(MessageResponse)
   async updateVideoTree(
     @Body() updates: UpdateVideoTreeRequest,
-    @Param('treeId') treeId: string,
+    @Param('id') id: string,
     @RequestUserId() userId: string,
   ) {
-    const command = new UpdateVideoTreeCommand(treeId, updates, userId);
+    const command = new UpdateVideoTreeCommand(id, updates, userId);
     await this.commandBus.execute(command);
 
     return { message: 'VideoTree updated successfully' };
@@ -65,14 +67,14 @@ export class VideoTreeController {
 
   /* Delete VideoTree */
   /*--------------------------------------------*/
-  @Delete(':treeId')
+  @Delete(':id')
   @Role('verified')
   @Serialize(MessageResponse)
   async deleteVideoTree(
-    @Param('treeId') treeId: string,
+    @Param('id') id: string,
     @RequestUserId() userId: string,
   ) {
-    const command = new DeleteVideoTreeCommand(treeId, userId);
+    const command = new DeleteVideoTreeCommand(id, userId);
     await this.commandBus.execute(command);
 
     return { message: 'VideoTree deleted successfully' };
@@ -80,12 +82,12 @@ export class VideoTreeController {
 
   /* Create VideoNode */
   /*--------------------------------------------*/
-  @Post(':treeId/video-nodes')
+  @Post(':id/video-nodes')
   @Role('verified')
   @Serialize(CreateVideoNodeResponse, { status: 201 })
   async createVideoNode(
     @Body() { parentId }: CreateVideoNodeRequest,
-    @Param('treeId') treeId: string,
+    @Param('id') treeId: string,
     @RequestUserId() userId: string,
   ) {
     const id = uuidv4();
@@ -97,16 +99,16 @@ export class VideoTreeController {
 
   /* Update VideoNode */
   /*--------------------------------------------*/
-  @Patch(':treeId/video-nodes/:nodeId')
+  @Patch(':id/video-nodes/:nodeId')
   @Role('verified')
   @Serialize(MessageResponse)
   async updateVideoNode(
     @Body() updates: UpdateVideoNodeRequest,
-    @Param('treeId') treeId: string,
-    @Param('nodeId') nodeId: string,
+    @Param('id') treeId: string,
+    @Param('nodeId') id: string,
     @RequestUserId() userId: string,
   ) {
-    const command = new UpdateVideoNodeCommand(nodeId, treeId, updates, userId);
+    const command = new UpdateVideoNodeCommand(id, treeId, updates, userId);
     await this.commandBus.execute(command);
 
     return { message: 'VideoNode updated successfully' };
@@ -114,17 +116,35 @@ export class VideoTreeController {
 
   /* Delete VideoNode */
   /*--------------------------------------------*/
-  @Delete(':treeId/video-nodes/:nodeId')
+  @Delete(':id/video-nodes/:nodeId')
   @Role('verified')
   @Serialize(MessageResponse)
   async deleteVideoNode(
-    @Param('treeId') treeId: string,
-    @Param('nodeId') nodeId: string,
+    @Param('id') treeId: string,
+    @Param('nodeId') id: string,
     @RequestUserId() userId: string,
   ) {
-    const command = new DeleteVideoNodeCommand(nodeId, treeId, userId);
+    const command = new DeleteVideoNodeCommand(id, treeId, userId);
     await this.commandBus.execute(command);
 
     return { message: 'VideoNode deleted successfully' };
+  }
+
+  /* Add to favorites */
+  /*--------------------------------------------*/
+  @Post(':id/favorites')
+  @Role('verified')
+  @Serialize(MessageResponse, { status: 201 })
+  async addToFavorites() {
+    return { message: 'Added to favorites successfully' };
+  }
+
+  /* Remove from VideoNode */
+  /*--------------------------------------------*/
+  @Delete(':id/favorites')
+  @Role('verified')
+  @Serialize(MessageResponse)
+  async removeFromFavorites() {
+    return { message: 'Removed from favorites successfully' };
   }
 }

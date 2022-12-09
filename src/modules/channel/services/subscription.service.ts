@@ -15,7 +15,7 @@ export class SubscriptionService {
     return this.repository
       .createQueryBuilder()
       .insert()
-      .values({ publisherId, subscriberId, createdAt: new Date() })
+      .values({ publisherId, subscriberId })
       .orIgnore()
       .execute();
   }
