@@ -4,6 +4,7 @@ import { VideoTreeDeletedHandler } from './video-tree-deleted.handler';
 import { VideoNodeCreatedHandler } from './video-node-created.handler';
 import { VideoNodeUpdatedHandler } from './video-node-updated.handler';
 import { VideoNodeDeletedHandler } from './video-node-deleted.handler';
+import { VideoTreeWatchedHandler } from './video-tree-watched.handler';
 
 export const EventHandlers = [
   VideoTreeCreatedHandler,
@@ -12,4 +13,5 @@ export const EventHandlers = [
   VideoNodeCreatedHandler,
   VideoNodeUpdatedHandler,
   VideoNodeDeletedHandler,
+  VideoTreeWatchedHandler,
 ];

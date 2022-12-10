@@ -1,5 +1,5 @@
 import { IQuery } from '@nestjs/cqrs';
 
-export class GetUserVideoTreeQuery implements IQuery {
+export class GetCurrentChannelVideoTreeQuery implements IQuery {
   constructor(public readonly id: string, public readonly userId: string) {}
 }

@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { mw } from 'request-ip';
 import helmet from 'helmet';
 
 import { AppModule } from './app.module';
@@ -33,6 +34,7 @@ export async function bootstrap(server = true) {
 
   app.enableCors({ origin });
   app.use(helmet());
+  app.use(mw({ attributeName: 'ip' }));
 
   server && (await app.listen(port));
 

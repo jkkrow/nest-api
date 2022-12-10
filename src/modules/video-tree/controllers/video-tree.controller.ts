@@ -1,11 +1,13 @@
 import {
   Controller,
+  Get,
   Post,
   Patch,
   Delete,
   Redirect,
   Body,
   Param,
+  Ip,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiTags } from '@nestjs/swagger';
@@ -16,12 +18,18 @@ import { RequestUserId } from 'src/auth/decorators/user.decorator';
 import { Serialize } from 'src/common/interceptors/serialize.interceptor';
 import { MessageResponse } from 'src/common/dtos/response/message.response';
 import { RedirectResponse } from 'src/common/dtos/response/redirect.response';
+
 import { CreateVideoTreeCommand } from '../commands/impl/create-video-tree.command';
 import { UpdateVideoTreeCommand } from '../commands/impl/update-video-tree.command';
 import { DeleteVideoTreeCommand } from '../commands/impl/delete-video-tree.command';
 import { CreateVideoNodeCommand } from '../commands/impl/create-video-node.command';
 import { UpdateVideoNodeCommand } from '../commands/impl/update-video-node.command';
 import { DeleteVideoNodeCommand } from '../commands/impl/delete-video-node.command';
+import { AddToFavoritesCommand } from '../commands/impl/add-to-favorites.command';
+import { RemoveFromFavoritesCommand } from '../commands/impl/remove-from-favorites.command';
+
+import { WatchVideoTreeQuery } from '../queries/impl/watch-video-tree.query';
+
 import { UpdateVideoTreeRequest } from '../dtos/request/update-video-tree.request';
 import { CreateVideoNodeRequest } from '../dtos/request/create-video-node.request';
 import { CreateVideoNodeResponse } from '../dtos/response/create-video-node.response';
@@ -135,7 +143,13 @@ export class VideoTreeController {
   @Post(':id/favorites')
   @Role('verified')
   @Serialize(MessageResponse, { status: 201 })
-  async addToFavorites() {
+  async addToFavorites(
+    @Param('id') id: string,
+    @RequestUserId() userId: string,
+  ) {
+    const command = new AddToFavoritesCommand(id, userId);
+    await this.commandBus.execute(command);
+
     return { message: 'Added to favorites successfully' };
   }
 
@@ -144,7 +158,27 @@ export class VideoTreeController {
   @Delete(':id/favorites')
   @Role('verified')
   @Serialize(MessageResponse)
-  async removeFromFavorites() {
+  async removeFromFavorites(
+    @Param('id') id: string,
+    @RequestUserId() userId: string,
+  ) {
+    const command = new RemoveFromFavoritesCommand(id, userId);
+    await this.commandBus.execute(command);
+
     return { message: 'Removed from favorites successfully' };
+  }
+
+  /* Watch VideoTree */
+  /*--------------------------------------------*/
+  @Get(':id/watch')
+  async watchVideoTree(
+    @Param('id') id: string,
+    @Ip() ip: string,
+    @RequestUserId() userId?: string,
+  ) {
+    const query = new WatchVideoTreeQuery(id, ip, userId);
+    const videoTree = await this.queryBus.execute(query);
+
+    return { videoTree };
   }
 }
