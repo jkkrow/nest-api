@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Delete, Param, Query } from '@nestjs/common';
-import { QueryBus } from '@nestjs/cqrs';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiTags } from '@nestjs/swagger';
 
 import { Serialize } from 'src/common/interceptors/serialize.interceptor';
@@ -7,10 +7,11 @@ import { PaginationRequest } from 'src/common/dtos/request/pagination.request';
 import { MessageResponse } from 'src/common/dtos/response/message.response';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { RequestUserId } from 'src/auth/decorators/user.decorator';
-import { SubscriptionService } from '../services/subscription.service';
 import { GetChannelQuery } from '../queries/impl/get-channel.query';
 import { GetSubscribersQuery } from '../queries/impl/get-subscribers.query';
 import { GetSubscribesQuery } from '../queries/impl/get-subscribes.query';
+import { SubscribeChannelCommand } from '../commands/impl/subscribe.command';
+import { UnsubscribeChannelCommand } from '../commands/impl/unsubscribe.command';
 import { GetChannelResponse } from '../dtos/response/get-channel.response';
 import { GetChannelsResponse } from '../dtos/response/get-channels.response';
 
@@ -18,8 +19,8 @@ import { GetChannelsResponse } from '../dtos/response/get-channels.response';
 @Controller('channels')
 export class ChannelController {
   constructor(
+    private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
-    private readonly subscriptionService: SubscriptionService,
   ) {}
 
   /* Get Channel */
@@ -68,12 +69,14 @@ export class ChannelController {
   @Post(':id/subscriptions')
   @Role('verified')
   @Serialize(MessageResponse, { status: 201 })
-  async subscribe(@Param('id') id: string, @RequestUserId() userId: string) {
-    await this.subscriptionService.subscribe(id, userId);
+  async subscribeChannel(
+    @Param('id') id: string,
+    @RequestUserId() userId: string,
+  ) {
+    const command = new SubscribeChannelCommand(id, userId);
+    await this.commandBus.execute(command);
 
-    return {
-      message: 'Subscribed to channel successfully',
-    };
+    return { message: 'Subscribed to channel successfully' };
   }
 
   /* Unsubscribe from Channel */
@@ -81,12 +84,14 @@ export class ChannelController {
   @Delete(':id/subscriptions')
   @Role('verified')
   @Serialize(MessageResponse)
-  async unsubscribe(@Param('id') id: string, @RequestUserId() userId: string) {
-    await this.subscriptionService.unsubscribe(id, userId);
+  async unsubscribeChannel(
+    @Param('id') id: string,
+    @RequestUserId() userId: string,
+  ) {
+    const command = new UnsubscribeChannelCommand(id, userId);
+    await this.commandBus.execute(command);
 
-    return {
-      message: 'Unsubscribed from channel successfully',
-    };
+    return { message: 'Unsubscribed from channel successfully' };
   }
 
   /* Get Current Channel Videos */
