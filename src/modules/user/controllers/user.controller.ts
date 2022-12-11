@@ -7,12 +7,11 @@ import {
   Redirect,
   Body,
   Param,
-  HttpCode,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiTags } from '@nestjs/swagger';
 
-import { Serialize } from 'src/common/interceptors/serialize.interceptor';
+import { Serialize } from 'src/common/decorators/serialize.decorator';
 import { MessageResponse } from 'src/common/dtos/response/message.response';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { RequestUser, RequestUserId } from 'src/auth/decorators/user.decorator';
@@ -59,6 +58,7 @@ import { CancelMembershipRequest } from '../dtos/request/cancel-membership.reque
 import { UpdateMembershipRequest } from '../dtos/request/update-membership.request';
 import { DeleteUserRequest } from '../dtos/request/delete-user.request';
 import { DeleteGoogleUserRequest } from '../dtos/request/delete-google-user.request';
+import { RedirectResponse } from 'src/common/dtos/response/redirect.response';
 
 @ApiTags('Users')
 @Controller('users')
@@ -92,7 +92,6 @@ export class UserController {
   /* Signin User */
   /*--------------------------------------------*/
   @Post('signin')
-  @HttpCode(200)
   @Serialize(SigninResponse)
   async signin(@Body() { email, password }: SigninRequest) {
     const query = new SigninQuery(email, password);
@@ -106,7 +105,6 @@ export class UserController {
   /* Signin Google User */
   /*--------------------------------------------*/
   @Post('signin-google')
-  @HttpCode(200)
   @Serialize(GoogleSigninResponse)
   async googleSignin(@Body() { token }: GoogleSigninRequest) {
     const command = new CreateGoogleUserCommand(token);
@@ -123,7 +121,6 @@ export class UserController {
   /* Send Verification */
   /*--------------------------------------------*/
   @Post('verification')
-  @HttpCode(200)
   @Serialize(MessageResponse)
   async sendVerification(@Body() { email }: SendVerificationRequest) {
     const command = new SendVerificationCommand(email);
@@ -137,7 +134,6 @@ export class UserController {
   /* Check Verification */
   /*--------------------------------------------*/
   @Post('verification/:token')
-  @HttpCode(200)
   @Serialize(MessageResponse)
   async checkVerification(@Param('token') token: string) {
     const command = new CheckVerificationCommand(token);
@@ -151,7 +147,6 @@ export class UserController {
   /* Send Recovery */
   /*--------------------------------------------*/
   @Post('recovery')
-  @HttpCode(200)
   @Serialize(MessageResponse)
   async sendRecovery(@Body() { email }: SendRecoveryRequest) {
     const command = new SendRecoveryCommand(email);
@@ -165,7 +160,6 @@ export class UserController {
   /* Check Recovery */
   /*--------------------------------------------*/
   @Post('recovery/:token')
-  @HttpCode(200)
   @Serialize(MessageResponse)
   async checkRecovery(@Param('token') token: string) {
     const command = new CheckRecoveryCommand(token);
@@ -275,8 +269,9 @@ export class UserController {
   /* Create User Membership */
   /*--------------------------------------------*/
   @Post('current/membership')
-  @Role('verified')
   @Redirect()
+  @Role('verified')
+  @Serialize(RedirectResponse, { status: 302 })
   async createMembership(
     @Body() { subscriptionId }: CreateMembershipRequest,
     @RequestUserId() id: string,
@@ -331,7 +326,6 @@ export class UserController {
   /*--------------------------------------------*/
   @Post('current/deletion')
   @Role('user')
-  @HttpCode(200)
   @Serialize(MessageResponse)
   async deleteUser(
     @Body() { email, password }: DeleteUserRequest,
@@ -349,7 +343,6 @@ export class UserController {
   /*--------------------------------------------*/
   @Post('current/deletion-google')
   @Role('user')
-  @HttpCode(200)
   @Serialize(MessageResponse)
   async deleteGoogleUser(
     @Body() { token }: DeleteGoogleUserRequest,

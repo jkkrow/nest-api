@@ -13,11 +13,11 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiTags } from '@nestjs/swagger';
 import { v4 as uuidv4 } from 'uuid';
 
-import { Role } from 'src/auth/decorators/role.decorator';
-import { RequestUserId } from 'src/auth/decorators/user.decorator';
-import { Serialize } from 'src/common/interceptors/serialize.interceptor';
+import { Serialize } from 'src/common/decorators/serialize.decorator';
 import { MessageResponse } from 'src/common/dtos/response/message.response';
 import { RedirectResponse } from 'src/common/dtos/response/redirect.response';
+import { Role } from 'src/auth/decorators/role.decorator';
+import { RequestUserId } from 'src/auth/decorators/user.decorator';
 
 import { CreateVideoTreeCommand } from '../commands/impl/create-video-tree.command';
 import { UpdateVideoTreeCommand } from '../commands/impl/update-video-tree.command';

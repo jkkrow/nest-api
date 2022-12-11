@@ -2,7 +2,7 @@ import { Controller, Get, Post, Delete, Param, Query } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiTags } from '@nestjs/swagger';
 
-import { Serialize } from 'src/common/interceptors/serialize.interceptor';
+import { Serialize } from 'src/common/decorators/serialize.decorator';
 import { PaginationRequest } from 'src/common/dtos/request/pagination.request';
 import { MessageResponse } from 'src/common/dtos/response/message.response';
 import { Role } from 'src/auth/decorators/role.decorator';

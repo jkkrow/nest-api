@@ -1,7 +1,7 @@
 import { Controller, Post, Body } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 
-import { Serialize } from 'src/common/interceptors/serialize.interceptor';
+import { Serialize } from 'src/common/decorators/serialize.decorator';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { RequestUserId } from 'src/auth/decorators/user.decorator';
 import { PaymentService } from '../services/payment.service';

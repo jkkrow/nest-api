@@ -8,10 +8,10 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiBasicAuth } from '@nestjs/swagger';
 
-import { Serialize } from 'src/common/interceptors/serialize.interceptor';
-import { BasicGuard } from 'src/auth/guards/basic.guard';
-import { Role } from 'src/auth/decorators/role.decorator';
+import { Serialize } from 'src/common/decorators/serialize.decorator';
 import { MessageResponse } from 'src/common/dtos/response/message.response';
+import { Role } from 'src/auth/decorators/role.decorator';
+import { BasicGuard } from 'src/auth/guards/basic.guard';
 import { BounceService } from '../services/bounce.service';
 import { CreateBounceRequest } from '../dtos/request/create-bounce.request';
 

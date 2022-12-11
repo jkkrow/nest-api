@@ -1,16 +1,8 @@
-import {
-  Controller,
-  Post,
-  Put,
-  Delete,
-  Body,
-  Param,
-  HttpCode,
-} from '@nestjs/common';
+import { Controller, Post, Put, Delete, Body, Param } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { v4 as uuidv4 } from 'uuid';
 
-import { Serialize } from 'src/common/interceptors/serialize.interceptor';
+import { Serialize } from 'src/common/decorators/serialize.decorator';
 import { MessageResponse } from 'src/common/dtos/response/message.response';
 import { UnauthorizedException } from 'src/common/exceptions';
 import { Role } from 'src/auth/decorators/role.decorator';
@@ -35,7 +27,6 @@ export class UploadController {
   /*--------------------------------------------*/
   @Post('multipart')
   @Role('verified')
-  @HttpCode(200)
   @Serialize(InitiateMultipartUploadResponse)
   async initiateMultipartUpload(
     @Body() { videoId, fileName, fileType }: InitiateMultipartUploadRequest,
@@ -71,7 +62,6 @@ export class UploadController {
   /*--------------------------------------------*/
   @Post('multipart/:uploadId')
   @Role('verified')
-  @HttpCode(200)
   @Serialize(CompleteMultipartUploadResponse)
   async completeMultipartUpload(
     @Body() { videoId, fileName, parts }: CompleteMultipartUploadRequest,
