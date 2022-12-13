@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm/dist';
 import { Repository } from 'typeorm';
 
 import { BadRequestException } from 'src/common/exceptions';
-import { CreateBounceRequest } from '../dtos/request/create-bounce.request';
+import { Bounce } from '../interfaces/bounces.interface';
 import { BounceEntity } from '../entities/bounce.entity';
 
 @Injectable()
@@ -17,9 +17,8 @@ export class BounceService {
     return this.repository.findOneBy({ email });
   }
 
-  create(params: CreateBounceRequest) {
-    const bounce = this.repository.create(params);
-    return this.repository.save(bounce);
+  create(bounce: Bounce) {
+    return this.repository.insert(bounce);
   }
 
   delete(email: string) {

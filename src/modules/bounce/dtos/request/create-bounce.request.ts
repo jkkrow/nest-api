@@ -4,29 +4,29 @@ import { Expose } from 'class-transformer';
 export class CreateBounceRequest {
   @IsEmail()
   @Expose({ name: 'Email' })
-  readonly email: string;
+  email: string;
 
   @IsString()
   @Expose({ name: 'From' })
-  readonly sender: string;
+  sender: string;
 
   @IsString()
   @Expose({ name: 'Type' })
-  readonly type: string;
+  type: string;
 
   @IsString()
   @Expose({ name: 'Description' })
-  readonly description: string;
+  description: string;
 
   @IsString()
   @Expose({ name: 'Details' })
-  readonly details: string;
+  details: string;
 
   @IsString()
   @Expose({ name: 'MessageStream' })
-  readonly messageStream: string;
+  messageStream: string;
 
   @IsDateString()
   @Expose({ name: 'BouncedAt' })
-  readonly bouncedAt: string;
+  bouncedAt: string;
 }

@@ -1,8 +1,6 @@
 import { Expose } from 'class-transformer';
 
-import { IChannel } from '../../interfaces/channel.interface';
-
-export class ChannelResponse implements IChannel {
+export class ChannelResponse {
   @Expose()
   id: string;
 

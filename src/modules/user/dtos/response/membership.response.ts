@@ -1,9 +1,8 @@
 import { Expose } from 'class-transformer';
 
-import { IMembership } from '../../interfaces/user.interface';
 import { MembershipName } from '../../constants/user.constant';
 
-export class MembershipResponse implements IMembership {
+export class MembershipResponse {
   @Expose()
   id: string;
 
