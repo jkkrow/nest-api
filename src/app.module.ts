@@ -13,6 +13,7 @@ import { UserModule } from './modules/user/user.module';
 import { VideoTreeModule } from './modules/video-tree/video-tree.module';
 import { CategoryModule } from './modules/category/category.module';
 import { ChannelModule } from './modules/channel/channel.module';
+import { HistoryModule } from './modules/history/history.module';
 import { BounceModule } from './modules/bounce/bounce.module';
 import { UploadModule } from './modules/upload/upload.module';
 import { PaymentModule } from './modules/payment/payment.module';
@@ -42,6 +43,7 @@ const GlobalHttpExceptionFilter = {
     VideoTreeModule,
     CategoryModule,
     ChannelModule,
+    HistoryModule,
     BounceModule,
     PaymentModule,
     UploadModule,
