@@ -1,15 +1,13 @@
-import { Entity, Column, Unique, ManyToOne, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryColumn, ManyToOne, CreateDateColumn } from 'typeorm';
 
-import { BaseEntity } from 'src/providers/database/entities/database.entity';
 import { UserEntity } from '../../user/entities/user.entity';
 
 @Entity('subscriptions')
-@Unique(['publisherId', 'subscriberId'])
-export class SubscriptionEntity extends BaseEntity {
-  @Column({ type: 'uuid' })
+export class SubscriptionEntity {
+  @PrimaryColumn({ type: 'uuid' })
   publisherId: string;
 
-  @Column({ type: 'uuid' })
+  @PrimaryColumn({ type: 'uuid' })
   subscriberId: string;
 
   @ManyToOne(() => UserEntity, (user) => user.id, { onDelete: 'CASCADE' })

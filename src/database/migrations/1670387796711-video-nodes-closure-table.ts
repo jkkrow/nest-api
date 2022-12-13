@@ -6,7 +6,7 @@ export class videoNodesClosureTable1670387796711 implements MigrationInterface {
       CREATE TABLE video_nodes_closure (
         ancestor_id UUID NOT NULL REFERENCES video_nodes(id) ON DELETE CASCADE,
         descendant_id UUID NOT NULL REFERENCES video_nodes(id) ON DELETE CASCADE,
-        PRIMARY KEY(ancestor_id, descendant_id)
+        PRIMARY KEY (ancestor_id, descendant_id)
       )
     `);
   }
