@@ -1,28 +1,28 @@
 import { Injectable } from '@nestjs/common';
-import { InjectDataSource } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
+import { InjectEntityManager } from '@nestjs/typeorm';
+import { EntityManager } from 'typeorm';
 
 import { IChannel } from '../interfaces/channel.interface';
 
 @Injectable()
 export class ChannelRepository {
   constructor(
-    @InjectDataSource()
-    private readonly dataSource: DataSource,
+    @InjectEntityManager()
+    private readonly entityManager: EntityManager,
   ) {}
 
   async findOneById(id: string, userId?: string) {
     return this.getChannelQuery(userId)
-      .where('u_channel.id = :id', { id })
+      .where('c_user.id = :id', { id })
       .getRawOne<IChannel>();
   }
 
   async findByPublisherId(id: string, page = 1, max = 12) {
     const query = this.getChannelQuery(id)
-      .innerJoin('subscriptions', 's', 's.subscriber_id = u_channel.id')
-      .where('s.publisher_id = :id', { id })
-      .addGroupBy('s.created_at')
-      .orderBy('s.created_at', 'DESC')
+      .innerJoin('subscriptions', 'q_subs', 'q_subs.subscriber_id = c_user.id')
+      .where('q_subs.publisher_id = :id', { id })
+      .addGroupBy('q_subs.created_at')
+      .orderBy('q_subs.created_at', 'DESC')
       .limit(max)
       .offset(max * (page - 1));
 
@@ -36,10 +36,10 @@ export class ChannelRepository {
 
   async findBySubscriberId(id: string, page = 1, max = 12) {
     const query = this.getChannelQuery(id)
-      .innerJoin('subscriptions', 's', 's.publisher_id = u_channel.id')
-      .where('s.subscriber_id = :id', { id })
-      .addGroupBy('s.created_at')
-      .orderBy('s.created_at', 'DESC')
+      .innerJoin('subscriptions', 'q_subs', 'q_subs.publisher_id = c_user.id')
+      .where('q_subs.subscriber_id = :id', { id })
+      .addGroupBy('q_subs.created_at')
+      .orderBy('q_subs.created_at', 'DESC')
       .limit(max)
       .offset(max * (page - 1));
 
@@ -52,35 +52,27 @@ export class ChannelRepository {
   }
 
   private getChannelQuery(userId?: string) {
-    const subscribedQuery = this.dataSource
+    const subscribedQuery = this.entityManager
       .createQueryBuilder()
-      .select('s_subscribed.id')
-      .from('subscriptions', 's_subscribed')
+      .select('*')
+      .from('subscriptions', 's_subs')
       .innerJoin(
         'users',
-        'u_subscribed',
-        'u_subscribed.id = s_subscribed.subscriber_id AND s_subscribed.publisher_id = u_channel.id',
+        's_user',
+        's_user.id = s_subs.subscriber_id AND s_subs.publisher_id = c_user.id',
       )
-      .where('s_subscribed.subscriber_id = :subscriberId', {
-        subscriberId: userId,
-      });
+      .where('s_subs.subscriber_id = :userId', { userId });
 
-    const channelQuery = this.dataSource
+    const channelQuery = this.entityManager
       .createQueryBuilder()
-      .select([
-        'u_channel.id AS id',
-        'u_channel.name AS name',
-        'u_channel.picture AS picture',
-        'COUNT(DISTINCT s_channel.subscriber_id) AS subscribers',
-        `EXISTS(${subscribedQuery.getQuery()}) AS subscribed`,
-      ])
-      .from('users', 'u_channel')
-      .leftJoin(
-        'subscriptions',
-        's_channel',
-        's_channel.publisher_id = u_channel.id',
-      )
-      .groupBy('u_channel.id')
+      .select('c_user.id', 'id')
+      .addSelect('c_user.name', 'name')
+      .addSelect('c_user.picture', 'picture')
+      .addSelect('COUNT(DISTINCT c_subs.subscriber_id)', 'subscribers')
+      .addSelect(`EXISTS(${subscribedQuery.getQuery()})`, 'subscribed')
+      .from('users', 'c_user')
+      .leftJoin('subscriptions', 'c_subs', 'c_subs.publisher_id = c_user.id')
+      .groupBy('c_user.id')
       .setParameters(subscribedQuery.getParameters());
 
     return channelQuery;
