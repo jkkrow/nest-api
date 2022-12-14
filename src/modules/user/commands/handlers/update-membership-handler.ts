@@ -22,7 +22,7 @@ export class UpdateMembershipHandler
 
     const { billing_info, custom_id, plan_id } = subscription;
 
-    const user = await this.repository.findById(custom_id);
+    const user = await this.repository.findOneById(custom_id);
 
     if (!user) {
       throw new NotFoundException('User not found');

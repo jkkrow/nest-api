@@ -19,7 +19,7 @@ export class SendRecoveryHandler
   ) {}
 
   async execute({ email }: SendRecoveryCommand) {
-    const user = await this.repository.findByEmail(email);
+    const user = await this.repository.findOneByEmail(email);
 
     if (!user) {
       throw new NotFoundException('User not found');

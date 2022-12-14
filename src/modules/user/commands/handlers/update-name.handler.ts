@@ -9,7 +9,7 @@ export class UpdateNameHandler implements ICommandHandler<UpdateNameCommand> {
   constructor(private readonly repository: UserRepository) {}
 
   async execute({ id, name }: UpdateNameCommand) {
-    const user = await this.repository.findById(id);
+    const user = await this.repository.findOneById(id);
 
     if (!user) {
       throw new NotFoundException('User not found');

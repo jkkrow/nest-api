@@ -17,11 +17,11 @@ export class UserRepository extends BaseRepository<UserEntity, User> {
     super(repository, factory);
   }
 
-  findById(id: string) {
+  findOneById(id: string) {
     return this._findOne({ id });
   }
 
-  findByEmail(email: string) {
+  findOneByEmail(email: string) {
     return this._findOne({ email });
   }
 

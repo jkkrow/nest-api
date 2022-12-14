@@ -33,7 +33,7 @@ export class CreateMembershipHandler
     }
 
     // Find user and create membership
-    const user = await this.repository.findById(custom_id);
+    const user = await this.repository.findOneById(custom_id);
 
     if (!user) {
       throw new NotFoundException('User not found');

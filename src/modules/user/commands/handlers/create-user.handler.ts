@@ -19,7 +19,7 @@ export class CreateUserHandler implements ICommandHandler<CreateUserCommand> {
 
   async execute({ name, email, password }: CreateUserCommand) {
     await this.bounceService.check(email);
-    const existingUser = await this.repository.findByEmail(email);
+    const existingUser = await this.repository.findOneByEmail(email);
 
     if (existingUser) {
       throw new ConflictException('Email already exists');

@@ -22,7 +22,7 @@ export class CreateUserHandler
   async execute({ token }: CreateGoogleUserCommand) {
     const { name, email, picture } = await this.oAuthService.verifyToken(token);
 
-    const existingUser = await this.repository.findByEmail(email);
+    const existingUser = await this.repository.findOneByEmail(email);
 
     if (existingUser && existingUser.type !== 'google') {
       throw new ConflictException('Email already exists');

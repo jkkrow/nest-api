@@ -13,7 +13,7 @@ export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand> {
   ) {}
 
   async execute({ id, email, password }: DeleteUserCommand) {
-    const user = await this.repository.findById(id);
+    const user = await this.repository.findOneById(id);
     const errorMessage = 'Invalid email or password';
 
     if (!user) {

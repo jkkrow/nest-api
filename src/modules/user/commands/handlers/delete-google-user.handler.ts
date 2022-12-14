@@ -15,7 +15,7 @@ export class DeleteGoogleUserHandler
   ) {}
 
   async execute({ id, token }: DeleteGoogleUserCommand) {
-    const user = await this.repository.findById(id);
+    const user = await this.repository.findOneById(id);
 
     if (!user) {
       throw new NotFoundException('User not found');

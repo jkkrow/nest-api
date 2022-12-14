@@ -19,7 +19,7 @@ export class CancelMembershipHandler
   ) {}
 
   async execute({ id, reason }: CancelMembershipCommand) {
-    const user = await this.repository.findById(id);
+    const user = await this.repository.findOneById(id);
 
     if (!user) {
       throw new NotFoundException('User not found');

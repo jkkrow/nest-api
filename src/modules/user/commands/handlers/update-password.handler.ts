@@ -15,7 +15,7 @@ export class UpdatePasswordHandler
   ) {}
 
   async execute({ id, password, newPassword }: UpdatePasswordCommand) {
-    const user = await this.repository.findById(id);
+    const user = await this.repository.findOneById(id);
     const errorMessage = 'Invalid email or password';
 
     if (!user) {

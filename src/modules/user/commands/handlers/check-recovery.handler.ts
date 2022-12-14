@@ -17,7 +17,7 @@ export class CheckRecoveryHandler
   async execute({ token }: CheckRecoveryCommand) {
     const { userId } = this.jwtService.verify(token, { sub: 'recovery' });
 
-    const user = await this.repository.findById(userId);
+    const user = await this.repository.findOneById(userId);
 
     if (!user) {
       throw new NotFoundException('User not found for this token');
