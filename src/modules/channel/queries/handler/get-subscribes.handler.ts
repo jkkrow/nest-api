@@ -7,7 +7,7 @@ import { ChannelRepository } from '../../repositories/channel.repository';
 export class GetSubscribesHandler implements IQueryHandler {
   constructor(private readonly repository: ChannelRepository) {}
 
-  async execute({ id, page, max }: GetSubscribesQuery) {
-    return await this.repository.findBySubscriberId(id, page, max);
+  async execute({ id, params }: GetSubscribesQuery) {
+    return await this.repository.findBySubscriberId(id, params);
   }
 }

@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectEntityManager } from '@nestjs/typeorm';
 import { EntityManager } from 'typeorm';
 
-import { IChannel } from '../interfaces/channel.interface';
+import { PageParams } from 'src/common/interfaces/pagination.interface';
+import { Channel } from '../interfaces/channel.interface';
 
 @Injectable()
 export class ChannelRepository {
@@ -13,13 +14,13 @@ export class ChannelRepository {
 
   async findOneById(id: string, userId?: string) {
     return this.getChannelQuery(userId)
-      .where('c_user.id = :id', { id })
-      .getRawOne<IChannel>();
+      .where('user.id = :id', { id })
+      .getRawOne<Channel>();
   }
 
-  async findByPublisherId(id: string, page = 1, max = 12) {
+  async findByPublisherId(id: string, { page, max }: PageParams) {
     const query = this.getChannelQuery(id)
-      .innerJoin('subscriptions', 'q_subs', 'q_subs.subscriber_id = c_user.id')
+      .innerJoin('subscriptions', 'q_subs', 'q_subs.subscriber_id = user.id')
       .where('q_subs.publisher_id = :id', { id })
       .addGroupBy('q_subs.created_at')
       .orderBy('q_subs.created_at', 'DESC')
@@ -27,16 +28,16 @@ export class ChannelRepository {
       .offset(max * (page - 1));
 
     const [channels, count] = await Promise.all([
-      query.getRawMany<IChannel>(),
+      query.getRawMany<Channel>(),
       query.getCount(),
     ]);
 
     return { channels, count };
   }
 
-  async findBySubscriberId(id: string, page = 1, max = 12) {
+  async findBySubscriberId(id: string, { page, max }: PageParams) {
     const query = this.getChannelQuery(id)
-      .innerJoin('subscriptions', 'q_subs', 'q_subs.publisher_id = c_user.id')
+      .innerJoin('subscriptions', 'q_subs', 'q_subs.publisher_id = user.id')
       .where('q_subs.subscriber_id = :id', { id })
       .addGroupBy('q_subs.created_at')
       .orderBy('q_subs.created_at', 'DESC')
@@ -44,7 +45,7 @@ export class ChannelRepository {
       .offset(max * (page - 1));
 
     const [channels, count] = await Promise.all([
-      query.getRawMany<IChannel>(),
+      query.getRawMany<Channel>(),
       query.getCount(),
     ]);
 
@@ -59,20 +60,20 @@ export class ChannelRepository {
       .innerJoin(
         'users',
         's_user',
-        's_user.id = s_subs.subscriber_id AND s_subs.publisher_id = c_user.id',
+        's_user.id = s_subs.subscriber_id AND s_subs.publisher_id = user.id',
       )
       .where('s_subs.subscriber_id = :userId', { userId });
 
     const channelQuery = this.entityManager
       .createQueryBuilder()
-      .select('c_user.id', 'id')
-      .addSelect('c_user.name', 'name')
-      .addSelect('c_user.picture', 'picture')
-      .addSelect('COUNT(DISTINCT c_subs.subscriber_id)', 'subscribers')
+      .select('user.id', 'id')
+      .addSelect('user.name', 'name')
+      .addSelect('user.picture', 'picture')
+      .addSelect('COUNT(DISTINCT subs.subscriber_id)', 'subscribers')
       .addSelect(`EXISTS(${subscribedQuery.getQuery()})`, 'subscribed')
-      .from('users', 'c_user')
-      .leftJoin('subscriptions', 'c_subs', 'c_subs.publisher_id = c_user.id')
-      .groupBy('c_user.id')
+      .from('users', 'user')
+      .leftJoin('subscriptions', 'subs', 'subs.publisher_id = user.id')
+      .groupBy('user.id')
       .setParameters(subscribedQuery.getParameters());
 
     return channelQuery;

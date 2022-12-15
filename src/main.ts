@@ -29,6 +29,7 @@ export async function bootstrap(server = true) {
       defaultModelsExpandDepth: false,
       tagsSorter: 'alpha',
       operationsSorter: 'alpha',
+      persistAuthorization: true,
     },
   });
 

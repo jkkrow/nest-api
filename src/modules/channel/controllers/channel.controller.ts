@@ -6,7 +6,7 @@ import { Serialize } from 'src/common/decorators/serialize.decorator';
 import { PaginationRequest } from 'src/common/dtos/request/pagination.request';
 import { MessageResponse } from 'src/common/dtos/response/message.response';
 import { Role } from 'src/auth/decorators/role.decorator';
-import { RequestUserId } from 'src/auth/decorators/user.decorator';
+import { CurrentUserId } from 'src/auth/decorators/user.decorator';
 import { GetChannelQuery } from '../queries/impl/get-channel.query';
 import { GetSubscribersQuery } from '../queries/impl/get-subscribers.query';
 import { GetSubscribesQuery } from '../queries/impl/get-subscribes.query';
@@ -27,7 +27,7 @@ export class ChannelController {
   /*--------------------------------------------*/
   @Get(':id')
   @Serialize(GetChannelResponse)
-  async getChannel(@Param('id') id: string, @RequestUserId() userId?: string) {
+  async getChannel(@Param('id') id: string, @CurrentUserId() userId?: string) {
     const query = new GetChannelQuery(id, userId);
     const channel = await this.queryBus.execute(query);
 
@@ -40,10 +40,10 @@ export class ChannelController {
   @Role('user')
   @Serialize(GetChannelsResponse)
   async getSubscribers(
-    @Query() { page, max }: PaginationRequest,
-    @RequestUserId() userId: string,
+    @Query() params: PaginationRequest,
+    @CurrentUserId() userId: string,
   ) {
-    const query = new GetSubscribersQuery(userId, page, max);
+    const query = new GetSubscribersQuery(userId, params);
     const { channels, count } = await this.queryBus.execute(query);
 
     return { channels, count };
@@ -55,10 +55,10 @@ export class ChannelController {
   @Role('user')
   @Serialize(GetChannelsResponse)
   async getSubscribes(
-    @Query() { page, max }: PaginationRequest,
-    @RequestUserId() userId: string,
+    @Query() params: PaginationRequest,
+    @CurrentUserId() userId: string,
   ) {
-    const query = new GetSubscribesQuery(userId, page, max);
+    const query = new GetSubscribesQuery(userId, params);
     const { channels, count } = await this.queryBus.execute(query);
 
     return { channels, count };
@@ -71,7 +71,7 @@ export class ChannelController {
   @Serialize(MessageResponse, { status: 201 })
   async subscribeChannel(
     @Param('id') id: string,
-    @RequestUserId() userId: string,
+    @CurrentUserId() userId: string,
   ) {
     const command = new SubscribeChannelCommand(id, userId);
     await this.commandBus.execute(command);
@@ -86,7 +86,7 @@ export class ChannelController {
   @Serialize(MessageResponse)
   async unsubscribeChannel(
     @Param('id') id: string,
-    @RequestUserId() userId: string,
+    @CurrentUserId() userId: string,
   ) {
     const command = new UnsubscribeChannelCommand(id, userId);
     await this.commandBus.execute(command);

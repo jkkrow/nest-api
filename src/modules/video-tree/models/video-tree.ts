@@ -7,25 +7,25 @@ import { VideoTreeDeletedEvent } from '../events/impl/video-tree-deleted.event';
 import { VideoNodeCreatedEvent } from '../events/impl/video-node-created.event';
 import { VideoNodeUpdatedEvent } from '../events/impl/video-node-updated.event';
 import { VideoNodeDeletedEvent } from '../events/impl/video-node-deleted.event';
-import { IVideoTree, UpdateVideoTreeProps } from '../interfaces/video-tree';
-import { IVideoNode, UpdateVideoNodeProps } from '../interfaces/video-node';
+import { UpdateVideoTreeProps } from '../interfaces/video-tree';
+import { VideoNode, UpdateVideoNodeProps } from '../interfaces/video-node';
 import { VideoTreeStatus } from '../constants/video-tree.contstant';
 
-export class VideoTree extends AggregateRoot implements IVideoTree {
+export class VideoTree extends AggregateRoot {
   constructor(
     private readonly props: {
       readonly id: string;
       readonly userId: string;
       title: string;
       description: string;
-      categories: string[];
+      categories: { name: string }[];
       thumbnail: string;
       size: number;
       maxDuration: number;
       minDuration: number;
       status: VideoTreeStatus;
       editing: boolean;
-      root: IVideoNode;
+      root: VideoNode;
     },
   ) {
     super();
@@ -44,7 +44,7 @@ export class VideoTree extends AggregateRoot implements IVideoTree {
   }
 
   get categories() {
-    return this.props.categories;
+    return this.props.categories.map((category) => ({ name: category.name }));
   }
 
   get description() {
@@ -75,7 +75,7 @@ export class VideoTree extends AggregateRoot implements IVideoTree {
     return this.props.editing;
   }
 
-  get root(): IVideoNode {
+  get root(): VideoNode {
     return JSON.parse(JSON.stringify(this.props.root));
   }
 
@@ -92,7 +92,7 @@ export class VideoTree extends AggregateRoot implements IVideoTree {
     this.props.editing = updates.editing;
 
     const savedNodes = this.traverseNodes();
-    const newNodes = this.traverseNodes(updates.root as IVideoNode);
+    const newNodes = this.traverseNodes(updates.root as VideoNode);
 
     savedNodes.forEach((savedNode) => {
       newNodes.forEach((newNode) => {
@@ -129,7 +129,7 @@ export class VideoTree extends AggregateRoot implements IVideoTree {
       throw new BadRequestException('Max length of children exceeded (max: 4)');
     }
 
-    const node: IVideoNode = {
+    const node: VideoNode = {
       id,
       level: parentNode.level + 1,
       name: '',
@@ -217,7 +217,7 @@ export class VideoTree extends AggregateRoot implements IVideoTree {
 
   private updateTotalSize() {
     const nodes = this.traverseNodes();
-    const filteredNodes: IVideoNode[] = [];
+    const filteredNodes: VideoNode[] = [];
     const seen: { [key: string]: boolean } = {};
 
     for (const node of nodes) {
@@ -243,9 +243,9 @@ export class VideoTree extends AggregateRoot implements IVideoTree {
   }
 
   private getPaths() {
-    const paths: IVideoNode[][] = [];
+    const paths: VideoNode[][] = [];
 
-    const iterate = (currentNode: IVideoNode, path: IVideoNode[]) => {
+    const iterate = (currentNode: VideoNode, path: VideoNode[]) => {
       const newPath = path.concat(currentNode);
 
       if (currentNode.children.length) {

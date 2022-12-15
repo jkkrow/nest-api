@@ -1,10 +1,10 @@
 import { Request } from 'express';
 
-import { IUser } from 'src/modules/user/interfaces/user.interface';
+import { User } from 'src/modules/user/interfaces/user.interface';
 
-export interface IRequestWithUser extends Request {
+export interface RequestWithUser extends Request {
   userId?: string;
-  user?: IRequestUser;
+  user?: RequestUser;
 }
 
-export interface IRequestUser extends IUser {}
+export interface RequestUser extends User {}

@@ -6,8 +6,7 @@ import { GetUserQuery } from 'src/modules/user/queries/impl/get-user.query';
 import { BearerGuard } from './bearer.guard';
 import { JwtService } from '../services/jwt.service';
 import { RoleName, ROLE_KEY } from '../constants/role.constant';
-import { IRequestWithUser } from '../interfaces/user.interface';
-import { IRequestUser } from '../interfaces/user.interface';
+import { RequestWithUser, RequestUser } from '../interfaces/user.interface';
 
 @Injectable()
 export class RoleGuard extends BearerGuard {
@@ -28,7 +27,7 @@ export class RoleGuard extends BearerGuard {
 
   async canActivate(context: ExecutionContext) {
     await super.canActivate(context);
-    const request = context.switchToHttp().getRequest<IRequestWithUser>();
+    const request = context.switchToHttp().getRequest<RequestWithUser>();
     const requiredRole = this.reflector.getAllAndOverride<RoleName>(ROLE_KEY, [
       context.getClass(),
       context.getHandler(),
@@ -49,7 +48,7 @@ export class RoleGuard extends BearerGuard {
 
   private async validateRole(userId: string) {
     const query = new GetUserQuery(userId);
-    const user = await this.queryBus.execute<GetUserQuery, IRequestUser>(query);
+    const user = await this.queryBus.execute<GetUserQuery, RequestUser>(query);
 
     if (!user) {
       return;
@@ -63,7 +62,7 @@ export class RoleGuard extends BearerGuard {
     return user;
   }
 
-  private validateMembership(user: IRequestUser) {
+  private validateMembership(user: RequestUser) {
     const isMember = user.membership
       ? new Date(user.membership.expiredAt) > new Date()
       : false;

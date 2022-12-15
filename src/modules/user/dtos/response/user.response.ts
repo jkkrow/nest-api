@@ -1,10 +1,9 @@
 import { Expose, Type } from 'class-transformer';
 
-import { IUser } from '../../interfaces/user.interface';
 import { UserType } from '../../constants/user.constant';
 import { MembershipResponse } from './membership.response';
 
-export class UserResponse implements Omit<IUser, 'password'> {
+export class UserResponse {
   @Expose()
   id: string;
 

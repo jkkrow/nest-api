@@ -7,7 +7,7 @@ import {
 import { PaymentService } from 'src/modules/payment/services/payment.service';
 import { CancelMembershipCommand } from '../impl/cancel-membership.command';
 import { UserRepository } from '../../models/user.repository';
-import { IMembership } from '../../interfaces/user.interface';
+import { Membership } from '../../interfaces/user.interface';
 
 @CommandHandler(CancelMembershipCommand)
 export class CancelMembershipHandler
@@ -29,7 +29,7 @@ export class CancelMembershipHandler
       throw new UnauthorizedException('User must be a member');
     }
 
-    const membership: IMembership = {
+    const membership: Membership = {
       ...user.membership,
       cancelled: true,
     };

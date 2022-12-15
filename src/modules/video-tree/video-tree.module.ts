@@ -13,6 +13,7 @@ import { FavoriteEntity } from './entities/favorite.entity';
 import { ViewEntity } from './entities/view.entity';
 import { VideoTreeFactory } from './models/video-tree.factory';
 import { VideoTreeRepository } from './models/video-tree.repository';
+import { VideoTreeRepository as VideoTreeQueryRepository } from './repositories/video-tree.repository';
 import { FavoriteService } from './services/favorites.service';
 import { ViewService } from './services/view.service';
 
@@ -34,6 +35,7 @@ import { ViewService } from './services/view.service';
     VideoTreeSaga,
     VideoTreeFactory,
     VideoTreeRepository,
+    VideoTreeQueryRepository,
     FavoriteService,
     ViewService,
   ],

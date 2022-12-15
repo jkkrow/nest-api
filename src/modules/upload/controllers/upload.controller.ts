@@ -6,7 +6,7 @@ import { Serialize } from 'src/common/decorators/serialize.decorator';
 import { MessageResponse } from 'src/common/dtos/response/message.response';
 import { UnauthorizedException } from 'src/common/exceptions';
 import { Role } from 'src/auth/decorators/role.decorator';
-import { RequestUserId } from 'src/auth/decorators/user.decorator';
+import { CurrentUserId } from 'src/auth/decorators/user.decorator';
 import { S3Service } from 'src/providers/aws/s3/services/s3.service';
 import { InitiateMultipartUploadRequest } from '../dtos/request/initiate-multipart-upload.request';
 import { InitiateMultipartUploadResponse } from '../dtos/response/initiate-multipart-upload.response';
@@ -30,7 +30,7 @@ export class UploadController {
   @Serialize(InitiateMultipartUploadResponse)
   async initiateMultipartUpload(
     @Body() { videoId, fileName, fileType }: InitiateMultipartUploadRequest,
-    @RequestUserId() userId: string,
+    @CurrentUserId() userId: string,
   ) {
     const key = `videos/${userId}/${videoId}/${fileName}`;
     const result = await this.s3Service.initiateMultipart(key, fileType);
@@ -46,7 +46,7 @@ export class UploadController {
   async processMultipartUpload(
     @Body() { videoId, fileName, partCount }: ProcessMultipartUploadRequest,
     @Param('uploadId') uploadId: string,
-    @RequestUserId() userId: string,
+    @CurrentUserId() userId: string,
   ) {
     const key = `videos/${userId}/${videoId}/${fileName}`;
     const presignedUrls = await this.s3Service.processMultipart(
@@ -66,7 +66,7 @@ export class UploadController {
   async completeMultipartUpload(
     @Body() { videoId, fileName, parts }: CompleteMultipartUploadRequest,
     @Param('uploadId') uploadId: string,
-    @RequestUserId() userId: string,
+    @CurrentUserId() userId: string,
   ) {
     const key = `videos/${userId}/${videoId}/${fileName}`;
     const result = await this.s3Service.completeMultipart(key, uploadId, parts);
@@ -82,7 +82,7 @@ export class UploadController {
   async cancelMultipartUpload(
     @Body() { videoId, fileName }: CancelMultipartUploadRequest,
     @Param('uploadId') uploadId: string,
-    @RequestUserId() userId: string,
+    @CurrentUserId() userId: string,
   ) {
     const key = `videos/${userId}/${videoId}/${fileName}`;
     await this.s3Service.cancelMultipart(key, uploadId);
@@ -99,7 +99,7 @@ export class UploadController {
   @Serialize(UploadImageResponse)
   async uploadImage(
     @Body() { key, fileType }: UploadImageRequest,
-    @RequestUserId() userId: string,
+    @CurrentUserId() userId: string,
   ) {
     if (key && key.split('/')[1] !== userId) {
       throw new UnauthorizedException('Image not belong to user');
@@ -123,7 +123,7 @@ export class UploadController {
   @Serialize(MessageResponse)
   async deleteImage(
     @Param('key') key: string,
-    @RequestUserId() userId: string,
+    @CurrentUserId() userId: string,
   ) {
     if (key.split('/')[1] !== userId) {
       throw new UnauthorizedException('Image not belong to user');

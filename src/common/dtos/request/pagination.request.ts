@@ -6,11 +6,11 @@ export class PaginationRequest {
   @IsInt()
   @IsPositive()
   @Type(() => Number)
-  page?: number;
+  page: number = 1;
 
   @IsOptional()
   @IsInt()
   @IsPositive()
   @Type(() => Number)
-  max?: number;
+  max: number = 12;
 }

@@ -1,13 +1,13 @@
 import { CanActivate, ExecutionContext } from '@nestjs/common';
 
 import { JwtService } from 'src/auth/services/jwt.service';
-import { IRequestWithUser } from 'src/auth/interfaces/user.interface';
+import { RequestWithUser } from 'src/auth/interfaces/user.interface';
 
 export class BearerGuard implements CanActivate {
   constructor(private readonly jwtService: JwtService) {}
 
   async canActivate(context: ExecutionContext) {
-    const request = context.switchToHttp().getRequest<IRequestWithUser>();
+    const request = context.switchToHttp().getRequest<RequestWithUser>();
     const { authorization } = request.headers;
 
     const token = authorization ? authorization.split('Bearer ')[1] : '';

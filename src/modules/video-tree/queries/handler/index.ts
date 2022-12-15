@@ -1,7 +1,9 @@
-import { GetCurrentChannelVideoTreeHandler } from './get-current-channel-video-tree.handler';
-import { WatchVideoTreeHandler } from './watch-video-tree.handler';
+import { GetVideoTreesHandler } from './get-video-trees.handler';
+import { GetVideoTreeHandler } from './get-video-tree.handler';
+import { GetMyVideoTreeHandler } from './get-my-video-tree.handler';
 
 export const QueryHandlers = [
-  GetCurrentChannelVideoTreeHandler,
-  WatchVideoTreeHandler,
+  GetVideoTreesHandler,
+  GetVideoTreeHandler,
+  GetMyVideoTreeHandler,
 ];

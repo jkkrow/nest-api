@@ -1,11 +1,13 @@
-import { IVideoNode } from './video-node';
+import { User } from 'src/modules/user/interfaces/user.interface';
+import { History } from 'src/modules/history/interfaces/history.interface';
+import { VideoNode, VideoNodeOnlyRoot } from './video-node';
 import { VideoTreeStatus } from '../constants/video-tree.contstant';
 
-export interface IVideoTree {
+export interface VideoTree {
   id: string;
   title: string;
   description: string;
-  categories: string[];
+  categories: { name: string }[];
   thumbnail: string;
   size: number;
   maxDuration: number;
@@ -13,12 +15,28 @@ export interface IVideoTree {
   status: VideoTreeStatus;
   editing: boolean;
   userId: string;
-  root: IVideoNode;
+  root: VideoNode;
 }
+
+export interface VideoTreeOnlyRoot extends Omit<VideoTree, 'root'> {
+  root: VideoNodeOnlyRoot;
+}
+
+export interface VideoTreeWithData extends VideoTree {
+  user: User;
+  views: number;
+  favorites: number;
+  favorited: boolean;
+  history: Omit<History, 'videoId' | 'userId'> | null;
+}
+
+export interface VideoTreeOnlyRootWithData
+  extends VideoTreeOnlyRoot,
+    Omit<VideoTreeWithData, 'root'> {}
 
 export interface UpdateVideoTreeProps {
   title: string;
-  categories: string[];
+  categories: { name: string }[];
   description: string;
   thumbnail: string;
   status: VideoTreeStatus;

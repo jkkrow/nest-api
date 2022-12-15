@@ -1,4 +1,4 @@
-export interface IVideoNode {
+export interface VideoNode {
   id: string;
   name: string;
   url: string;
@@ -8,8 +8,10 @@ export interface IVideoNode {
   duration: number;
   selectionTimeStart: number;
   selectionTimeEnd: number;
-  children: IVideoNode[];
+  children: VideoNode[];
 }
+
+export interface VideoNodeOnlyRoot extends Omit<VideoNode, 'children'> {}
 
 export interface UpdateVideoNodeProps {
   name: string;

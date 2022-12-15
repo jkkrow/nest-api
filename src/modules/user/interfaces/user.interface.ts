@@ -1,6 +1,6 @@
 import { UserType, MembershipName } from '../constants/user.constant';
 
-export interface IUser {
+export interface User {
   id: string;
   type: UserType;
   name: string;
@@ -9,17 +9,17 @@ export interface IUser {
   picture: string;
   verified: boolean;
   admin: boolean;
-  membership: IMembership | null;
+  membership: Membership | null;
 }
 
-export interface IMembership {
+export interface Membership {
   id: string;
   name: MembershipName;
   expiredAt: Date;
   cancelled: boolean;
 }
 
-export interface CreateUserParams extends Partial<IUser> {
+export interface CreateUserParams extends Partial<User> {
   id: string;
   type: UserType;
   name: string;

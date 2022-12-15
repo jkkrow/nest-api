@@ -1,4 +1,4 @@
-export interface IHistory {
+export interface History {
   videoId: string;
   userId: string;
   activeNodeId: string;

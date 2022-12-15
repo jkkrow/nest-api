@@ -4,7 +4,7 @@ import { BadRequestException, NotFoundException } from 'src/common/exceptions';
 import { PaymentService } from 'src/modules/payment/services/payment.service';
 import { CreateMembershipCommand } from '../impl/create-membership.command';
 import { UserRepository } from '../../models/user.repository';
-import { IMembership } from '../../interfaces/user.interface';
+import { Membership } from '../../interfaces/user.interface';
 
 @CommandHandler(CreateMembershipCommand)
 export class CreateMembershipHandler
@@ -44,9 +44,9 @@ export class CreateMembershipHandler
     const nextBillingTime = new Date(billing_info.next_billing_time);
     const expiredAt = new Date(nextBillingTime.setUTCHours(23, 59, 59, 999));
 
-    const membership: IMembership = {
+    const membership: Membership = {
       id: subscriptionId,
-      name: name.toLowerCase() as IMembership['name'],
+      name: name.toLowerCase() as Membership['name'],
       expiredAt,
       cancelled: false,
     };

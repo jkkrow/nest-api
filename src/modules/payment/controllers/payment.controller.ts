@@ -3,7 +3,7 @@ import { ApiTags } from '@nestjs/swagger';
 
 import { Serialize } from 'src/common/decorators/serialize.decorator';
 import { Role } from 'src/auth/decorators/role.decorator';
-import { RequestUserId } from 'src/auth/decorators/user.decorator';
+import { CurrentUserId } from 'src/auth/decorators/user.decorator';
 import { PaymentService } from '../services/payment.service';
 import { CreateSubscriptionRequest } from '../dtos/request/create-subscription.request';
 import { CreateSubscriptionResponse } from '../dtos/response/create-subscription.response';
@@ -20,7 +20,7 @@ export class PaymentController {
   @Serialize(CreateSubscriptionResponse, { status: 201 })
   async createSubscription(
     @Body() { planName }: CreateSubscriptionRequest,
-    @RequestUserId() id: string,
+    @CurrentUserId() id: string,
   ) {
     const subscription = await this.paymentService.createSubscription(
       planName,

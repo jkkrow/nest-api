@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { HistoryEntity } from '../entities/history.entity';
-import { IHistory } from '../interfaces/history.interface';
+import { History } from '../interfaces/history.interface';
 
 @Injectable()
 export class HistoryService {
@@ -12,7 +12,7 @@ export class HistoryService {
     private readonly repository: Repository<HistoryEntity>,
   ) {}
 
-  async save(history: IHistory) {
+  async save(history: History) {
     await this.repository.save(history);
   }
 
