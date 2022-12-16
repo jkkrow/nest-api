@@ -1,14 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, TreeRepository } from 'typeorm';
+import { Repository, SelectQueryBuilder, TreeRepository } from 'typeorm';
 
 import { PageParams } from 'src/common/interfaces/pagination.interface';
 import {
+  VideoTree,
   VideoTreeWithData,
+  VideoTreeOnlyRoot,
   VideoTreeOnlyRootWithData,
 } from '../interfaces/video-tree';
 import { VideoTreeEntity } from '../entities/video-tree.entity';
 import { VideoNodeEntity } from '../entities/video-node.entity';
+import { VideoTreeStatus } from '../constants/video-tree.contstant';
+
+interface FindVideoTreeOptions {
+  id?: string;
+  creatorId?: string;
+  status?: VideoTreeStatus;
+}
 
 @Injectable()
 export class VideoTreeRepository {
@@ -19,72 +28,133 @@ export class VideoTreeRepository {
     private readonly treeRepository: TreeRepository<VideoNodeEntity>,
   ) {}
 
-  async findWithData({ page, max }: PageParams, userId?: string) {
-    const query = this.getVideoTreeWithDataQuery(userId)
-      .orderBy('video_tree.created_at', 'DESC')
-      .limit(max)
-      .offset(max * (page - 1));
+  private readonly alias = 'video_tree';
+
+  async find(options: FindVideoTreeOptions, params: PageParams) {
+    const query = this.getVideoTreeQuery();
+    const findQuery = this.findVideoTreeQuery(query, options, params);
 
     const [videoTrees, count] = await Promise.all([
-      query.getMapMany<VideoTreeOnlyRootWithData>(),
-      query.getCount(),
+      findQuery.getMapMany<VideoTreeOnlyRoot>(),
+      findQuery.getCount(),
     ]);
 
     return { videoTrees, count };
   }
 
-  async findOneWithDataById(id: string, userId?: string) {
-    const videoTree = await this.getVideoTreeWithDataQuery(userId)
-      .where('video_tree.id = :id', { id })
-      .getMapOne<VideoTreeOnlyRootWithData>();
+  async findOne(options: FindVideoTreeOptions) {
+    const query = this.getVideoTreeQuery();
+    const findQuery = this.findVideoTreeQuery(query, options);
 
-    if (!videoTree) {
-      return null;
+    const videoTree = await findQuery.getMapOne<VideoTreeOnlyRoot>();
+    return videoTree ? this.withFullNodes(videoTree) : null;
+  }
+
+  async findWithData(
+    options: FindVideoTreeOptions,
+    params: PageParams,
+    userId?: string,
+  ) {
+    const query = this.getVideoTreeWithDataQuery(userId);
+    const findQuery = this.findVideoTreeQuery(query, options, params);
+
+    const [videoTrees, count] = await Promise.all([
+      findQuery.getMapMany<VideoTreeOnlyRootWithData>(),
+      findQuery.getCount(),
+    ]);
+
+    return { videoTrees, count };
+  }
+
+  async findOneWithData(options: FindVideoTreeOptions, userId?: string) {
+    const query = this.getVideoTreeWithDataQuery(userId);
+    const findQuery = this.findVideoTreeQuery(query, options);
+
+    const videoTree = await findQuery.getMapOne<VideoTreeOnlyRootWithData>();
+    return videoTree ? this.withFullNodes<VideoTreeWithData>(videoTree) : null;
+  }
+
+  private findVideoTreeQuery(
+    query: SelectQueryBuilder<VideoTreeEntity>,
+    options: FindVideoTreeOptions,
+    params?: PageParams,
+  ) {
+    const { id, creatorId, status } = options;
+
+    if (id) {
+      query.andWhere(`${this.alias}.id = :id`, { id });
     }
 
-    videoTree.root = await this.treeRepository.findDescendantsTree(
-      videoTree.root as VideoNodeEntity,
-    );
+    if (creatorId) {
+      query.andWhere(`${this.alias}.creator_id = :creatorId`, { creatorId });
+    }
 
-    return videoTree as VideoTreeWithData;
+    if (status) {
+      query.andWhere(`${this.alias}.status = :status`, { status });
+    }
+
+    if (params) {
+      query.orderBy(`${this.alias}.created_at`, 'DESC');
+      query.limit(params.max);
+      query.offset(params.max * (params.page - 1));
+    }
+
+    return query;
+  }
+
+  private getVideoTreeQuery() {
+    return this.repository
+      .createQueryBuilder(this.alias)
+      .leftJoinAndSelect(`${this.alias}.root`, 'node')
+      .leftJoinAndSelect(`${this.alias}.categories`, 'category');
   }
 
   private getVideoTreeWithDataQuery(userId?: string) {
-    const favoritedQuery = this.repository
-      .createQueryBuilder()
-      .select('*')
-      .from('favorites', 'f_favor')
-      .innerJoin(
-        'users',
-        'f_user',
-        'f_user.id = f_favor.user_id AND f_favor.video_id = video_tree.id',
-      )
-      .where('f_favor.user_id = :userId', { userId });
-
-    const videoTreeWithDataQuery = this.repository
-      .createQueryBuilder('video_tree')
+    return this.repository
+      .createQueryBuilder(this.alias)
       .addSelect('COUNT(DISTINCT view.id)', 'views')
       .addSelect('COUNT(DISTINCT favorite.user_id)', 'favorites')
-      .addSelect(`EXISTS(${favoritedQuery.getQuery()})`, 'favorited')
-      .leftJoinAndSelect('video_tree.root', 'video_node')
-      .leftJoinAndSelect('video_tree.categories', 'category')
-      .leftJoinAndSelect('video_tree.user', 'user')
-      .leftJoin('views', 'view', 'view.video_id = video_tree.id')
-      .leftJoin('favorites', 'favorite', 'favorite.video_id = video_tree.id')
+      .addSelect(`EXISTS(${this.getFavoritedQuery()})`, 'favorited')
+      .leftJoin('views', 'view', `view.video_id = ${this.alias}.id`)
+      .leftJoin('favorites', 'favorite', `favorite.video_id = ${this.alias}.id`)
+      .leftJoinAndSelect(`${this.alias}.root`, 'node')
+      .leftJoinAndSelect(`${this.alias}.categories`, 'category')
+      .leftJoinAndSelect(`${this.alias}.creator`, 'user')
       .leftJoinAndMapOne(
-        'video_tree.history',
+        `${this.alias}.history`,
         'histories',
         'history',
-        'history.video_id = video_tree.id AND history.user_id = :userId',
+        `history.video_id = ${this.alias}.id AND history.user_id = :userId`,
         { userId },
       )
-      .groupBy('video_tree.id')
-      .addGroupBy('video_node.id')
+      .groupBy(`${this.alias}.id`)
+      .addGroupBy('node.id')
       .addGroupBy('user.id')
       .addGroupBy('history.video_id')
       .addGroupBy('history.user_id')
       .addGroupBy('category.name');
+  }
 
-    return videoTreeWithDataQuery;
+  private getFavoritedQuery(userId?: string) {
+    const alias = 'f_favor';
+    const userAlias = 'f_user';
+    const cond = `${userAlias}.id = ${alias}.user_id AND ${alias}.video_id = ${this.alias}.id`;
+    return this.repository
+      .createQueryBuilder()
+      .select('*')
+      .from('favorites', alias)
+      .innerJoin('users', userAlias, cond)
+      .where(`${alias}.user_id = :userId`, { userId })
+      .getQuery();
+  }
+
+  private async withFullNodes<T extends VideoTree>(
+    videoTree: VideoTreeOnlyRoot,
+  ) {
+    videoTree.root = await this.treeRepository.findDescendantsTree(
+      videoTree.root as VideoNodeEntity,
+    );
+
+    return videoTree as T;
   }
 }

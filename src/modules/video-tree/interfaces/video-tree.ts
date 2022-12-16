@@ -14,7 +14,7 @@ export interface VideoTree {
   minDuration: number;
   status: VideoTreeStatus;
   editing: boolean;
-  userId: string;
+  creatorId: string;
   root: VideoNode;
 }
 
@@ -27,7 +27,7 @@ export interface VideoTreeWithData extends VideoTree {
   views: number;
   favorites: number;
   favorited: boolean;
-  history: Omit<History, 'videoId' | 'userId'> | null;
+  history: Omit<History, 'videoId' | 'creatorId'> | null;
 }
 
 export interface VideoTreeOnlyRootWithData

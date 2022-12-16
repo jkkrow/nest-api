@@ -34,15 +34,15 @@ export class HistoryEntity {
   @Column({ type: 'boolean' })
   ended: boolean;
 
-  @ManyToOne(() => VideoTreeEntity, (tree) => tree.id, { onDelete: 'CASCADE' })
-  video: VideoTreeEntity;
-
-  @ManyToOne(() => UserEntity, (user) => user.id, { onDelete: 'CASCADE' })
-  user: UserEntity;
-
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @ManyToOne(() => VideoTreeEntity, (tree) => tree.id, { onDelete: 'CASCADE' })
+  video: VideoTreeEntity;
+
+  @ManyToOne(() => UserEntity, (user) => user.id, { onDelete: 'CASCADE' })
+  user: UserEntity;
 }

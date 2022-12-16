@@ -14,7 +14,7 @@ export class CreateVideoTreeHandler
   ) {}
 
   async execute({ id, userId }: CreateVideoTreeCommand) {
-    const videoTree = this.factory.create({ id, userId });
+    const videoTree = this.factory.create({ id, creatorId: userId });
 
     await this.repository.save(videoTree);
 

@@ -1,6 +1,6 @@
 import { IQuery } from '@nestjs/cqrs';
 
-export class GetVideoTreeQuery implements IQuery {
+export class WatchVideoTreeQuery implements IQuery {
   constructor(
     public readonly id: string,
     public readonly ip: string,

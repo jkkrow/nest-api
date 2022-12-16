@@ -10,12 +10,12 @@ export class SubscriptionEntity {
   @PrimaryColumn({ type: 'uuid' })
   subscriberId: string;
 
+  @CreateDateColumn()
+  createdAt: Date;
+
   @ManyToOne(() => UserEntity, (user) => user.id, { onDelete: 'CASCADE' })
   publisher: UserEntity;
 
   @ManyToOne(() => UserEntity, (user) => user.id, { onDelete: 'CASCADE' })
   subscriber: UserEntity;
-
-  @CreateDateColumn()
-  createdAt: Date;
 }

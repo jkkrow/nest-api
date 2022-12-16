@@ -8,7 +8,7 @@ export class videoTreesTable1670387603272 implements MigrationInterface {
     await queryRunner.query(`
       CREATE TABLE video_trees (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        creator_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         title VARCHAR(50) NOT NULL,
         description VARCHAR(1000) NOT NULL,
         thumbnail VARCHAR(200) NOT NULL,

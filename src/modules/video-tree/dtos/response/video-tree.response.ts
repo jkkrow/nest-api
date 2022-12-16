@@ -73,7 +73,7 @@ export class VideoTreeResponse {
   editing: boolean;
 
   @Expose()
-  userId: string;
+  creatorId: string;
 
   @Expose()
   @Type(() => VideoTreeRoot)

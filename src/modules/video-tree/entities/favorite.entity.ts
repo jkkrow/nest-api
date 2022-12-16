@@ -11,12 +11,12 @@ export class FavoriteEntity {
   @PrimaryColumn({ type: 'uuid' })
   userId: string;
 
+  @CreateDateColumn()
+  createdAt: Date;
+
   @ManyToOne(() => VideoTreeEntity, (tree) => tree.id, { onDelete: 'CASCADE' })
   video: VideoTreeEntity;
 
   @ManyToOne(() => UserEntity, (user) => user.id, { onDelete: 'CASCADE' })
   user: UserEntity;
-
-  @CreateDateColumn()
-  createdAt: Date;
 }

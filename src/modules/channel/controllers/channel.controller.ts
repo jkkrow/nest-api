@@ -7,6 +7,10 @@ import { PaginationRequest } from 'src/common/dtos/request/pagination.request';
 import { MessageResponse } from 'src/common/dtos/response/message.response';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { CurrentUserId } from 'src/auth/decorators/user.decorator';
+import { GetCreatedVideoTreesQuery } from 'src/modules/video-tree/queries/impl/get-created-video-trees.query';
+import { GetCreatedVideoTreeQuery } from 'src/modules/video-tree/queries/impl/get-created-video-tree.query';
+import { GetCreatedVideoTreesResponse } from '../dtos/response/get-created-videos.response';
+import { GetCreatedVideoTreeResponse } from '../dtos/response/get-created-video.response';
 import { GetChannelQuery } from '../queries/impl/get-channel.query';
 import { GetSubscribersQuery } from '../queries/impl/get-subscribers.query';
 import { GetSubscribesQuery } from '../queries/impl/get-subscribes.query';
@@ -94,11 +98,33 @@ export class ChannelController {
     return { message: 'Unsubscribed from channel successfully' };
   }
 
-  /* Get Current Channel Videos */
+  /* Get Created Videos */
+  /*--------------------------------------------*/
+  @Get('current/video-trees')
+  @Role('user')
+  @Serialize(GetCreatedVideoTreesResponse)
+  async getCreatedVideoTrees(
+    @Query() params: PaginationRequest,
+    @CurrentUserId() userId: string,
+  ) {
+    const query = new GetCreatedVideoTreesQuery(userId, params);
+    const { videoTrees, count } = await this.queryBus.execute(query);
+
+    return { videoTrees, count };
+  }
+
+  /* Get Created Video */
   /*--------------------------------------------*/
   @Get('current/video-trees/:id')
   @Role('user')
-  async getCurrentChannelVideoTrees() {
-    return {};
+  @Serialize(GetCreatedVideoTreeResponse)
+  async getCreatedVideoTree(
+    @Param('id') id: string,
+    @CurrentUserId() userId: string,
+  ) {
+    const query = new GetCreatedVideoTreeQuery(id, userId);
+    const videoTree = await this.queryBus.execute(query);
+
+    return { videoTree };
   }
 }

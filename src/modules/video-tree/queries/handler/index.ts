@@ -1,9 +1,11 @@
-import { GetVideoTreesHandler } from './get-video-trees.handler';
-import { GetVideoTreeHandler } from './get-video-tree.handler';
-import { GetMyVideoTreeHandler } from './get-my-video-tree.handler';
+import { BrowseVideoTreesHandler } from './browse-video-trees.handler';
+import { WatchVideoTreeHandler } from './watch-video-tree.handler';
+import { GetCreatedVideoTreesHandler } from './get-created-video-trees.handler';
+import { GetCreatedVideoTreeHandler } from './get-created-video-tree.handler';
 
 export const QueryHandlers = [
-  GetVideoTreesHandler,
-  GetVideoTreeHandler,
-  GetMyVideoTreeHandler,
+  BrowseVideoTreesHandler,
+  WatchVideoTreeHandler,
+  GetCreatedVideoTreesHandler,
+  GetCreatedVideoTreeHandler,
 ];

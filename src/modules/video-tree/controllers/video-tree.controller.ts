@@ -30,15 +30,15 @@ import { DeleteVideoNodeCommand } from '../commands/impl/delete-video-node.comma
 import { AddToFavoritesCommand } from '../commands/impl/add-to-favorites.command';
 import { RemoveFromFavoritesCommand } from '../commands/impl/remove-from-favorites.command';
 
-import { GetVideoTreesQuery } from '../queries/impl/get-video-trees.query';
-import { GetVideoTreeQuery } from '../queries/impl/get-video-tree.query';
+import { BrowseVideoTreesQuery } from '../queries/impl/browse-video-trees.query';
+import { WatchVideoTreeQuery } from '../queries/impl/watch-video-tree.query';
 
 import { UpdateVideoTreeRequest } from '../dtos/request/update-video-tree.request';
 import { CreateVideoNodeRequest } from '../dtos/request/create-video-node.request';
 import { CreateVideoNodeResponse } from '../dtos/response/create-video-node.response';
 import { UpdateVideoNodeRequest } from '../dtos/request/update-video-node.request';
-import { GetVideoTreesResponse } from '../dtos/response/get-video-trees.response';
-import { GetVideoTreeResponse } from '../dtos/response/get-video-tree.response';
+import { BrowseVideoTreesResponse } from '../dtos/response/browse-video-trees.response';
+import { WatchVideoTreeResponse } from '../dtos/response/watch-video-tree.response';
 
 @ApiTags('VideoTrees')
 @Controller('video-trees')
@@ -176,12 +176,12 @@ export class VideoTreeController {
   /* Get VideoTrees */
   /*--------------------------------------------*/
   @Get()
-  @Serialize(GetVideoTreesResponse)
+  @Serialize(BrowseVideoTreesResponse)
   async getVideoTrees(
     @Query() params: PaginationRequest,
     @CurrentUserId() userId?: string,
   ) {
-    const query = new GetVideoTreesQuery(params, userId);
+    const query = new BrowseVideoTreesQuery(params, userId);
     const { videoTrees, count } = await this.queryBus.execute(query);
 
     return { videoTrees, count };
@@ -190,13 +190,13 @@ export class VideoTreeController {
   /* Get VideoTree */
   /*--------------------------------------------*/
   @Get(':id')
-  @Serialize(GetVideoTreeResponse)
+  @Serialize(WatchVideoTreeResponse)
   async getVideoTree(
     @Param('id') id: string,
     @Ip() ip: string,
     @CurrentUserId() userId?: string,
   ) {
-    const query = new GetVideoTreeQuery(id, ip, userId);
+    const query = new WatchVideoTreeQuery(id, ip, userId);
     const videoTree = await this.queryBus.execute(query);
 
     return { videoTree };

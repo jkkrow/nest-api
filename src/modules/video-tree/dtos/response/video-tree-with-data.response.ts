@@ -30,7 +30,7 @@ export class VideoTreeHistory {
 export class VideoTreeWithDataResponse extends VideoTreeResponse {
   @Expose()
   @Type(() => VideoTreeUser)
-  user: VideoTreeUser;
+  creator: VideoTreeUser;
 
   @Expose()
   views: number;

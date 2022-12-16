@@ -4,25 +4,28 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from 'src/common/exceptions';
-import { GetVideoTreeQuery } from '../impl/get-video-tree.query';
+import { WatchVideoTreeQuery } from '../impl/watch-video-tree.query';
 import { VideoTreeWatchedEvent } from '../../events/impl/video-tree-watched.event';
 import { VideoTreeRepository } from '../../repositories/video-tree.repository';
 
-@QueryHandler(GetVideoTreeQuery)
-export class GetVideoTreeHandler implements IQueryHandler<GetVideoTreeQuery> {
+@QueryHandler(WatchVideoTreeQuery)
+export class WatchVideoTreeHandler
+  implements IQueryHandler<WatchVideoTreeQuery>
+{
   constructor(
     private readonly repository: VideoTreeRepository,
     private readonly eventBus: EventBus,
   ) {}
 
-  async execute({ id, ip, userId }: GetVideoTreeQuery) {
-    const videoTree = await this.repository.findOneWithDataById(id);
+  async execute({ id, ip, userId }: WatchVideoTreeQuery) {
+    const videoTree = await this.repository.findOneWithData({ id }, userId);
 
     if (!videoTree) {
       throw new NotFoundException('VideoTree not found');
     }
 
-    if (videoTree.status === 'private' && videoTree.userId !== userId) {
+    // TODO: Add validation logic for private video
+    if (videoTree.status === 'private' && videoTree.creatorId !== userId) {
       throw new UnauthorizedException('Unable to access private content');
     }
 

@@ -16,12 +16,12 @@ export class ViewEntity extends BaseEntity {
   @Column({ type: 'varchar', length: 50 })
   ip: string;
 
+  @CreateDateColumn()
+  createdAt: Date;
+
   @ManyToOne(() => VideoTreeEntity, (tree) => tree.id, { onDelete: 'CASCADE' })
   video: VideoTreeEntity;
 
   @ManyToOne(() => UserEntity, (user) => user.id, { onDelete: 'SET NULL' })
   user: UserEntity;
-
-  @CreateDateColumn()
-  createdAt: Date;
 }

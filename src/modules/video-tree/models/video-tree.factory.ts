@@ -12,7 +12,7 @@ export class VideoTreeFactory
 {
   constructor(private readonly publisher: EventPublisher) {}
 
-  create(params: { id: string; userId: string }) {
+  create(params: { id: string; creatorId: string }) {
     const videoTree = this.publisher.mergeObjectContext(
       new VideoTree({
         ...params,
@@ -48,7 +48,7 @@ export class VideoTreeFactory
   createEntity(model: VideoTree): VideoTreeEntity {
     return {
       id: model.id,
-      userId: model.userId,
+      creatorId: model.creatorId,
       title: model.title,
       categories: model.categories,
       description: model.description,
@@ -65,7 +65,7 @@ export class VideoTreeFactory
   createFromEntity(entity: VideoTreeEntity): VideoTree {
     const videoTree = new VideoTree({
       id: entity.id,
-      userId: entity.userId,
+      creatorId: entity.creatorId,
       title: entity.title,
       categories: entity.categories,
       description: entity.description,

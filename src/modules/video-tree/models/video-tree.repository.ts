@@ -23,7 +23,7 @@ export class VideoTreeRepository extends BaseRepository<
     super(repository, factory);
   }
 
-  async findById(id: string) {
+  async findOneById(id: string) {
     const videoTree = await this.repository.findOneBy({ id });
 
     if (!videoTree) {

@@ -15,7 +15,7 @@ export class VideoTree extends AggregateRoot {
   constructor(
     private readonly props: {
       readonly id: string;
-      readonly userId: string;
+      readonly creatorId: string;
       title: string;
       description: string;
       categories: { name: string }[];
@@ -35,8 +35,8 @@ export class VideoTree extends AggregateRoot {
     return this.props.id;
   }
 
-  get userId() {
-    return this.props.userId;
+  get creatorId() {
+    return this.props.creatorId;
   }
 
   get title() {
@@ -115,7 +115,7 @@ export class VideoTree extends AggregateRoot {
   }
 
   delete() {
-    this.apply(new VideoTreeDeletedEvent(this.id, this.userId));
+    this.apply(new VideoTreeDeletedEvent(this.id, this.creatorId));
   }
 
   createNode(id: string, parentId: string) {

@@ -14,13 +14,13 @@ export class UpdateVideoNodeHandler
   constructor(private readonly repository: VideoTreeRepository) {}
 
   async execute({ id, treeId, updates, userId }: UpdateVideoNodeCommand) {
-    const videoTree = await this.repository.findById(treeId);
+    const videoTree = await this.repository.findOneById(treeId);
 
     if (!videoTree) {
       throw new NotFoundException('VideoTree not found');
     }
 
-    if (videoTree.userId !== userId) {
+    if (videoTree.creatorId !== userId) {
       throw new UnauthorizedException('VideoTree not belong to user');
     }
 
