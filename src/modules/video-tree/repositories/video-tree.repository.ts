@@ -125,26 +125,27 @@ export class VideoTreeRepository {
         'histories',
         'history',
         `history.video_id = ${this.alias}.id AND history.user_id = :userId`,
-        { userId },
       )
       .groupBy(`${this.alias}.id`)
       .addGroupBy('node.id')
       .addGroupBy('user.id')
       .addGroupBy('history.video_id')
       .addGroupBy('history.user_id')
-      .addGroupBy('category.name');
+      .addGroupBy('category.name')
+      .setParameter('userId', userId);
   }
 
-  private getFavoritedQuery(userId?: string) {
+  private getFavoritedQuery() {
     const alias = 'f_favor';
     const userAlias = 'f_user';
-    const cond = `${userAlias}.id = ${alias}.user_id AND ${alias}.video_id = ${this.alias}.id`;
+    const joinCond = `${userAlias}.id = ${alias}.user_id AND ${alias}.video_id = ${this.alias}.id`;
+
     return this.repository
       .createQueryBuilder()
       .select('*')
       .from('favorites', alias)
-      .innerJoin('users', userAlias, cond)
-      .where(`${alias}.user_id = :userId`, { userId })
+      .innerJoin('users', userAlias, joinCond)
+      .where(`${alias}.user_id = :userId`)
       .getQuery();
   }
 

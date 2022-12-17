@@ -11,8 +11,8 @@ import { UserFactory } from './user.factory';
 export class UserRepository extends BaseRepository<UserEntity, User> {
   constructor(
     @InjectRepository(UserEntity)
-    readonly repository: Repository<UserEntity>,
-    readonly factory: UserFactory,
+    protected readonly repository: Repository<UserEntity>,
+    protected readonly factory: UserFactory,
   ) {
     super(repository, factory);
   }

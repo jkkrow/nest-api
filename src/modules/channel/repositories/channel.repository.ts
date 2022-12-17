@@ -12,18 +12,23 @@ export class ChannelRepository {
     private readonly entityManager: EntityManager,
   ) {}
 
+  private readonly alias = 'channel';
+
   async findOneById(id: string, userId?: string) {
     return this.getChannelQuery(userId)
-      .where('user.id = :id', { id })
+      .where(`${this.alias}.id = :id`, { id })
       .getRawOne<Channel>();
   }
 
   async findByPublisherId(id: string, { page, max }: PageParams) {
+    const alias = 'q_subscription';
+    const joinCond = `${alias}.subscriber_id = ${this.alias}.id`;
+
     const query = this.getChannelQuery(id)
-      .innerJoin('subscriptions', 'q_subs', 'q_subs.subscriber_id = user.id')
-      .where('q_subs.publisher_id = :id', { id })
-      .addGroupBy('q_subs.created_at')
-      .orderBy('q_subs.created_at', 'DESC')
+      .innerJoin('subscriptions', alias, joinCond)
+      .where(`${alias}.publisher_id = :id`, { id })
+      .addGroupBy(`${alias}.created_at`)
+      .orderBy(`${alias}.created_at`, 'DESC')
       .limit(max)
       .offset(max * (page - 1));
 
@@ -36,11 +41,14 @@ export class ChannelRepository {
   }
 
   async findBySubscriberId(id: string, { page, max }: PageParams) {
+    const alias = 'q_subscription';
+    const joinCond = `${alias}.subscriber_id = ${this.alias}.id`;
+
     const query = this.getChannelQuery(id)
-      .innerJoin('subscriptions', 'q_subs', 'q_subs.publisher_id = user.id')
-      .where('q_subs.subscriber_id = :id', { id })
-      .addGroupBy('q_subs.created_at')
-      .orderBy('q_subs.created_at', 'DESC')
+      .innerJoin('subscriptions', alias, joinCond)
+      .where(`${alias}.publisher_id = :id`, { id })
+      .addGroupBy(`${alias}.created_at`)
+      .orderBy(`${alias}.created_at`, 'DESC')
       .limit(max)
       .offset(max * (page - 1));
 
@@ -53,29 +61,30 @@ export class ChannelRepository {
   }
 
   private getChannelQuery(userId?: string) {
-    const subscribedQuery = this.entityManager
+    return this.entityManager
+      .createQueryBuilder()
+      .select(`${this.alias}.id`, 'id')
+      .addSelect(`${this.alias}.name`, 'name')
+      .addSelect(`${this.alias}.picture`, 'picture')
+      .addSelect('COUNT(DISTINCT subs.subscriber_id)', 'subscribers')
+      .addSelect(`EXISTS(${this.getSubscribedQuery()})`, 'subscribed')
+      .from('users', this.alias)
+      .leftJoin('subscriptions', 'subs', `subs.publisher_id = ${this.alias}.id`)
+      .groupBy(`${this.alias}.id`)
+      .setParameter('userId', userId);
+  }
+
+  private getSubscribedQuery() {
+    const alias = 's_subscription';
+    const userAlias = 's_user';
+    const joinCond = `${userAlias}.id = ${alias}.subscriber_id AND ${alias}.publisher_id = ${this.alias}.id`;
+
+    return this.entityManager
       .createQueryBuilder()
       .select('*')
-      .from('subscriptions', 's_subs')
-      .innerJoin(
-        'users',
-        's_user',
-        's_user.id = s_subs.subscriber_id AND s_subs.publisher_id = user.id',
-      )
-      .where('s_subs.subscriber_id = :userId', { userId });
-
-    const channelQuery = this.entityManager
-      .createQueryBuilder()
-      .select('user.id', 'id')
-      .addSelect('user.name', 'name')
-      .addSelect('user.picture', 'picture')
-      .addSelect('COUNT(DISTINCT subs.subscriber_id)', 'subscribers')
-      .addSelect(`EXISTS(${subscribedQuery.getQuery()})`, 'subscribed')
-      .from('users', 'user')
-      .leftJoin('subscriptions', 'subs', 'subs.publisher_id = user.id')
-      .groupBy('user.id')
-      .setParameters(subscribedQuery.getParameters());
-
-    return channelQuery;
+      .from('subscriptions', alias)
+      .innerJoin('users', userAlias, joinCond)
+      .where(`${alias}.subscriber_id = :userId`)
+      .getQuery();
   }
 }
