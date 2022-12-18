@@ -15,7 +15,6 @@ import { ApiTags } from '@nestjs/swagger';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Serialize } from 'src/common/decorators/serialize.decorator';
-import { PaginationRequest } from 'src/common/dtos/request/pagination.request';
 import { MessageResponse } from 'src/common/dtos/response/message.response';
 import { RedirectResponse } from 'src/common/dtos/response/redirect.response';
 import { Role } from 'src/auth/decorators/role.decorator';
@@ -30,14 +29,15 @@ import { DeleteVideoNodeCommand } from '../commands/impl/delete-video-node.comma
 import { AddToFavoritesCommand } from '../commands/impl/add-to-favorites.command';
 import { RemoveFromFavoritesCommand } from '../commands/impl/remove-from-favorites.command';
 
-import { BrowseVideoTreesQuery } from '../queries/impl/browse-video-trees.query';
+import { GetVideoTreesQuery } from '../queries/impl/get-video-trees.query';
 import { WatchVideoTreeQuery } from '../queries/impl/watch-video-tree.query';
 
 import { UpdateVideoTreeRequest } from '../dtos/request/update-video-tree.request';
 import { CreateVideoNodeRequest } from '../dtos/request/create-video-node.request';
 import { CreateVideoNodeResponse } from '../dtos/response/create-video-node.response';
 import { UpdateVideoNodeRequest } from '../dtos/request/update-video-node.request';
-import { BrowseVideoTreesResponse } from '../dtos/response/browse-video-trees.response';
+import { GetVideoTreesRequest } from '../dtos/request/get-video-trees.request';
+import { GetVideoTreesResponse } from '../dtos/response/get-video-trees.response';
 import { WatchVideoTreeResponse } from '../dtos/response/watch-video-tree.response';
 
 @ApiTags('VideoTrees')
@@ -176,12 +176,12 @@ export class VideoTreeController {
   /* Get VideoTrees */
   /*--------------------------------------------*/
   @Get()
-  @Serialize(BrowseVideoTreesResponse)
+  @Serialize(GetVideoTreesResponse)
   async getVideoTrees(
-    @Query() params: PaginationRequest,
+    @Query() { ids, ...rest }: GetVideoTreesRequest,
     @CurrentUserId() userId?: string,
   ) {
-    const query = new BrowseVideoTreesQuery(params, userId);
+    const query = new GetVideoTreesQuery({ ids }, rest, userId);
     const { videoTrees, count } = await this.queryBus.execute(query);
 
     return { videoTrees, count };

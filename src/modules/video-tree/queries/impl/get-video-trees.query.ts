@@ -2,8 +2,9 @@ import { IQuery } from '@nestjs/cqrs';
 
 import { PageParams } from 'src/common/interfaces/pagination.interface';
 
-export class BrowseVideoTreesQuery implements IQuery {
+export class GetVideoTreesQuery implements IQuery {
   constructor(
+    public readonly options: { ids?: string[] },
     public readonly params: PageParams,
     public readonly userId?: string,
   ) {}

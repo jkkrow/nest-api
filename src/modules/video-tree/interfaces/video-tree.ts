@@ -16,6 +16,8 @@ export interface VideoTree {
   editing: boolean;
   creatorId: string;
   root: VideoNode;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface VideoTreeOnlyRoot extends Omit<VideoTree, 'root'> {

@@ -1,8 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, SelectQueryBuilder, TreeRepository } from 'typeorm';
+import { Repository, TreeRepository } from 'typeorm';
 
-import { PageParams } from 'src/common/interfaces/pagination.interface';
+import {
+  BaseRepository,
+  FindOptions,
+} from 'src/providers/database/repositories/database.repository';
 import {
   VideoTree,
   VideoTreeWithData,
@@ -11,28 +14,27 @@ import {
 } from '../interfaces/video-tree';
 import { VideoTreeEntity } from '../entities/video-tree.entity';
 import { VideoNodeEntity } from '../entities/video-node.entity';
-import { VideoTreeStatus } from '../constants/video-tree.contstant';
 
-interface FindVideoTreeOptions {
-  id?: string;
-  creatorId?: string;
-  status?: VideoTreeStatus;
-}
+interface FindVideoTreeOptions
+  extends FindOptions<VideoTreeEntity, 'history' | 'favorite' | 'view'> {}
 
 @Injectable()
-export class VideoTreeRepository {
+export class VideoTreeRepository extends BaseRepository<
+  VideoTreeEntity,
+  FindVideoTreeOptions
+> {
   constructor(
     @InjectRepository(VideoTreeEntity)
     private readonly repository: Repository<VideoTreeEntity>,
     @InjectRepository(VideoNodeEntity)
     private readonly treeRepository: TreeRepository<VideoNodeEntity>,
-  ) {}
+  ) {
+    super('video_tree');
+  }
 
-  private readonly alias = 'video_tree';
-
-  async find(options: FindVideoTreeOptions, params: PageParams) {
+  async find(options: FindVideoTreeOptions) {
     const query = this.getVideoTreeQuery();
-    const findQuery = this.findVideoTreeQuery(query, options, params);
+    const findQuery = this.filterQuery(query, options);
 
     const [videoTrees, count] = await Promise.all([
       findQuery.getMapMany<VideoTreeOnlyRoot>(),
@@ -44,19 +46,15 @@ export class VideoTreeRepository {
 
   async findOne(options: FindVideoTreeOptions) {
     const query = this.getVideoTreeQuery();
-    const findQuery = this.findVideoTreeQuery(query, options);
+    const findQuery = this.filterQuery(query, options);
 
     const videoTree = await findQuery.getMapOne<VideoTreeOnlyRoot>();
     return videoTree ? this.withFullNodes(videoTree) : null;
   }
 
-  async findWithData(
-    options: FindVideoTreeOptions,
-    params: PageParams,
-    userId?: string,
-  ) {
+  async findWithData(options: FindVideoTreeOptions, userId?: string) {
     const query = this.getVideoTreeWithDataQuery(userId);
-    const findQuery = this.findVideoTreeQuery(query, options, params);
+    const findQuery = this.filterQuery(query, options);
 
     const [videoTrees, count] = await Promise.all([
       findQuery.getMapMany<VideoTreeOnlyRootWithData>(),
@@ -68,38 +66,10 @@ export class VideoTreeRepository {
 
   async findOneWithData(options: FindVideoTreeOptions, userId?: string) {
     const query = this.getVideoTreeWithDataQuery(userId);
-    const findQuery = this.findVideoTreeQuery(query, options);
+    const findQuery = this.filterQuery(query, options);
 
-    const videoTree = await findQuery.getMapOne<VideoTreeOnlyRootWithData>();
+    const videoTree = await findQuery.getMapOne<VideoTreeOnlyRoot>();
     return videoTree ? this.withFullNodes<VideoTreeWithData>(videoTree) : null;
-  }
-
-  private findVideoTreeQuery(
-    query: SelectQueryBuilder<VideoTreeEntity>,
-    options: FindVideoTreeOptions,
-    params?: PageParams,
-  ) {
-    const { id, creatorId, status } = options;
-
-    if (id) {
-      query.andWhere(`${this.alias}.id = :id`, { id });
-    }
-
-    if (creatorId) {
-      query.andWhere(`${this.alias}.creator_id = :creatorId`, { creatorId });
-    }
-
-    if (status) {
-      query.andWhere(`${this.alias}.status = :status`, { status });
-    }
-
-    if (params) {
-      query.orderBy(`${this.alias}.created_at`, 'DESC');
-      query.limit(params.max);
-      query.offset(params.max * (params.page - 1));
-    }
-
-    return query;
   }
 
   private getVideoTreeQuery() {
@@ -117,9 +87,9 @@ export class VideoTreeRepository {
       .addSelect(`EXISTS(${this.getFavoritedQuery()})`, 'favorited')
       .leftJoin('views', 'view', `view.video_id = ${this.alias}.id`)
       .leftJoin('favorites', 'favorite', `favorite.video_id = ${this.alias}.id`)
-      .leftJoinAndSelect(`${this.alias}.root`, 'node')
+      .leftJoinAndSelect(`${this.alias}.root`, 'root')
       .leftJoinAndSelect(`${this.alias}.categories`, 'category')
-      .leftJoinAndSelect(`${this.alias}.creator`, 'user')
+      .leftJoinAndSelect(`${this.alias}.creator`, 'creator')
       .leftJoinAndMapOne(
         `${this.alias}.history`,
         'histories',
@@ -127,8 +97,8 @@ export class VideoTreeRepository {
         `history.video_id = ${this.alias}.id AND history.user_id = :userId`,
       )
       .groupBy(`${this.alias}.id`)
-      .addGroupBy('node.id')
-      .addGroupBy('user.id')
+      .addGroupBy('root.id')
+      .addGroupBy('creator.id')
       .addGroupBy('history.video_id')
       .addGroupBy('history.user_id')
       .addGroupBy('category.name')

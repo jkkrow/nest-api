@@ -10,6 +10,9 @@ export class GetCreatedVideoTreesHandler
   constructor(private readonly repository: VideoTreeRepository) {}
 
   async execute({ creatorId, params }: GetCreatedVideoTreesQuery) {
-    return await this.repository.find({ creatorId }, params);
+    return await this.repository.find({
+      where: { creatorId },
+      pagination: params,
+    });
   }
 }

@@ -18,7 +18,10 @@ export class WatchVideoTreeHandler
   ) {}
 
   async execute({ id, ip, userId }: WatchVideoTreeQuery) {
-    const videoTree = await this.repository.findOneWithData({ id }, userId);
+    const videoTree = await this.repository.findOneWithData(
+      { where: { id } },
+      userId,
+    );
 
     if (!videoTree) {
       throw new NotFoundException('VideoTree not found');

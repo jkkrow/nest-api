@@ -76,6 +76,12 @@ export class VideoTreeResponse {
   creatorId: string;
 
   @Expose()
+  createdAt: Date;
+
+  @Expose()
+  updatedAt: Date;
+
+  @Expose()
   @Type(() => VideoTreeRoot)
   root: VideoTreeRoot;
 }

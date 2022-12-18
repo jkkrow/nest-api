@@ -11,7 +11,9 @@ export class GetCreatedVideoTreeHandler
   constructor(private readonly repository: VideoTreeRepository) {}
 
   async execute({ id, creatorId }: GetCreatedVideoTreeQuery) {
-    const videoTree = await this.repository.findOne({ id, creatorId });
+    const videoTree = await this.repository.findOne({
+      where: { id, creatorId },
+    });
 
     if (!videoTree) {
       throw new NotFoundException('VideoTree not found');
