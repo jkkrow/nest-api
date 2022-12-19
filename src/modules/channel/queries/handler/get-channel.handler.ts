@@ -9,7 +9,7 @@ export class GetChannelHandler implements IQueryHandler {
   constructor(private readonly repository: ChannelRepository) {}
 
   async execute({ id, userId }: GetChannelQuery) {
-    const channel = await this.repository.findOneById(id, userId);
+    const channel = await this.repository.findOne({ where: { id } }, userId);
 
     if (!channel) {
       throw new NotFoundException('Channel not found');

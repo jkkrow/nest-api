@@ -2,10 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, TreeRepository } from 'typeorm';
 
-import {
-  BaseRepository,
-  FindOptions,
-} from 'src/providers/database/repositories/database.repository';
+import { BaseRepository } from 'src/providers/database/repositories/database.repository';
+import { FindOptions } from 'src/providers/database/types/database.type';
 import {
   VideoTree,
   VideoTreeWithData,
@@ -16,7 +14,7 @@ import { VideoTreeEntity } from '../entities/video-tree.entity';
 import { VideoNodeEntity } from '../entities/video-node.entity';
 
 interface FindVideoTreeOptions
-  extends FindOptions<VideoTreeEntity, 'history' | 'favorite' | 'view'> {}
+  extends FindOptions<VideoTreeEntity, 'histories' | 'favorites' | 'views'> {}
 
 @Injectable()
 export class VideoTreeRepository extends BaseRepository<
@@ -29,7 +27,7 @@ export class VideoTreeRepository extends BaseRepository<
     @InjectRepository(VideoNodeEntity)
     private readonly treeRepository: TreeRepository<VideoNodeEntity>,
   ) {
-    super('video_tree');
+    super('video_trees');
   }
 
   async find(options: FindVideoTreeOptions) {
@@ -73,49 +71,67 @@ export class VideoTreeRepository extends BaseRepository<
   }
 
   private getVideoTreeQuery() {
+    // Alias
+    const video = this.alias;
+    const root = 'v_root';
+    const category = 'v_categories';
+
     return this.repository
-      .createQueryBuilder(this.alias)
-      .leftJoinAndSelect(`${this.alias}.root`, 'node')
-      .leftJoinAndSelect(`${this.alias}.categories`, 'category');
+      .createQueryBuilder(video)
+      .leftJoinAndSelect(`${video}.root`, root)
+      .leftJoinAndSelect(`${video}.categories`, category);
   }
 
   private getVideoTreeWithDataQuery(userId?: string) {
+    // Alias
+    const video = this.alias;
+    const view = 'v_views';
+    const favorite = 'v_favorites';
+    const history = 'v_histories';
+    const category = 'v_categories';
+    const root = 'v_root';
+    const creator = 'v_creator';
+
+    // Join Condition
+    const joinView = `${view}.video_id = ${video}.id`;
+    const joinFavorite = `${favorite}.video_id = ${video}.id`;
+    const joinHistory = `${history}.video_id = ${video}.id AND ${history}.user_id = :userId`;
+
     return this.repository
-      .createQueryBuilder(this.alias)
-      .addSelect('COUNT(DISTINCT view.id)', 'views')
-      .addSelect('COUNT(DISTINCT favorite.user_id)', 'favorites')
+      .createQueryBuilder(video)
+      .addSelect(`COUNT(DISTINCT ${view}.id)`, 'views')
+      .addSelect(`COUNT(DISTINCT ${favorite}.user_id)`, 'favorites')
       .addSelect(`EXISTS(${this.getFavoritedQuery()})`, 'favorited')
-      .leftJoin('views', 'view', `view.video_id = ${this.alias}.id`)
-      .leftJoin('favorites', 'favorite', `favorite.video_id = ${this.alias}.id`)
-      .leftJoinAndSelect(`${this.alias}.root`, 'root')
-      .leftJoinAndSelect(`${this.alias}.categories`, 'category')
-      .leftJoinAndSelect(`${this.alias}.creator`, 'creator')
-      .leftJoinAndMapOne(
-        `${this.alias}.history`,
-        'histories',
-        'history',
-        `history.video_id = ${this.alias}.id AND history.user_id = :userId`,
-      )
-      .groupBy(`${this.alias}.id`)
-      .addGroupBy('root.id')
-      .addGroupBy('creator.id')
-      .addGroupBy('history.video_id')
-      .addGroupBy('history.user_id')
-      .addGroupBy('category.name')
+      .leftJoin('views', view, joinView)
+      .leftJoin('favorites', favorite, joinFavorite)
+      .leftJoinAndSelect(`${video}.root`, root)
+      .leftJoinAndSelect(`${video}.categories`, category)
+      .leftJoinAndSelect(`${video}.creator`, creator)
+      .leftJoinAndMapOne(`${video}.history`, 'histories', history, joinHistory)
+      .addGroupBy(`${video}.id`)
+      .addGroupBy(`${root}.id`)
+      .addGroupBy(`${creator}.id`)
+      .addGroupBy(`${history}.video_id`)
+      .addGroupBy(`${history}.user_id`)
+      .addGroupBy(`${category}.name`)
       .setParameter('userId', userId);
   }
 
   private getFavoritedQuery() {
-    const alias = 'f_favor';
-    const userAlias = 'f_user';
-    const joinCond = `${userAlias}.id = ${alias}.user_id AND ${alias}.video_id = ${this.alias}.id`;
+    // Alias
+    const video = this.alias;
+    const favorite = 'f_favorites';
+    const user = 'f_user';
+
+    // Join Condition
+    const joinUser = `${user}.id = ${favorite}.user_id AND ${favorite}.video_id = ${video}.id`;
 
     return this.repository
       .createQueryBuilder()
       .select('*')
-      .from('favorites', alias)
-      .innerJoin('users', userAlias, joinCond)
-      .where(`${alias}.user_id = :userId`)
+      .from('favorites', favorite)
+      .innerJoin('users', user, joinUser)
+      .where(`${favorite}.user_id = :userId`)
       .getQuery();
   }
 

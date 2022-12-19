@@ -11,6 +11,9 @@ export class ChannelResponse {
   picture: string;
 
   @Expose()
+  videos: number;
+
+  @Expose()
   subscribers: number;
 
   @Expose()

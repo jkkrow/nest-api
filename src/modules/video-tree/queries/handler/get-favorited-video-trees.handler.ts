@@ -10,10 +10,15 @@ export class GetFavoritedVideoTreesHandler
   constructor(private readonly repository: VideoTreeRepository) {}
 
   async execute({ userId, params }: GetFavoritedVideoTreesQuery) {
-    return await this.repository.findWithData(
+    return this.repository.findWithData(
       {
-        where: { editing: false, 'favorite.user_id': userId },
-        orderBy: { 'favorite.created_at': 'DESC' },
+        relation: {
+          table: 'favorites',
+          condition: { 'favorites.video_id': 'id' },
+        },
+        where: { 'favorites.user_id': userId, editing: false },
+        orderBy: { 'favorites.created_at': 'DESC' },
+        groupBy: { 'favorites.created_at': true },
         pagination: params,
       },
       userId,

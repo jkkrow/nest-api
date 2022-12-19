@@ -1,90 +1,68 @@
 import { Injectable } from '@nestjs/common';
-import { InjectEntityManager } from '@nestjs/typeorm';
-import { EntityManager } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
-import { PageParams } from 'src/common/interfaces/pagination.interface';
+import { BaseRepository } from 'src/providers/database/repositories/database.repository';
+import { FindOptions } from 'src/providers/database/types/database.type';
+import { ChannelEntity } from '../entities/channel.entity';
 import { Channel } from '../interfaces/channel.interface';
 
+interface FindChannelOptions
+  extends FindOptions<ChannelEntity, 'subscriptions'> {}
+
 @Injectable()
-export class ChannelRepository {
+export class ChannelRepository extends BaseRepository<
+  ChannelEntity,
+  FindChannelOptions
+> {
   constructor(
-    @InjectEntityManager()
-    private readonly entityManager: EntityManager,
-  ) {}
-
-  private readonly alias = 'channel';
-
-  async findOneById(id: string, userId?: string) {
-    return this.getChannelQuery(userId)
-      .where(`${this.alias}.id = :id`, { id })
-      .getRawOne<Channel>();
+    @InjectRepository(ChannelEntity)
+    private readonly repository: Repository<ChannelEntity>,
+  ) {
+    super('channels');
   }
 
-  async findByPublisherId(id: string, { page, max }: PageParams) {
-    const alias = 'q_subscription';
-    const joinCond = `${alias}.subscriber_id = ${this.alias}.id`;
-
-    const query = this.getChannelQuery(id)
-      .innerJoin('subscriptions', alias, joinCond)
-      .where(`${alias}.publisher_id = :id`, { id })
-      .addGroupBy(`${alias}.created_at`)
-      .orderBy(`${alias}.created_at`, 'DESC')
-      .limit(max)
-      .offset(max * (page - 1));
+  async find(options: FindChannelOptions, userId?: string) {
+    const query = this.getChannelQuery(userId);
+    const findQuery = this.filterQuery(query, options);
 
     const [channels, count] = await Promise.all([
-      query.getRawMany<Channel>(),
-      query.getCount(),
+      findQuery.getMapMany<Channel>(),
+      findQuery.getCount(),
     ]);
 
     return { channels, count };
   }
 
-  async findBySubscriberId(id: string, { page, max }: PageParams) {
-    const alias = 'q_subscription';
-    const joinCond = `${alias}.subscriber_id = ${this.alias}.id`;
+  async findOne(options: FindChannelOptions, userId?: string) {
+    const query = this.getChannelQuery(userId);
+    const findQuery = this.filterQuery(query, options);
 
-    const query = this.getChannelQuery(id)
-      .innerJoin('subscriptions', alias, joinCond)
-      .where(`${alias}.publisher_id = :id`, { id })
-      .addGroupBy(`${alias}.created_at`)
-      .orderBy(`${alias}.created_at`, 'DESC')
-      .limit(max)
-      .offset(max * (page - 1));
-
-    const [channels, count] = await Promise.all([
-      query.getRawMany<Channel>(),
-      query.getCount(),
-    ]);
-
-    return { channels, count };
+    return findQuery.getMapOne<Channel>();
   }
 
   private getChannelQuery(userId?: string) {
-    return this.entityManager
-      .createQueryBuilder()
-      .select(`${this.alias}.id`, 'id')
-      .addSelect(`${this.alias}.name`, 'name')
-      .addSelect(`${this.alias}.picture`, 'picture')
-      .addSelect('COUNT(DISTINCT subs.subscriber_id)', 'subscribers')
+    return this.repository
+      .createQueryBuilder(this.alias)
       .addSelect(`EXISTS(${this.getSubscribedQuery()})`, 'subscribed')
-      .from('users', this.alias)
-      .leftJoin('subscriptions', 'subs', `subs.publisher_id = ${this.alias}.id`)
-      .groupBy(`${this.alias}.id`)
       .setParameter('userId', userId);
   }
 
   private getSubscribedQuery() {
-    const alias = 's_subscription';
-    const userAlias = 's_user';
-    const joinCond = `${userAlias}.id = ${alias}.subscriber_id AND ${alias}.publisher_id = ${this.alias}.id`;
+    // Alias
+    const channel = this.alias;
+    const subscription = 's_subscriptions';
+    const user = 's_users';
 
-    return this.entityManager
+    // Join Condition
+    const joinUser = `${user}.id = ${subscription}.subscriber_id AND ${subscription}.publisher_id = ${channel}.id`;
+
+    return this.repository
       .createQueryBuilder()
       .select('*')
-      .from('subscriptions', alias)
-      .innerJoin('users', userAlias, joinCond)
-      .where(`${alias}.subscriber_id = :userId`)
+      .from('subscriptions', subscription)
+      .innerJoin('users', user, joinUser)
+      .where(`${subscription}.subscriber_id = :userId`)
       .getQuery();
   }
 }

@@ -12,9 +12,10 @@ export class GetVideoTreesHandler implements IQueryHandler<GetVideoTreesQuery> {
       return;
     }
 
-    return await this.repository.findWithData(
+    return this.repository.findWithData(
       {
         where: { editing: false, status: 'public' },
+        orderBy: { createdAt: 'DESC' },
         pagination: params,
       },
       userId,

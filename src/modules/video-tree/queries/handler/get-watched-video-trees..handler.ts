@@ -10,11 +10,16 @@ export class GetWatchedVideoTreesHandler
   constructor(private readonly repository: VideoTreeRepository) {}
 
   async execute({ userId, params, skipEnded }: GetWatchedVideoTreesQuery) {
-    const filterEnded = skipEnded ? { 'history.ended': false } : {};
-    return await this.repository.findWithData(
+    const filterEnded = skipEnded ? { 'histories.ended': false } : {};
+    return this.repository.findWithData(
       {
-        where: { editing: false, 'history.user_id': userId, ...filterEnded },
-        orderBy: { 'history.updated_at': 'DESC' },
+        relation: {
+          table: 'histories',
+          condition: { 'histories.video_id': 'id' },
+        },
+        where: { 'histories.user_id': userId, editing: false, ...filterEnded },
+        orderBy: { 'histories.updated_at': 'ASC' },
+        groupBy: { 'histories.updated_at': true },
         pagination: params,
       },
       userId,

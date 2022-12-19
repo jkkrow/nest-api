@@ -10,9 +10,10 @@ export class GetChannelVideoTreesHandler
   constructor(private readonly repository: VideoTreeRepository) {}
 
   async execute({ channelId, params, userId }: GetChannelVideoTreesQuery) {
-    return await this.repository.findWithData(
+    return this.repository.findWithData(
       {
         where: { creatorId: channelId, editing: false },
+        orderBy: { createdAt: 'ASC' },
         pagination: params,
       },
       userId,

@@ -8,6 +8,17 @@ export class GetSubscribersHandler implements IQueryHandler {
   constructor(private readonly repository: ChannelRepository) {}
 
   async execute({ id, params }: GetSubscribersQuery) {
-    return await this.repository.findByPublisherId(id, params);
+    return this.repository.find(
+      {
+        relation: {
+          table: 'subscriptions',
+          condition: { 'subscriptions.subscriber_id': 'id' },
+        },
+        where: { 'subscriptions.publisher_id': id },
+        orderBy: { 'subscriptions.created_at': 'DESC' },
+        pagination: params,
+      },
+      id,
+    );
   }
 }
