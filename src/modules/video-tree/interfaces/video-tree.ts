@@ -20,7 +20,9 @@ export interface VideoTree {
   updatedAt: Date;
 }
 
-export interface VideoTreeOnlyRoot extends Omit<VideoTree, 'root'> {
+export interface VideoTreeNoRoot extends Omit<VideoTree, 'root'> {}
+
+export interface VideoTreeOnlyRoot extends VideoTreeNoRoot {
   root: VideoNodeOnlyRoot;
 }
 
@@ -31,6 +33,10 @@ export interface VideoTreeWithData extends VideoTree {
   favorited: boolean;
   history: Omit<History, 'videoId' | 'creatorId'> | null;
 }
+
+export interface VideoTreeNoRootWithData
+  extends VideoTreeNoRoot,
+    Omit<VideoTreeWithData, 'root'> {}
 
 export interface VideoTreeOnlyRootWithData
   extends VideoTreeOnlyRoot,

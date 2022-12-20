@@ -20,10 +20,16 @@ SelectQueryBuilder.prototype.getMapMany = async function (identifier = 'id') {
   const mappedEntities = entities.map((entity) => {
     const item = raw.find((rawItem) => rawItem[idKey] === entity[identifier]);
 
-    for (const [key, value] of Object.entries<any>(item)) {
-      if (key.includes('_')) continue;
-      entity[key] = value;
-    }
+    Object.entries(item).forEach(([key, value]) => {
+      if (key.includes('_')) return;
+      if (key.includes('.')) {
+        const [property, nestedProperty] = key.split('.');
+        entity[property] = entity[property] || {};
+        entity[property][nestedProperty] = value;
+      } else {
+        entity[key] = value;
+      }
+    });
 
     return entity;
   });

@@ -1,11 +1,11 @@
 import { Expose, Type } from 'class-transformer';
 
-import { VideoTreeWithDataResponse } from './video-tree-with-data.response';
+import { VideoTreeEntryWithDataResponse } from './video-tree-entry-with-data.response';
 
 export class GetVideoTreesResponse {
   @Expose()
-  @Type(() => VideoTreeWithDataResponse)
-  videoTrees: VideoTreeWithDataResponse[];
+  @Type(() => VideoTreeEntryWithDataResponse)
+  videoTrees: VideoTreeEntryWithDataResponse[];
 
   @Expose()
   count: number;
