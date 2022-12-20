@@ -25,7 +25,7 @@ export class VideoTreeRepository extends BaseRepository<
 
   async findOneById(id: string) {
     const videoTree = await this._findOne({ id });
-    return videoTree ? this.withFullNodes(videoTree) : null;
+    return videoTree ? this.withAllNodes(videoTree) : null;
   }
 
   async save(videoTree: VideoTree) {
@@ -36,7 +36,7 @@ export class VideoTreeRepository extends BaseRepository<
     await this._delete(videoTree);
   }
 
-  private async withFullNodes(videoTree: VideoTree) {
+  private async withAllNodes(videoTree: VideoTree) {
     const entity = this.factory.createEntity(videoTree);
     entity.root = await this.treeRepository.findDescendantsTree(entity.root);
     return this.factory.createFromEntity(entity);
