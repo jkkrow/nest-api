@@ -1,4 +1,8 @@
-import { SelectQueryBuilder as QueryBuilder, ObjectLiteral } from 'typeorm';
+import {
+  SelectQueryBuilder as QueryBuilder,
+  ObjectLiteral,
+  FindOperator,
+} from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
 import { FindOptions } from '../types/database.type';
@@ -25,21 +29,21 @@ export abstract class BaseRepository<
 
   private setWhere(query: QueryBuilder<T>, where: K['where']) {
     if (!where) return;
-    Object.entries(where).forEach(([key, value]) => {
+    Object.entries(where).forEach(([key, operator]) => {
       const property = this.parseKey(key);
       const uid = uuidv4().replace(/-/g, '');
-      query.andWhere(`${property} = :${uid}`, { [uid]: value });
+      const [expression, value] = this.parseFindOperator(operator, uid);
+      query.andWhere(`${property} ${expression}`, { [uid]: value });
     });
   }
 
   private setRelation(query: QueryBuilder<T>, relation: K['relation']) {
     if (!relation) return;
     const { table, condition, type } = relation;
-    const conditions: string[] = [];
-    Object.entries(condition).forEach(([key, value]) => {
+    const conditions = Object.entries(condition).map(([key, value]) => {
       const keyProp = this.parseKey(key);
       const valueProp = this.parseKey(value as string);
-      conditions.push(keyProp + ' = ' + valueProp);
+      return `${keyProp} = ${valueProp}`;
     });
 
     const alias = table;
@@ -81,8 +85,30 @@ export abstract class BaseRepository<
     query.offset(max * (page - 1));
   }
 
-  private parseComputeOperator() {
-    return;
+  private parseFindOperator(operator: FindOperator<any> | any, uid: string) {
+    if (!(operator instanceof FindOperator)) return [`= :${uid}`, operator];
+    switch (operator.type) {
+      case 'equal':
+        return [`= :${uid}`, operator.value];
+      case 'moreThan':
+        return [`> :${uid}`, operator.value];
+      case 'lessThan':
+        return [`< :${uid}`, operator.value];
+      case 'moreThanOrEqual':
+        return [`>= :${uid}`, operator.value];
+      case 'lessThanOrEqual':
+        return [`<= :${uid}`, operator.value];
+      case 'not':
+        return [`!= :${uid}`, operator.value];
+      case 'like':
+        return [`LIKE :${uid}`, operator.value];
+      case 'in':
+        return [`IN (:...${uid})`, operator.value];
+      case 'any':
+        return [`ANY (:...${uid})`, operator.value];
+      default:
+        throw new TypeError('Unsupported FindOperator');
+    }
   }
 
   private parseKey(key: string) {

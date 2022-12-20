@@ -1,4 +1,5 @@
 import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
+import { In } from 'typeorm';
 
 import { GetVideoTreesQuery } from '../impl/get-video-trees.query';
 import { VideoTreeRepository } from '../../repositories/video-tree.repository';
@@ -8,13 +9,13 @@ export class GetVideoTreesHandler implements IQueryHandler<GetVideoTreesQuery> {
   constructor(private readonly repository: VideoTreeRepository) {}
 
   async execute({ options, params, userId }: GetVideoTreesQuery) {
-    if (options.ids) {
-      return;
-    }
-
+    const { ids } = options;
+    const filterIds = ids
+      ? { id: ids instanceof Array ? In(ids) : ids }
+      : { status: 'public' };
     return this.repository.findWithData(
       {
-        where: { editing: false, status: 'public' },
+        where: { editing: false, ...filterIds },
         orderBy: { createdAt: 'DESC' },
         pagination: params,
       },
