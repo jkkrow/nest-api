@@ -19,7 +19,6 @@ import { MessageResponse } from 'src/common/dtos/response/message.response';
 import { RedirectResponse } from 'src/common/dtos/response/redirect.response';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { CurrentUserId } from 'src/auth/decorators/user.decorator';
-
 import { CreateVideoTreeCommand } from '../commands/impl/create-video-tree.command';
 import { UpdateVideoTreeCommand } from '../commands/impl/update-video-tree.command';
 import { DeleteVideoTreeCommand } from '../commands/impl/delete-video-tree.command';
@@ -28,13 +27,10 @@ import { UpdateVideoNodeCommand } from '../commands/impl/update-video-node.comma
 import { DeleteVideoNodeCommand } from '../commands/impl/delete-video-node.command';
 import { AddToFavoritesCommand } from '../commands/impl/add-to-favorites.command';
 import { RemoveFromFavoritesCommand } from '../commands/impl/remove-from-favorites.command';
-
 import { GetVideoTreesQuery } from '../queries/impl/get-video-trees.query';
 import { WatchVideoTreeQuery } from '../queries/impl/watch-video-tree.query';
-
 import { UpdateVideoTreeRequest } from '../dtos/request/update-video-tree.request';
 import { CreateVideoNodeRequest } from '../dtos/request/create-video-node.request';
-import { CreateVideoNodeResponse } from '../dtos/response/create-video-node.response';
 import { UpdateVideoNodeRequest } from '../dtos/request/update-video-node.request';
 import { GetVideoTreesRequest } from '../dtos/request/get-video-trees.request';
 import { GetVideoTreesResponse } from '../dtos/response/get-video-trees.response';
@@ -96,8 +92,9 @@ export class VideoTreeController {
   /* Create VideoNode */
   /*--------------------------------------------*/
   @Post(':id/video-nodes')
+  @Redirect()
   @Role('verified')
-  @Serialize(CreateVideoNodeResponse, { status: 201 })
+  @Serialize(RedirectResponse, { status: 302 })
   async createVideoNode(
     @Body() { parentId }: CreateVideoNodeRequest,
     @Param('id') treeId: string,
@@ -107,7 +104,7 @@ export class VideoTreeController {
     const command = new CreateVideoNodeCommand(id, treeId, parentId, userId);
     await this.commandBus.execute(command);
 
-    return { id };
+    return { url: `/channels/current/video-trees/${treeId}/video-nodes/${id}` };
   }
 
   /* Update VideoNode */

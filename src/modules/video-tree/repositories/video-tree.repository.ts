@@ -44,15 +44,6 @@ export class VideoTreeRepository extends BaseRepository<
     return { videoTrees, count };
   }
 
-  async findOne(options: FindVideoTreeOptions) {
-    const query = this.getVideoTreeQuery();
-    query.leftJoinAndSelect(`${this.alias}.root`, 'v_root');
-    const findQuery = this.filterQuery(query, options);
-
-    const videoTree = await findQuery.getMapOne<VideoTreeOnlyRoot>();
-    return videoTree ? this.withFullNodes(videoTree) : null;
-  }
-
   async findWithData(options: FindVideoTreeOptions, userId?: string) {
     const query = this.getVideoTreeWithDataQuery(userId);
     const findQuery = this.filterQuery(query, options);
@@ -65,28 +56,49 @@ export class VideoTreeRepository extends BaseRepository<
     return { videoTrees, count };
   }
 
+  async findOne(options: FindVideoTreeOptions) {
+    const query = this.getVideoTreeQuery(true);
+    const findQuery = this.filterQuery(query, options);
+
+    const videoTree = await findQuery.getMapOne<VideoTreeOnlyRoot>();
+    return videoTree ? this.withAllNodes(videoTree) : null;
+  }
+
   async findOneWithData(options: FindVideoTreeOptions, userId?: string) {
-    const query = this.getVideoTreeWithDataQuery(userId);
-    query
-      .leftJoinAndSelect(`${this.alias}.root`, 'v_root')
-      .addGroupBy('v_root.id');
+    const query = this.getVideoTreeWithDataQuery(userId, true);
     const findQuery = this.filterQuery(query, options);
 
     const videoTree = await findQuery.getMapOne<VideoTreeOnlyRootWithData>();
-    return videoTree ? this.withFullNodes<VideoTreeWithData>(videoTree) : null;
+    return videoTree ? this.withAllNodes<VideoTreeWithData>(videoTree) : null;
   }
 
-  private getVideoTreeQuery() {
+  async findOneNode(options: FindVideoTreeOptions, nodeId: string) {
+    const query = this.getVideoTreeQuery(true);
+    const findQuery = this.filterQuery(query, options);
+
+    const videoTree = await findQuery.getMapOne<VideoTreeOnlyRoot>();
+    const nodes = videoTree ? await this.getAllNodes(videoTree) : [];
+    return nodes.find((node) => node.id === nodeId);
+  }
+
+  private getVideoTreeQuery(withRoot?: boolean) {
     // Alias
     const video = this.alias;
     const category = 'v_categories';
+    const root = 'v_root';
 
-    return this.repository
+    const query = this.repository
       .createQueryBuilder(video)
       .leftJoinAndSelect(`${video}.categories`, category);
+
+    if (withRoot) {
+      query.leftJoinAndSelect(`${video}.root`, root);
+    }
+
+    return query;
   }
 
-  private getVideoTreeWithDataQuery(userId?: string) {
+  private getVideoTreeWithDataQuery(userId?: string, withRoot?: boolean) {
     // Alias
     const video = this.alias;
     const view = 'v_views';
@@ -94,6 +106,7 @@ export class VideoTreeRepository extends BaseRepository<
     const history = 'v_histories';
     const category = 'v_categories';
     const creator = 'v_creator';
+    const root = 'v_root';
 
     // Join Condition
     const joinView = `${view}.video_id = ${video}.id`;
@@ -101,7 +114,7 @@ export class VideoTreeRepository extends BaseRepository<
     const joinHistory = `${history}.video_id = ${video}.id AND ${history}.user_id = :userId`;
     const joinCreator = `${video}.creator_id = ${creator}.id`;
 
-    return this.repository
+    const query = this.repository
       .createQueryBuilder(video)
       .addSelect(`COUNT(DISTINCT ${view}.id)`, 'views')
       .addSelect(`COUNT(DISTINCT ${favorite}.user_id)`, 'favorites')
@@ -120,6 +133,13 @@ export class VideoTreeRepository extends BaseRepository<
       .addGroupBy(`${history}.user_id`)
       .addGroupBy(`${category}.name`)
       .setParameter('userId', userId);
+
+    if (withRoot) {
+      query.leftJoinAndSelect(`${video}.root`, root);
+      query.addGroupBy(`${root}.id`);
+    }
+
+    return query;
   }
 
   private getFavoritedQuery() {
@@ -140,7 +160,7 @@ export class VideoTreeRepository extends BaseRepository<
       .getQuery();
   }
 
-  private async withFullNodes<T extends VideoTree>(
+  private async withAllNodes<T extends VideoTree>(
     videoTree: VideoTreeOnlyRoot,
   ) {
     videoTree.root = await this.treeRepository.findDescendantsTree(
@@ -148,5 +168,15 @@ export class VideoTreeRepository extends BaseRepository<
     );
 
     return videoTree as T;
+  }
+
+  private async getAllNodes<T extends VideoTree['root']>(
+    videoTree: VideoTreeOnlyRoot,
+  ) {
+    const descendants = await this.treeRepository.findDescendants(
+      videoTree.root as VideoNodeEntity,
+    );
+
+    return descendants as any as T[];
   }
 }

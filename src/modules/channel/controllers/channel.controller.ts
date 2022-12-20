@@ -9,11 +9,13 @@ import { Role } from 'src/auth/decorators/role.decorator';
 import { CurrentUserId } from 'src/auth/decorators/user.decorator';
 import { GetCreatedVideoTreesQuery } from 'src/modules/video-tree/queries/impl/get-created-video-trees.query';
 import { GetCreatedVideoTreeQuery } from 'src/modules/video-tree/queries/impl/get-created-video-tree.query';
+import { GetCreatedVideoNodeQuery } from 'src/modules/video-tree/queries/impl/get-created-video-node.query';
 import { GetChannelVideoTreesQuery } from 'src/modules/video-tree/queries/impl/get-channel-video-trees.query';
 import { GetFavoritedVideoTreesQuery } from 'src/modules/video-tree/queries/impl/get-favorited-video-trees.query';
 import { GetWatchedVideoTreesQuery } from 'src/modules/video-tree/queries/impl/get-watched-video-trees.query';
-import { GetCreatedVideoTreesResponse } from '../dtos/response/get-created-videos.response';
-import { GetCreatedVideoTreeResponse } from 'src/modules/channel/dtos/response/get-created-video.response';
+import { GetCreatedVideoTreesResponse } from '../dtos/response/get-created-video-trees.response';
+import { GetCreatedVideoTreeResponse } from 'src/modules/channel/dtos/response/get-created-video-tree.response';
+import { GetCreatedVideoNodeResponse } from '../dtos/response/get-created-video-node.response';
 import { GetVideoTreesResponse } from 'src/modules/video-tree/dtos/response/get-video-trees.response';
 import { GetChannelQuery } from '../queries/impl/get-channel.query';
 import { GetSubscribersQuery } from '../queries/impl/get-subscribers.query';
@@ -103,7 +105,7 @@ export class ChannelController {
     return { videoTrees, count };
   }
 
-  /* Get Created Videos */
+  /* Get Created Video Trees */
   /*--------------------------------------------*/
   @Get('current/video-trees')
   @Role('user')
@@ -118,7 +120,7 @@ export class ChannelController {
     return { videoTrees, count };
   }
 
-  /* Get Created Video */
+  /* Get Created Video Tree */
   /*--------------------------------------------*/
   @Get('current/video-trees/:id')
   @Role('user')
@@ -131,6 +133,22 @@ export class ChannelController {
     const videoTree = await this.queryBus.execute(query);
 
     return { videoTree };
+  }
+
+  /* Get Created Video Node */
+  /*--------------------------------------------*/
+  @Get('current/video-trees/:id/video-nodes/:nodeId')
+  @Role('user')
+  @Serialize(GetCreatedVideoNodeResponse)
+  async getCreatedVideoNode(
+    @Param('id') treeId: string,
+    @Param('nodeId') id: string,
+    @CurrentUserId() userId: string,
+  ) {
+    const query = new GetCreatedVideoNodeQuery(id, treeId, userId);
+    const videoNode = await this.queryBus.execute(query);
+
+    return { videoNode };
   }
 
   /* Get Channel Videos */
