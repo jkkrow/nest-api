@@ -44,7 +44,7 @@ export class JwtService {
 
   signAuthToken(userId: string) {
     const refreshToken = this.sign(userId, { sub: 'refresh', exp: '7d' });
-    const accessToken = this.sign(userId, { sub: 'access', exp: '7d' });
+    const accessToken = this.sign(userId, { sub: 'access', exp: '15m' });
 
     return { refreshToken, accessToken };
   }

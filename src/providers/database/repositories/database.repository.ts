@@ -11,9 +11,7 @@ export abstract class BaseRepository<
   T extends ObjectLiteral,
   K extends FindOptions<T, string>,
 > {
-  constructor(protected readonly alias: string) {
-    this.alias = alias;
-  }
+  constructor(protected readonly alias: string) {}
 
   protected filterQuery(query: QueryBuilder<T>, options: K) {
     const { where, orderBy, groupBy, relation, pagination } = options;

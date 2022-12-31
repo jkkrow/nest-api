@@ -4,23 +4,25 @@ declare module 'typeorm/query-builder/SelectQueryBuilder' {
   interface SelectQueryBuilder<Entity> {
     getMapMany<T = Entity>(
       this: SelectQueryBuilder<Entity>,
-      identifier?: string,
+      identifier?: string[],
     ): Promise<T[]>;
     getMapOne<T>(
       this: SelectQueryBuilder<Entity>,
-      identifier?: string,
+      identifier?: string[],
     ): Promise<T | undefined>;
   }
 }
 
-SelectQueryBuilder.prototype.getMapMany = async function (identifier = 'id') {
+SelectQueryBuilder.prototype.getMapMany = async function (identifier = ['id']) {
   const { entities, raw } = await this.getRawAndEntities();
-  const idKey = `${this.alias}_${identifier}`;
+  const idKeys = identifier.map((id) => `${this.alias}_${id}`);
 
   const mappedEntities = entities.map((entity) => {
-    const item = raw.find((rawItem) => rawItem[idKey] === entity[identifier]);
+    const matchedRawItem = raw.find((rawItem) =>
+      idKeys.every((idKey, i) => rawItem[idKey] === entity[identifier[i]]),
+    );
 
-    Object.entries(item).forEach(([key, value]) => {
+    Object.entries(matchedRawItem).forEach(([key, value]) => {
       if (key.includes('_')) return;
       if (key.includes('.')) {
         const [property, nestedProperty] = key.split('.');
@@ -37,7 +39,7 @@ SelectQueryBuilder.prototype.getMapMany = async function (identifier = 'id') {
   return mappedEntities;
 };
 
-SelectQueryBuilder.prototype.getMapOne = async function (identifier = 'id') {
+SelectQueryBuilder.prototype.getMapOne = async function (identifier = ['id']) {
   const mappedEntities = await this.getMapMany(identifier);
   return mappedEntities[0];
 };
