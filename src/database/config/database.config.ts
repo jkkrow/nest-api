@@ -1,8 +1,4 @@
-import {
-  TypeOrmModuleOptions,
-  TypeOrmModuleAsyncOptions,
-} from '@nestjs/typeorm';
-import { DataSource, DataSourceOptions } from 'typeorm';
+import { DataSourceOptions } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
 import 'dotenv/config';
 
@@ -10,7 +6,7 @@ import { ConfigService } from 'src/config/services/config.service';
 
 const config = new ConfigService();
 
-const typeOrmConfig: TypeOrmModuleOptions = {
+export const typeOrmConfig: DataSourceOptions = {
   type: 'postgres',
   host: config.get('DB_HOST'),
   port: config.get('DB_PORT'),
@@ -25,18 +21,3 @@ const typeOrmConfig: TypeOrmModuleOptions = {
   synchronize: false,
   namingStrategy: new SnakeNamingStrategy(),
 };
-
-export const typeOrmAsyncConfig: TypeOrmModuleAsyncOptions = {
-  useFactory: () => {
-    return {
-      ...typeOrmConfig,
-      autoLoadEntities: true,
-    };
-  },
-};
-
-export default new DataSource({
-  ...typeOrmConfig,
-  entities: [__dirname + '/../../**/*.entity.{ts,js}'],
-  migrations: [__dirname + '/../migrations/*.{ts,js}'],
-} as DataSourceOptions);

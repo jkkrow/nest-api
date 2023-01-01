@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { typeOrmAsyncConfig } from 'src/database/config/database.config';
-import 'src/database/config/polyfill';
+import { typeOrmModuleConfig } from 'src/database/config/module.config';
+import 'src/database/extensions';
 
 @Module({
-  imports: [TypeOrmModule.forRootAsync(typeOrmAsyncConfig)],
+  imports: [TypeOrmModule.forRootAsync(typeOrmModuleConfig)],
 })
 export class DatabaseModule extends TypeOrmModule {
   constructor() {
