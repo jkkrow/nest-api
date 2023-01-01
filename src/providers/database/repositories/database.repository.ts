@@ -14,9 +14,10 @@ export abstract class BaseRepository<
   constructor(protected readonly alias: string) {}
 
   protected filterQuery(query: QueryBuilder<T>, options: K) {
-    const { where, orderBy, groupBy, relation, pagination } = options;
+    const { where, search, orderBy, groupBy, relation, pagination } = options;
 
     this.setWhere(query, where);
+    this.setSearch(query, search);
     this.setRelation(query, relation);
     this.setGroupBy(query, groupBy);
     this.setOrderBy(query, orderBy);
@@ -33,6 +34,13 @@ export abstract class BaseRepository<
       const [expression, value] = this.parseFindOperator(operator, uid);
       query.andWhere(`${property} ${expression}`, { [uid]: value });
     });
+  }
+
+  private setSearch(query: QueryBuilder<T>, search: K['search']) {
+    if (!search) return;
+    const uid = uuidv4().replace(/-/g, '');
+    query.andWhere(`search @@ plainto_tsquery(:${uid})`, { [uid]: search });
+    query.addOrderBy(`ts_rank(search, plainto_tsquery(:${uid}))`, 'DESC');
   }
 
   private setRelation(query: QueryBuilder<T>, relation: K['relation']) {

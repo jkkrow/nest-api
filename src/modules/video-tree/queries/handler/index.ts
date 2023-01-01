@@ -6,6 +6,7 @@ import { GetCreatedVideoNodeHandler } from './get-created-video-node.handler';
 import { GetFavoritedVideoTreesHandler } from './get-favorited-video-trees.handler';
 import { GetWatchedVideoTreesHandler } from './get-watched-video-trees..handler';
 import { GetChannelVideoTreesHandler } from './get-channel-video-trees.handler';
+import { SearchVideoTreesHandler } from './search-video-trees.handler';
 
 export const QueryHandlers = [
   WatchVideoTreeHandler,
@@ -16,4 +17,5 @@ export const QueryHandlers = [
   GetFavoritedVideoTreesHandler,
   GetWatchedVideoTreesHandler,
   GetChannelVideoTreesHandler,
+  SearchVideoTreesHandler,
 ];

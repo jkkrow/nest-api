@@ -1,6 +1,7 @@
 export type FindOptions<T, K extends string> = {
   where?: Where<T, K>;
   relation?: Relation<T, K>;
+  search?: Search;
   groupBy?: GroupBy<T, K>;
   orderBy?: OrderBy<T, K>;
   pagination?: Pagination;
@@ -11,6 +12,8 @@ type Where<T, K extends string> = {
 } & {
   [key in Prefix<K>]: any;
 };
+
+type Search = string;
 
 type JoinCondition<T, K extends string> = {
   [key in keyof T]?: keyof T | Prefix<K>;

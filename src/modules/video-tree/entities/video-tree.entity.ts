@@ -66,4 +66,7 @@ export class VideoTreeEntity extends BaseEntityWithTimestamps {
     inverseJoinColumn: { name: 'category_name', referencedColumnName: 'name' },
   })
   categories: CategoryEntity[];
+
+  @Column('tsvector', { select: false })
+  search: any;
 }
