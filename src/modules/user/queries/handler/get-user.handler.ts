@@ -1,20 +1,15 @@
 import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 
 import { NotFoundException } from 'src/common/exceptions';
 import { GetUserQuery } from '../impl/get-user.query';
-import { UserEntity } from '../../entities/user.entity';
+import { UserRepository } from '../../repositories/user.repository';
 
 @QueryHandler(GetUserQuery)
 export class GetUserHandler implements IQueryHandler<GetUserQuery> {
-  constructor(
-    @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
-  ) {}
+  constructor(private readonly repository: UserRepository) {}
 
   async execute({ id }: GetUserQuery) {
-    const user = await this.userRepository.findOneBy({ id });
+    const user = await this.repository.findOne({ where: { id } });
 
     if (!user) {
       throw new NotFoundException('User not found');

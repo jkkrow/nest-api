@@ -1,24 +1,21 @@
 import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 
 import { BadRequestException } from 'src/common/exceptions';
+import { UserRepository } from '../../repositories/user.repository';
 import { JwtService } from 'src/auth/services/jwt.service';
 import { EncryptService } from 'src/auth/services/encrypt.service';
 import { SigninQuery } from '../impl/signin.query';
-import { UserEntity } from '../../entities/user.entity';
 
 @QueryHandler(SigninQuery)
 export class SigninHandler implements IQueryHandler<SigninQuery> {
   constructor(
-    @InjectRepository(UserEntity)
-    private readonly userRepository: Repository<UserEntity>,
+    private readonly userRepository: UserRepository,
     private readonly jwtService: JwtService,
     private readonly encryptService: EncryptService,
   ) {}
 
   async execute({ email, password }: SigninQuery) {
-    const user = await this.userRepository.findOneBy({ email });
+    const user = await this.userRepository.findOne({ where: { email } });
     const errorMessage = 'Invalid email or password';
 
     if (!user || user.type !== 'native') {

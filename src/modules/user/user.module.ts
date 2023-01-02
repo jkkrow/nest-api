@@ -16,6 +16,7 @@ import { UserEntity } from './entities/user.entity';
 import { MembershipEntity } from './entities/membership.entity';
 import { UserFactory } from './models/user.factory';
 import { UserRepository } from './models/user.repository';
+import { UserRepository as UserQueryRepository } from './repositories/user.repository';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { UserRepository } from './models/user.repository';
     UserSaga,
     UserFactory,
     UserRepository,
+    UserQueryRepository,
   ],
 })
 export class UserModule {}
