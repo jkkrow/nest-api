@@ -79,6 +79,10 @@ export class VideoTree extends AggregateRoot {
     return JSON.parse(JSON.stringify(this.props.root));
   }
 
+  get nodes(): VideoNode[] {
+    return JSON.parse(JSON.stringify(this.traverseNodes()));
+  }
+
   create() {
     this.apply(new VideoTreeCreatedEvent(this.id));
   }
@@ -153,13 +157,10 @@ export class VideoTree extends AggregateRoot {
       throw new NotFoundException('VideoNode not found');
     }
 
-    videoNode.name = updates.name;
-    videoNode.url = updates.url;
-    videoNode.size = updates.size;
-    videoNode.duration = updates.duration;
-    videoNode.label = updates.label;
-    videoNode.selectionTimeStart = updates.selectionTimeStart;
-    videoNode.selectionTimeEnd = updates.selectionTimeEnd;
+    for (const key in updates) {
+      if (updates[key] === undefined) continue;
+      videoNode[key] = updates[key];
+    }
 
     this.updateTotalSize();
     this.updateMinMaxDuration();

@@ -1,13 +1,25 @@
-import { Controller, Post, Put, Delete, Body, Param } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
-import { v4 as uuidv4 } from 'uuid';
+import {
+  Controller,
+  Post,
+  Put,
+  Delete,
+  Body,
+  Param,
+  UseGuards,
+} from '@nestjs/common';
+import { CommandBus } from '@nestjs/cqrs';
+import { ApiTags, ApiSecurity } from '@nestjs/swagger';
 
 import { Serialize } from 'src/common/decorators/serialize.decorator';
 import { MessageResponse } from 'src/common/dtos/response/message.response';
 import { UnauthorizedException } from 'src/common/exceptions';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { CurrentUserId } from 'src/auth/decorators/user.decorator';
+import { ApiKeyGuard } from 'src/auth/guards/apikey.guard';
 import { S3Service } from 'src/providers/aws/s3/services/s3.service';
+import { MediaConvertService } from 'src/providers/aws/media-convert/services/media-convert.service';
+import { UpdateVideoNodesCommand } from 'src/modules/video-tree/commands/impl/update-video-nodes.command';
+import { ConvertGuard } from '../guards/convert.guard';
 import { InitiateMultipartUploadRequest } from '../dtos/request/initiate-multipart-upload.request';
 import { InitiateMultipartUploadResponse } from '../dtos/response/initiate-multipart-upload.response';
 import { ProcessMultipartUploadRequest } from '../dtos/request/process-multipart-upload.request';
@@ -17,11 +29,17 @@ import { CompleteMultipartUploadResponse } from '../dtos/response/complete-multi
 import { CancelMultipartUploadRequest } from '../dtos/request/cancel-multipart-upload.request';
 import { UploadImageRequest } from '../dtos/request/upload-image.request';
 import { UploadImageResponse } from '../dtos/response/upload-image.response';
+import { InitiateVideoConvertRequest } from '../dtos/request/initiate-video-convert.request';
+import { CompleteVideoConvertRequest } from '../dtos/request/complete-video-convert.request';
 
 @ApiTags('Upload')
 @Controller('upload')
 export class UploadController {
-  constructor(private readonly s3Service: S3Service) {}
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly s3Service: S3Service,
+    private readonly mediaConvertService: MediaConvertService,
+  ) {}
 
   /* Initiate Multipart Upload */
   /*--------------------------------------------*/
@@ -32,7 +50,7 @@ export class UploadController {
     @Body() { videoId, fileName, fileType }: InitiateMultipartUploadRequest,
     @CurrentUserId() userId: string,
   ) {
-    const key = `videos/${userId}/${videoId}/${fileName}`;
+    const key = this.s3Service.generateVideoKey(userId, videoId, fileName);
     const result = await this.s3Service.initiateMultipart(key, fileType);
 
     return { uploadId: result.UploadId };
@@ -48,7 +66,7 @@ export class UploadController {
     @Param('uploadId') uploadId: string,
     @CurrentUserId() userId: string,
   ) {
-    const key = `videos/${userId}/${videoId}/${fileName}`;
+    const key = this.s3Service.generateVideoKey(userId, videoId, fileName);
     const presignedUrls = await this.s3Service.processMultipart(
       key,
       uploadId,
@@ -68,7 +86,7 @@ export class UploadController {
     @Param('uploadId') uploadId: string,
     @CurrentUserId() userId: string,
   ) {
-    const key = `videos/${userId}/${videoId}/${fileName}`;
+    const key = this.s3Service.generateVideoKey(userId, videoId, fileName);
     const result = await this.s3Service.completeMultipart(key, uploadId, parts);
 
     return { url: result.Key };
@@ -84,12 +102,10 @@ export class UploadController {
     @Param('uploadId') uploadId: string,
     @CurrentUserId() userId: string,
   ) {
-    const key = `videos/${userId}/${videoId}/${fileName}`;
+    const key = this.s3Service.generateVideoKey(userId, videoId, fileName);
     await this.s3Service.cancelMultipart(key, uploadId);
 
-    return {
-      message: 'Video upload cancelled successfully',
-    };
+    return { message: 'Video upload cancelled successfully' };
   }
 
   /* Upload Image */
@@ -105,8 +121,7 @@ export class UploadController {
       throw new UnauthorizedException('Image not belong to user');
     }
 
-    const ext = fileType.split('/')[1];
-    const newKey = `images/${userId}/${uuidv4()}.${ext}`;
+    const newKey = this.s3Service.generateImageKey(userId, fileType);
     const presignedUrl = await this.s3Service.uploadObject(newKey, fileType);
 
     if (key) {
@@ -131,8 +146,37 @@ export class UploadController {
 
     await this.s3Service.deleteObject(key);
 
-    return {
-      message: 'Image deleted successfully',
-    };
+    return { message: 'Image deleted successfully' };
+  }
+
+  /* Initiate Video Convert */
+  /*--------------------------------------------*/
+  @Post('videos/convert')
+  @UseGuards(ApiKeyGuard)
+  @UseGuards(ConvertGuard)
+  @Serialize(MessageResponse)
+  @ApiSecurity('api_key')
+  async initiateVideoConvert(
+    @Body() { key, bucket }: InitiateVideoConvertRequest,
+  ) {
+    await this.mediaConvertService.createJob(key, bucket);
+
+    return { message: 'Initiated video convert successfully' };
+  }
+
+  /* Complete Video Convert */
+  /*--------------------------------------------*/
+  @Post('videos/convert/complete')
+  @UseGuards(ApiKeyGuard)
+  @Serialize(MessageResponse)
+  @ApiSecurity('api_key')
+  async completeVideoConvert(
+    @Body() { key, userId, videoId, name }: CompleteVideoConvertRequest,
+  ) {
+    const updates = { url: key };
+    const command = new UpdateVideoNodesCommand(name, videoId, userId, updates);
+    await this.commandBus.execute(command);
+
+    return { message: 'Completed video convert successfully' };
   }
 }

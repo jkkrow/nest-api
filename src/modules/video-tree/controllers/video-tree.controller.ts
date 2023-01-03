@@ -70,7 +70,7 @@ export class VideoTreeController {
     @Param('id') id: string,
     @CurrentUserId() userId: string,
   ) {
-    const command = new UpdateVideoTreeCommand(id, updates, userId);
+    const command = new UpdateVideoTreeCommand(id, userId, updates);
     await this.commandBus.execute(command);
 
     return { message: 'VideoTree updated successfully' };

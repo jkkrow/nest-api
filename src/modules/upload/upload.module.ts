@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
+import { CqrsModule } from '@nestjs/cqrs';
 
-import { S3Module } from 'src/providers/aws/s3/s3.module';
+import { AwsModule } from 'src/providers/aws/aws.module';
 import { UploadController } from './controllers/upload.controller';
 
 @Module({
-  imports: [S3Module],
+  imports: [CqrsModule, AwsModule],
   controllers: [UploadController],
 })
 export class UploadModule {}

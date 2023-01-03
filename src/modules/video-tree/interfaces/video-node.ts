@@ -14,11 +14,11 @@ export interface VideoNode {
 export interface VideoNodeOnlyRoot extends Omit<VideoNode, 'children'> {}
 
 export interface UpdateVideoNodeProps {
-  name: string;
-  url: string;
-  duration: number;
-  size: number;
-  label: string;
-  selectionTimeStart: number;
-  selectionTimeEnd: number;
+  name?: string;
+  url?: string;
+  duration?: number;
+  size?: number;
+  label?: string;
+  selectionTimeStart?: number;
+  selectionTimeEnd?: number;
 }

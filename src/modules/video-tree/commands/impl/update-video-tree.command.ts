@@ -5,7 +5,7 @@ import { UpdateVideoTreeProps } from '../../interfaces/video-tree';
 export class UpdateVideoTreeCommand implements ICommand {
   constructor(
     public readonly id: string,
-    public readonly updates: UpdateVideoTreeProps,
     public readonly userId: string,
+    public readonly updates: UpdateVideoTreeProps,
   ) {}
 }

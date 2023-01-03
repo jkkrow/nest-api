@@ -5,6 +5,8 @@ export class EnvironmentVariables {
   PORT: number;
 
   @IsString()
+  APPLICATION_ID: string;
+  @IsString()
   APPLICATION_NAME: string;
   @IsString()
   DOMAIN_URL: string;
@@ -63,6 +65,10 @@ export class EnvironmentVariables {
   AWS_MEDIACONVERT_ROLE: string;
   @IsString()
   AWS_MEDIACONVERT_ENDPOINT: string;
+  @IsString()
+  AWS_MEDIACONVERT_JOB_TEMPLATE: string;
+  @IsString()
+  AWS_MEDIACONVERT_EXT: string;
   @IsString()
   AWS_CLOUDFRONT_MEDIA_URL: string;
   @IsString()
