@@ -58,9 +58,7 @@ export class EnvironmentVariables {
   @IsString()
   AWS_CONFIG_REGION: string;
   @IsString()
-  AWS_S3_BUCKET_SOURCE: string;
-  @IsString()
-  AWS_S3_BUCKET_MEDIA: string;
+  AWS_S3_BUCKET: string;
   @IsString()
   AWS_MEDIACONVERT_ROLE: string;
   @IsString()

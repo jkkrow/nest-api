@@ -8,16 +8,25 @@ import { UploadPart } from '../interfaces/s3.interface';
 @Injectable()
 export class S3Service {
   private readonly s3: AWS.S3;
-  private readonly sourceBucket: string;
+  private readonly bucket: string;
 
   constructor(private readonly config: ConfigService) {
     this.s3 = new AWS.S3();
-    this.sourceBucket = this.config.get('AWS_S3_BUCKET_SOURCE');
+    this.bucket = this.config.get('AWS_S3_BUCKET');
+  }
+
+  generateVideoKey(userId: string, videoId: string, fileName: string) {
+    return `videos/${userId}/${videoId}/source/${fileName}`;
+  }
+
+  generateImageKey(userId: string, fileType: string) {
+    const ext = fileType.split('/')[1];
+    return `images/${userId}/${uuidv4()}.${ext}`;
   }
 
   initiateMultipart(key: string, fileType: string) {
     const params = {
-      Bucket: this.sourceBucket,
+      Bucket: this.bucket,
       Key: key,
       ContentType: fileType,
     };
@@ -27,7 +36,7 @@ export class S3Service {
 
   processMultipart(key: string, uploadId: string, partCount: number) {
     const params = {
-      Bucket: this.sourceBucket,
+      Bucket: this.bucket,
       Key: key,
       UploadId: uploadId,
     };
@@ -48,7 +57,7 @@ export class S3Service {
 
   completeMultipart(key: string, uploadId: string, parts: UploadPart[]) {
     const params = {
-      Bucket: this.sourceBucket,
+      Bucket: this.bucket,
       Key: key,
       UploadId: uploadId,
       MultipartUpload: { Parts: parts },
@@ -59,7 +68,7 @@ export class S3Service {
 
   cancelMultipart(key: string, uploadId: string) {
     const params = {
-      Bucket: this.sourceBucket,
+      Bucket: this.bucket,
       Key: key,
       UploadId: uploadId,
     };
@@ -69,7 +78,7 @@ export class S3Service {
 
   uploadObject(key: string, fileType: string) {
     const params = {
-      Bucket: this.sourceBucket,
+      Bucket: this.bucket,
       Key: key,
       ContentType: fileType,
     };
@@ -79,7 +88,7 @@ export class S3Service {
 
   deleteObject(key: string) {
     const params = {
-      Bucket: this.sourceBucket,
+      Bucket: this.bucket,
       Key: key,
     };
 
@@ -88,7 +97,7 @@ export class S3Service {
 
   async deleteDirectory(key: string) {
     const params = {
-      Bucket: this.sourceBucket,
+      Bucket: this.bucket,
       Key: key,
     };
 
@@ -108,7 +117,7 @@ export class S3Service {
 
   private async getDirectoryPrefixes(key: string) {
     const params = {
-      Bucket: this.sourceBucket,
+      Bucket: this.bucket,
       Prefix: key,
       Delimiter: '/',
     };
@@ -143,14 +152,5 @@ export class S3Service {
     });
 
     return prefixes;
-  }
-
-  generateVideoKey(userId: string, videoId: string, fileName: string) {
-    return `videos/${userId}/${videoId}/source/${fileName}`;
-  }
-
-  generateImageKey(userId: string, fileType: string) {
-    const ext = fileType.split('/')[1];
-    return `images/${userId}/${uuidv4()}.${ext}`;
   }
 }
