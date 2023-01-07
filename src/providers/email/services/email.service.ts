@@ -25,10 +25,9 @@ export class EmailService {
     messageStream?: string;
   }) {
     await this.bounceService.check(options.to);
-    const sender = this.config.get('EMAIL_FROM');
 
     return this.client.sendEmail({
-      From: sender.replace('@', options.from + '@'),
+      From: this.defineSender(options.from),
       To: options.to,
       Subject: options.subject,
       HtmlBody: options.message,
@@ -44,14 +43,18 @@ export class EmailService {
     messageStream?: string;
   }) {
     await this.bounceService.check(options.to);
-    const sender = this.config.get('EMAIL_FROM');
 
     return this.client.sendEmailWithTemplate({
-      From: sender.replace('@', options.from + '@'),
+      From: this.defineSender(options.from),
       To: options.to,
       TemplateAlias: options.template,
       TemplateModel: options.templateModel,
       MessageStream: options.messageStream,
     });
+  }
+
+  private defineSender(from: From) {
+    const sender = this.config.get<string>('EMAIL_FROM');
+    return sender.replace('@', from + '@');
   }
 }
