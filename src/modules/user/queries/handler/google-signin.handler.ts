@@ -3,7 +3,7 @@ import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
 import { NotFoundException } from 'src/common/exceptions';
 import { UserRepository } from '../../repositories/user.repository';
 import { JwtService } from 'src/auth/services/jwt.service';
-import { OAuthService } from 'src/providers/gcp/oauth/oauth.service';
+import { OAuthService } from 'src/providers/gcp/oauth/services/oauth.service';
 import { GoogleSigninQuery } from '../impl/google-signin.query';
 
 @QueryHandler(GoogleSigninQuery)

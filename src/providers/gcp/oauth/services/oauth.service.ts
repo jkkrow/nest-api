@@ -6,7 +6,7 @@ import { ConfigService } from 'src/config/services/config.service';
 
 @Injectable()
 export class OAuthService {
-  public readonly client: OAuth2Client;
+  private readonly client: OAuth2Client;
   private readonly clientId: string;
 
   constructor(private readonly config: ConfigService) {
