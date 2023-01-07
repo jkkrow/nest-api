@@ -49,15 +49,6 @@ export class JwtService {
     return { refreshToken, accessToken };
   }
 
-  async invalidateRefreshToken(
-    refreshToken: string,
-    next: string | null,
-    exp: number,
-  ) {
-    const ttl = exp - Math.round(new Date().getTime() / 1000);
-    await this.cacheService.set<JwtInvalidation>(refreshToken, { next }, ttl);
-  }
-
   async rotateRefreshToken(refreshToken: string) {
     // Verify refresh token
     const { userId, exp } = await this.verifyRefreshToken(refreshToken);
@@ -102,5 +93,14 @@ export class JwtService {
     }
 
     throw new UnauthorizedException('Invalid or expired token');
+  }
+
+  async invalidateRefreshToken(
+    refreshToken: string,
+    next: string | null,
+    exp: number,
+  ) {
+    const ttl = exp - Math.round(new Date().getTime() / 1000);
+    await this.cacheService.set<JwtInvalidation>(refreshToken, { next }, ttl);
   }
 }

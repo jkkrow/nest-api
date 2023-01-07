@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { CqrsModule } from '@nestjs/cqrs';
 import { APP_GUARD } from '@nestjs/core';
-import { JwtModule } from '@nestjs/jwt';
+import { JwtModule as BaseJwtModule } from '@nestjs/jwt';
 
 import { ConfigService } from 'src/config/services/config.service';
 import { CacheModule } from 'src/providers/cache/cache.module';
@@ -16,16 +16,12 @@ const GlobalRoleGuard = {
 
 @Module({
   imports: [
-    JwtModule.registerAsync({
+    BaseJwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         secret: config.get('JWT_SECRET_KEY'),
-        signOptions: {
-          issuer: config.get('DOMAIN_URL'),
-        },
-        verifyOptions: {
-          issuer: config.get('DOMAIN_URL'),
-        },
+        signOptions: { issuer: config.get('DOMAIN_URL') },
+        verifyOptions: { issuer: config.get('DOMAIN_URL') },
       }),
     }),
     CqrsModule,
