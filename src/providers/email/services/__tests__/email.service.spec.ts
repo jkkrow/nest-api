@@ -1,31 +1,14 @@
 import { Test } from '@nestjs/testing';
 
+import { ConfigModule } from 'src/config/config.module';
 import { ConfigService } from 'src/config/services/config.service';
 import { BounceService } from 'src/modules/bounce/services/bounce.service';
 import { EmailService } from '../email.service';
 import { From, Template } from '../../constants/email.constant';
 
-jest.mock('postmark', () => ({
-  ServerClient: jest.fn().mockReturnValue({
-    sendEmail: jest.fn(),
-    sendEmailWithTemplate: jest.fn(),
-  }),
-}));
-
 describe('EmailService', () => {
   let emailService: EmailService;
   let bounceService: BounceService;
-
-  const fakeConfigService = {
-    get: jest.fn((key: string) => {
-      switch (key) {
-        case 'EMAIL_FROM':
-          return 'Test <@example.com>';
-        default:
-          return 'mock';
-      }
-    }),
-  };
 
   const fakeBounceService = {
     check: jest.fn(),
@@ -33,9 +16,10 @@ describe('EmailService', () => {
 
   beforeEach(async () => {
     const module = await Test.createTestingModule({
+      imports: [ConfigModule],
       providers: [
         EmailService,
-        { provide: ConfigService, useValue: fakeConfigService },
+        ConfigService,
         { provide: BounceService, useValue: fakeBounceService },
       ],
     }).compile();
@@ -63,10 +47,12 @@ describe('EmailService', () => {
     it('should send email with valid sender', async () => {
       const defineSender = jest.spyOn(emailService as any, 'defineSender');
 
-      await emailService.sendEmail(options);
-
+      const result = await emailService.sendEmail(options);
       const sender = defineSender.mock.results[0].value;
+
       expect(sender).toContain('@');
+      expect(result.ErrorCode).toEqual(0);
+      expect(result.Message).toEqual('OK');
     });
   });
 
@@ -89,10 +75,12 @@ describe('EmailService', () => {
     it('should send email with valid sender', async () => {
       const defineSender = jest.spyOn(emailService as any, 'defineSender');
 
-      await emailService.sendEmailWithTemplate(options);
-
+      const result = await emailService.sendEmailWithTemplate(options);
       const sender = defineSender.mock.results[0].value;
+
       expect(sender).toContain('@');
+      expect(result.ErrorCode).toEqual(0);
+      expect(result.Message).toEqual('OK');
     });
   });
 });
