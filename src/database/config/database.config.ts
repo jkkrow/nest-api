@@ -1,8 +1,12 @@
 import { DataSourceOptions } from 'typeorm';
 import { SnakeNamingStrategy } from 'typeorm-naming-strategies';
-import 'dotenv/config';
+import dotenv from 'dotenv';
 
 import { ConfigService } from 'src/config/services/config.service';
+
+dotenv.config({
+  path: process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : '.env',
+});
 
 const config = new ConfigService();
 
@@ -14,9 +18,6 @@ export const typeOrmConfig: DataSourceOptions = {
   database: config.get('DB_DATABASE'),
   password: config.get('DB_PASSWORD'),
   ssl: config.get('DB_HOST') === 'localhost' ? false : true,
-  extra: {
-    options: config.get('DB_OPTIONS'),
-  },
 
   synchronize: false,
   namingStrategy: new SnakeNamingStrategy(),

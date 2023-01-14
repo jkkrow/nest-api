@@ -18,6 +18,7 @@ import { CacheService } from './services/cache.service';
             host: config.get('REDIS_HOST'),
             port: config.get('REDIS_PORT'),
           },
+          username: config.get('REDIS_USERNAME'),
           password: config.get('REDIS_PASSWORD'),
         });
 

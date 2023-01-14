@@ -10,9 +10,7 @@
 
 # environment variables
 .env
-.env.prod
-.env.dev
-.env.test
+.env.*
 
 # Logs
 logs

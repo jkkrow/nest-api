@@ -33,15 +33,15 @@ export class EnvironmentVariables {
   DB_PORT: number;
   @IsString()
   DB_DATABASE: string;
-  @IsString()
-  DB_OPTIONS: string;
 
   @IsString()
   REDIS_HOST: string;
-  @IsNumber()
-  REDIS_PORT: number;
+  @IsString()
+  REDIS_USERNAME: string;
   @IsString()
   REDIS_PASSWORD: string;
+  @IsNumber()
+  REDIS_PORT: number;
 
   @IsString()
   GOOGLE_CLIENT_ID: string;
@@ -67,12 +67,6 @@ export class EnvironmentVariables {
   AWS_MEDIACONVERT_JOB_TEMPLATE: string;
   @IsString()
   AWS_MEDIACONVERT_EXT: string;
-  @IsString()
-  AWS_CLOUDFRONT_MEDIA_URL: string;
-  @IsString()
-  AWS_CLOUDFRONT_SOURCE_URL: string;
-  @IsString()
-  AWS_CLOUDFRONT_KEY_PAIR_ID: string;
 
   @IsString()
   PAYPAL_API_URL: string;
