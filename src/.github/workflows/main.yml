@@ -1,0 +1,28 @@
+name: Deploy Serverless
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: [16.x]
+      - name: Create .env file
+        run: |
+          echo "${{ secrets:ENV_PROD }}" > .env.production
+      - name: Install Serverless Framework
+        run: npm install -g serverless
+      - name: Install dependencies
+        run: npm install
+      - name: Serverless AWS authentication
+        run: serverless config credentials --provider aws --key ${{ secrets.AWS_ACCESS_KEY_ID }} --secret ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      - name: Deploy
+        run: serverless deploy --stage production

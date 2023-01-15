@@ -1,16 +1,23 @@
 service: watchtree-api
 
+useDotenv: true
+
 provider:
   name: aws
-  runtime: nodejs14.x
-  region: ap-northeast-2
+  runtime: nodejs16.x
+  region: ${env:AWS_CONFIG_REGION}
   stackName: watchtree-api
   apiName: watchtree-api
+  deploymentBucket:
+    name: watchtree-api
+    serverSideEncryption: AES256
   timeout: 15
 
 plugins:
   - serverless-plugin-typescript
   - serverless-tscpaths
+  - serverless-dotenv-plugin
+  - serverless-deployment-bucket
   - serverless-offline
 
 custom:
