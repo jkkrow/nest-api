@@ -6,6 +6,7 @@ import { ConfigService } from 'src/config/services/config.service';
 
 dotenv.config({
   path: process.env.NODE_ENV ? `.env.${process.env.NODE_ENV}` : '.env',
+  override: true,
 });
 
 const config = new ConfigService();
@@ -18,7 +19,6 @@ export const typeOrmConfig: DataSourceOptions = {
   database: config.get('DB_DATABASE'),
   password: config.get('DB_PASSWORD'),
   ssl: config.get('DB_HOST') === 'localhost' ? false : true,
-
   synchronize: false,
   namingStrategy: new SnakeNamingStrategy(),
 };
