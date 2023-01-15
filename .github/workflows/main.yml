@@ -17,7 +17,7 @@ jobs:
           node-version: [16.x]
       - name: Create .env file
         run: |
-          echo "${{ secrets:ENV_PROD }}" > .env.production
+          echo "${{ secrets.ENV_PROD }}" > .env.production
       - name: Install Serverless Framework
         run: npm install -g serverless
       - name: Install dependencies
