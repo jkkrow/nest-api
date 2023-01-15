@@ -19,9 +19,9 @@ jobs:
         run: |
           echo "${{ secrets.ENV_PROD }}" > .env.production
       - name: Install Serverless Framework
-        run: npm install -g serverless
+        run: yarn global add serverless
       - name: Install dependencies
-        run: npm install
+        run: yarn install
       - name: Serverless AWS authentication
         run: serverless config credentials --provider aws --key ${{ secrets.AWS_ACCESS_KEY_ID }} --secret ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       - name: Deploy
