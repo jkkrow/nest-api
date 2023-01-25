@@ -35,6 +35,7 @@ import { UpdateMembershipCommand } from '../commands/impl/update-membership.comm
 import { DeleteUserCommand } from '../commands/impl/delete-user.command';
 import { DeleteGoogleUserCommand } from '../commands/impl/delete-google-user.command';
 import { SigninQuery } from '../queries/impl/signin.query';
+import { SignoutQuery } from '../queries/impl/signout.query';
 import { GoogleSigninQuery } from '../queries/impl/google-signin.query';
 import { GetSessionQuery } from '../queries/impl/get-session.query';
 
@@ -42,6 +43,7 @@ import { SignupRequest } from '../dtos/request/signup.request';
 import { SignupResponse } from '../dtos/response/signup.response';
 import { SigninRequest } from '../dtos/request/signin.request';
 import { SigninResponse } from '../dtos/response/signin.response';
+import { SignoutResponse } from '../dtos/response/signout.response';
 import { GoogleSigninRequest } from '../dtos/request/google-signin.request';
 import { GoogleSigninResponse } from '../dtos/response/google-signin.response';
 import { SendVerificationRequest } from '../dtos/request/send-verification.request';
@@ -78,11 +80,11 @@ export class UserController {
     await this.commandBus.execute(command);
 
     const query = new SigninQuery(email, password);
-    const session = await this.queryBus.execute(query);
+    const userWithSession = await this.queryBus.execute(query);
 
     const message = 'Verification email sent. Check email to finish signup';
 
-    return { ...session, message };
+    return { ...userWithSession, message };
   }
 
   /* Signin User */
@@ -92,9 +94,9 @@ export class UserController {
   @SetCookie('refreshToken', { httpOnly: true })
   async signin(@Body() { email, password }: SigninRequest) {
     const query = new SigninQuery(email, password);
-    const session = await this.queryBus.execute(query);
+    const userWithSession = await this.queryBus.execute(query);
 
-    return session;
+    return userWithSession;
   }
 
   /* Signin Google User */
@@ -106,9 +108,21 @@ export class UserController {
     await this.commandBus.execute(command);
 
     const query = new GoogleSigninQuery(token);
-    const session = await this.queryBus.execute(query);
+    const userWithSession = await this.queryBus.execute(query);
 
-    return session;
+    return userWithSession;
+  }
+
+  /* Signout User */
+  /*--------------------------------------------*/
+  @Post('signout')
+  @Serialize(SignoutResponse)
+  @SetCookie('refreshToken', { expires: new Date() })
+  async signout(@Cookie('refreshToken') refreshToken: string) {
+    const query = new SignoutQuery(refreshToken);
+    await this.queryBus.execute(query);
+
+    return { refreshToken };
   }
 
   /* Send Verification */

@@ -23,9 +23,9 @@ export class GoogleSigninHandler implements IQueryHandler<GoogleSigninQuery> {
       throw new NotFoundException('User not found');
     }
 
-    const result = this.jwtService.signAuthToken(user.id);
-    const session = { user, ...result };
+    const session = this.jwtService.createSession(user.id);
+    const userWithSession = { user, ...session };
 
-    return session;
+    return userWithSession;
   }
 }

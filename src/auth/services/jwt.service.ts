@@ -22,13 +22,8 @@ export class JwtService {
 
   sign(userId: string, options: JwtSignOptions) {
     return this.jwtService.sign(
-      {
-        userId,
-      },
-      {
-        expiresIn: options.exp,
-        subject: options.sub,
-      },
+      { userId },
+      { expiresIn: options.exp, subject: options.sub },
     );
   }
 
@@ -46,7 +41,7 @@ export class JwtService {
     }
   }
 
-  signAuthToken(userId: string) {
+  createSession(userId: string) {
     const refreshToken = this.sign(userId, { sub: 'refresh', exp: '7d' });
     const accessToken = this.sign(userId, { sub: 'access', exp: '15m' });
     const lastSignedIn = dayjs().toDate();
@@ -60,16 +55,16 @@ export class JwtService {
     const { userId, exp } = await this.verifyRefreshToken(refreshToken);
 
     // Sign new auth token
-    const result = this.signAuthToken(userId);
+    const result = this.createSession(userId);
 
     // Invalidate previous refresh token
     const next = result.refreshToken;
     await this.invalidateRefreshToken(refreshToken, next, exp);
 
-    return { userId, ...result };
+    return result;
   }
 
-  private async verifyRefreshToken(refreshToken: string) {
+  async verifyRefreshToken(refreshToken: string) {
     // Check if it's expired
     const result = this.verify(refreshToken, { sub: 'refresh' });
 
@@ -101,7 +96,7 @@ export class JwtService {
     throw new UnauthorizedException(this.errorMessage);
   }
 
-  private async invalidateRefreshToken(
+  async invalidateRefreshToken(
     refreshToken: string,
     next: string | null,
     exp: number,
