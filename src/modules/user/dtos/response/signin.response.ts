@@ -12,4 +12,10 @@ export class SigninResponse {
 
   @Expose()
   accessToken: string;
+
+  @Expose()
+  lastSignedIn: Date;
+
+  @Expose()
+  sessionExpiresIn: Date;
 }

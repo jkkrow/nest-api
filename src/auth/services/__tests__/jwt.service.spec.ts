@@ -69,7 +69,7 @@ describe('JwtService', () => {
       const set = jest.spyOn(cacheService, 'set');
 
       const exp = Date.now() + 60;
-      await jwtService.invalidateRefreshToken(refreshToken, null, exp);
+      await jwtService['invalidateRefreshToken'](refreshToken, null, exp);
 
       expect(set).toBeCalled();
     });
@@ -79,7 +79,7 @@ describe('JwtService', () => {
     it('should return payload if not invalidated', async () => {
       const refreshToken = jwtService.sign('id', { sub: 'refresh', exp: '7d' });
 
-      const result = await jwtService.verifyRefreshToken(refreshToken);
+      const result = await jwtService['verifyRefreshToken'](refreshToken);
 
       expect(result).toHaveProperty('userId');
     });
@@ -89,7 +89,7 @@ describe('JwtService', () => {
       const get = jest.spyOn(cacheService, 'get');
       get.mockResolvedValueOnce({ next: null });
 
-      const verifyPromise = jwtService.verifyRefreshToken(refreshToken);
+      const verifyPromise = jwtService['verifyRefreshToken'](refreshToken);
 
       await expect(verifyPromise).rejects.toThrow();
     });

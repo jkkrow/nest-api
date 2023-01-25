@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import dayjs from 'dayjs';
 
 import { ViewEntity } from '../entities/view.entity';
 
@@ -30,10 +31,8 @@ export class ViewService {
   }
 
   private validateViewedAt(viewedAt: Date) {
-    const dayAfterViewed = new Date(viewedAt);
-    dayAfterViewed.setDate(dayAfterViewed.getDate() + 1);
-
-    const isDayPassed = new Date() > dayAfterViewed;
+    const dayAfterViewed = dayjs(viewedAt).add(1, 'day');
+    const isDayPassed = dayAfterViewed.isBefore(dayjs());
 
     return isDayPassed;
   }

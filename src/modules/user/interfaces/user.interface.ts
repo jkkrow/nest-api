@@ -15,7 +15,7 @@ export interface User {
 export interface Membership {
   id: string;
   name: MembershipName;
-  expiredAt: Date;
+  expiresIn: Date;
   cancelled: boolean;
 }
 

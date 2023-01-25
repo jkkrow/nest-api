@@ -24,10 +24,9 @@ export class SigninHandler implements IQueryHandler<SigninQuery> {
 
     await this.encryptService.verify(password, user.password, errorMessage);
 
-    const { refreshToken, accessToken } = this.jwtService.signAuthToken(
-      user.id,
-    );
+    const result = this.jwtService.signAuthToken(user.id);
+    const session = { user, ...result };
 
-    return { user, refreshToken, accessToken };
+    return session;
   }
 }

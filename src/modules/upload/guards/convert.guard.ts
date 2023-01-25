@@ -1,5 +1,6 @@
 import { Injectable, ExecutionContext } from '@nestjs/common';
 import { QueryBus } from '@nestjs/cqrs';
+import dayjs from 'dayjs';
 
 import {
   RequestWithUser,
@@ -20,7 +21,7 @@ export class ConvertGuard {
     const user = await this.queryBus.execute<GetUserQuery, RequestUser>(query);
 
     const isMember = user.membership
-      ? new Date(user.membership.expiredAt) > new Date()
+      ? dayjs().isBefore(user.membership.expiresIn)
       : false;
 
     return isMember;

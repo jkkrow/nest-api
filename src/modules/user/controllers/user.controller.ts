@@ -9,9 +9,10 @@ import {
   Param,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiTags, ApiCookieAuth } from '@nestjs/swagger';
 
 import { Serialize } from 'src/common/decorators/serialize.decorator';
+import { SetCookie, Cookie } from 'src/common/decorators/cookie.decorator';
 import { MessageResponse } from 'src/common/dtos/response/message.response';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { CurrentUser, CurrentUserId } from 'src/auth/decorators/user.decorator';
@@ -35,7 +36,7 @@ import { DeleteUserCommand } from '../commands/impl/delete-user.command';
 import { DeleteGoogleUserCommand } from '../commands/impl/delete-google-user.command';
 import { SigninQuery } from '../queries/impl/signin.query';
 import { GoogleSigninQuery } from '../queries/impl/google-signin.query';
-import { GetAuthTokenQuery } from '../queries/impl/get-auth-token.query';
+import { GetSessionQuery } from '../queries/impl/get-session.query';
 
 import { SignupRequest } from '../dtos/request/signup.request';
 import { SignupResponse } from '../dtos/response/signup.response';
@@ -46,8 +47,7 @@ import { GoogleSigninResponse } from '../dtos/response/google-signin.response';
 import { SendVerificationRequest } from '../dtos/request/send-verification.request';
 import { SendRecoveryRequest } from '../dtos/request/send-recovery.request';
 import { ResetPasswordRequest } from '../dtos/request/reset-password.request';
-import { GetAuthTokenRequest } from '../dtos/request/get-auth-token.request';
-import { GetAuthTokenResponse } from '../dtos/response/get-auth-token.response';
+import { GetSessionResponse } from '../dtos/response/get-session.response';
 import { GetUserResponse } from '../dtos/response/get-user.response';
 import { GetMembershipResponse } from '../dtos/response/get-membership.response';
 import { UpdateNameRequest } from '../dtos/request/update-name.request';
@@ -72,34 +72,29 @@ export class UserController {
   /*--------------------------------------------*/
   @Post('signup')
   @Serialize(SignupResponse, { status: 201 })
+  @SetCookie('refreshToken', { httpOnly: true })
   async signup(@Body() { name, email, password }: SignupRequest) {
     const command = new CreateUserCommand(name, email, password);
     await this.commandBus.execute(command);
 
     const query = new SigninQuery(email, password);
-    const { user, refreshToken, accessToken } = await this.queryBus.execute(
-      query,
-    );
+    const session = await this.queryBus.execute(query);
 
-    return {
-      user,
-      refreshToken,
-      accessToken,
-      message: 'Verification email sent. Check your email and confirm signup',
-    };
+    const message = 'Verification email sent. Check email to finish signup';
+
+    return { ...session, message };
   }
 
   /* Signin User */
   /*--------------------------------------------*/
   @Post('signin')
   @Serialize(SigninResponse)
+  @SetCookie('refreshToken', { httpOnly: true })
   async signin(@Body() { email, password }: SigninRequest) {
     const query = new SigninQuery(email, password);
-    const { user, refreshToken, accessToken } = await this.queryBus.execute(
-      query,
-    );
+    const session = await this.queryBus.execute(query);
 
-    return { user, refreshToken, accessToken };
+    return session;
   }
 
   /* Signin Google User */
@@ -111,11 +106,9 @@ export class UserController {
     await this.commandBus.execute(command);
 
     const query = new GoogleSigninQuery(token);
-    const { user, refreshToken, accessToken } = await this.queryBus.execute(
-      query,
-    );
+    const session = await this.queryBus.execute(query);
 
-    return { user, refreshToken, accessToken };
+    return session;
   }
 
   /* Send Verification */
@@ -126,9 +119,9 @@ export class UserController {
     const command = new SendVerificationCommand(email);
     await this.commandBus.execute(command);
 
-    return {
-      message: 'Verification email sent. Check your email and confirm signup',
-    };
+    const message = 'Verification email sent. Check email to finish signup';
+
+    return { message };
   }
 
   /* Check Verification */
@@ -139,9 +132,9 @@ export class UserController {
     const command = new CheckVerificationCommand(token);
     await this.commandBus.execute(command);
 
-    return {
-      message: 'Account verified successfully',
-    };
+    const message = 'Account verified successfully';
+
+    return { message };
   }
 
   /* Send Recovery */
@@ -152,9 +145,9 @@ export class UserController {
     const command = new SendRecoveryCommand(email);
     await this.commandBus.execute(command);
 
-    return {
-      message: 'Recovery email sent. Check your email to reset password',
-    };
+    const message = 'Recovery email sent. Check your email to reset password';
+
+    return { message };
   }
 
   /* Check Recovery */
@@ -165,9 +158,9 @@ export class UserController {
     const command = new CheckRecoveryCommand(token);
     await this.commandBus.execute(command);
 
-    return {
-      message: 'Recovery token verified successfully',
-    };
+    const message = 'Recovery token verified successfully';
+
+    return { message };
   }
 
   /* Reset Password */
@@ -181,20 +174,9 @@ export class UserController {
     const command = new ResetPasswordCommand(token, password);
     await this.commandBus.execute(command);
 
-    return {
-      message: 'Password reset successfully',
-    };
-  }
+    const message = 'Password reset successfully';
 
-  /* Get Auth Token */
-  /*--------------------------------------------*/
-  @Post('token')
-  @Serialize(GetAuthTokenResponse)
-  async getToken(@Body() { refreshToken: token }: GetAuthTokenRequest) {
-    const query = new GetAuthTokenQuery(token);
-    const { refreshToken, accessToken } = await this.queryBus.execute(query);
-
-    return { refreshToken, accessToken };
+    return { message };
   }
 
   /* Get User */
@@ -215,6 +197,19 @@ export class UserController {
     return { membership };
   }
 
+  /* Get User Session */
+  /*--------------------------------------------*/
+  @Get('current/session')
+  @ApiCookieAuth()
+  @Serialize(GetSessionResponse)
+  @SetCookie('refreshToken', { httpOnly: true })
+  async getToken(@Cookie('refreshToken') refreshToken: string) {
+    const query = new GetSessionQuery(refreshToken);
+    const session = await this.queryBus.execute(query);
+
+    return session;
+  }
+
   /* Update User Name */
   /*--------------------------------------------*/
   @Patch('current/name')
@@ -227,9 +222,9 @@ export class UserController {
     const command = new UpdateNameCommand(id, name);
     await this.commandBus.execute(command);
 
-    return {
-      message: 'User name updated successfully',
-    };
+    const message = 'User name updated successfully';
+
+    return { message };
   }
 
   /* Update User Password */
@@ -244,9 +239,9 @@ export class UserController {
     const command = new UpdatePasswordCommand(id, password, newPassword);
     await this.commandBus.execute(command);
 
-    return {
-      message: 'User password updated successfully',
-    };
+    const message = 'User password updated successfully';
+
+    return { message };
   }
 
   /* Update User Picture */
@@ -261,9 +256,9 @@ export class UserController {
     const command = new UpdatePictureCommand(id, picture);
     await this.commandBus.execute(command);
 
-    return {
-      message: 'User picture updated successfully',
-    };
+    const message = 'User picture updated successfully';
+
+    return { message };
   }
 
   /* Create User Membership */
@@ -294,9 +289,9 @@ export class UserController {
     const command = new CancelMembershipCommand(id, reason);
     await this.commandBus.execute(command);
 
-    return {
-      message: 'Membership cancelled successfully',
-    };
+    const message = 'Membership cancelled successfully';
+
+    return { message };
   }
 
   /* Update User Membership */
@@ -317,9 +312,9 @@ export class UserController {
       await this.commandBus.execute(command);
     }
 
-    return {
-      message: 'Membership updated successfully',
-    };
+    const message = 'Membership updated successfully';
+
+    return { message };
   }
 
   /* Delete User */
@@ -334,9 +329,9 @@ export class UserController {
     const command = new DeleteUserCommand(id, email, password);
     await this.commandBus.execute(command);
 
-    return {
-      message: 'User deleted successfully',
-    };
+    const message = 'User deleted successfully';
+
+    return { message };
   }
 
   /* Delete Google User */
@@ -351,8 +346,8 @@ export class UserController {
     const command = new DeleteGoogleUserCommand(id, token);
     await this.commandBus.execute(command);
 
-    return {
-      message: 'User deleted successfully',
-    };
+    const message = 'User deleted successfully';
+
+    return { message };
   }
 }

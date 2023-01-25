@@ -10,7 +10,7 @@ export class membershipsTable1668851156524 implements MigrationInterface {
         id VARCHAR(100) PRIMARY KEY,
         user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
         name membership_name NOT NULL,
-        expired_at TIMESTAMP NOT NULL,
+        expires_in TIMESTAMP NOT NULL,
         cancelled BOOLEAN NOT NULL
       )
     `);

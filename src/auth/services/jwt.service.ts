@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService as BaseJwtService } from '@nestjs/jwt';
+import dayjs from 'dayjs';
 
 import { UnauthorizedException } from 'src/common/exceptions';
 import { CacheService } from 'src/providers/cache/services/cache.service';
@@ -17,6 +18,8 @@ export class JwtService {
     private readonly cacheService: CacheService,
   ) {}
 
+  private errorMessage = 'Invalid or expired token';
+
   sign(userId: string, options: JwtSignOptions) {
     return this.jwtService.sign(
       {
@@ -30,23 +33,26 @@ export class JwtService {
   }
 
   verify(token: string, options?: JwtVerifyOptions) {
+    const { sub, ignoreExp, errorMessage } = options || {};
     try {
       const result = this.jwtService.verify<JwtPayload>(token, {
-        subject: options?.sub,
-        ignoreExpiration: options?.ignoreExp,
+        subject: sub,
+        ignoreExpiration: ignoreExp,
       });
 
       return result;
     } catch (err) {
-      throw new UnauthorizedException('Invalid or expired token');
+      throw new UnauthorizedException(errorMessage || this.errorMessage);
     }
   }
 
   signAuthToken(userId: string) {
     const refreshToken = this.sign(userId, { sub: 'refresh', exp: '7d' });
     const accessToken = this.sign(userId, { sub: 'access', exp: '15m' });
+    const lastSignedIn = dayjs().toDate();
+    const sessionExpiresIn = dayjs().add(7, 'day').toDate();
 
-    return { refreshToken, accessToken };
+    return { refreshToken, accessToken, lastSignedIn, sessionExpiresIn };
   }
 
   async rotateRefreshToken(refreshToken: string) {
@@ -54,16 +60,16 @@ export class JwtService {
     const { userId, exp } = await this.verifyRefreshToken(refreshToken);
 
     // Sign new auth token
-    const token = this.signAuthToken(userId);
+    const result = this.signAuthToken(userId);
 
     // Invalidate previous refresh token
-    const next = token.refreshToken;
+    const next = result.refreshToken;
     await this.invalidateRefreshToken(refreshToken, next, exp);
 
-    return token;
+    return { userId, ...result };
   }
 
-  async verifyRefreshToken(refreshToken: string) {
+  private async verifyRefreshToken(refreshToken: string) {
     // Check if it's expired
     const result = this.verify(refreshToken, { sub: 'refresh' });
 
@@ -92,15 +98,15 @@ export class JwtService {
       currentToken = result.next;
     }
 
-    throw new UnauthorizedException('Invalid or expired token');
+    throw new UnauthorizedException(this.errorMessage);
   }
 
-  async invalidateRefreshToken(
+  private async invalidateRefreshToken(
     refreshToken: string,
     next: string | null,
     exp: number,
   ) {
-    const ttl = exp - Math.round(new Date().getTime() / 1000);
+    const ttl = exp - dayjs().unix();
     await this.cacheService.set<JwtInvalidation>(refreshToken, { next }, ttl);
   }
 }

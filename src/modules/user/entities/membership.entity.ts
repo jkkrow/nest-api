@@ -12,7 +12,7 @@ export class MembershipEntity {
   name: MembershipName;
 
   @Column({ type: 'timestamp' })
-  expiredAt: Date;
+  expiresIn: Date;
 
   @Column({ type: 'boolean' })
   cancelled: boolean;

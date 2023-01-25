@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { mw } from 'request-ip';
 import helmet from 'helmet';
+import cookieParser from 'cookie-parser';
 
 import { AppModule } from './app.module';
 import { ConfigService } from './config/services/config.service';
@@ -20,6 +21,7 @@ export async function bootstrap(server = true) {
     .addBearerAuth()
     .addBasicAuth()
     .addApiKey()
+    .addCookieAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, documentOptions);
@@ -34,6 +36,7 @@ export async function bootstrap(server = true) {
   });
 
   app.enableCors({ origin });
+  app.use(cookieParser());
   app.use(helmet());
   app.use(mw({ attributeName: 'ip' }));
 

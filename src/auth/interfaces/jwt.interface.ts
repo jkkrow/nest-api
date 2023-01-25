@@ -16,6 +16,7 @@ export interface JwtSignOptions {
 export interface JwtVerifyOptions {
   sub?: JwtSub;
   ignoreExp?: boolean;
+  errorMessage?: string;
 }
 
 export interface JwtInvalidation {

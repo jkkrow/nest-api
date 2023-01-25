@@ -1,4 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import dayjs from 'dayjs';
 
 import { BadRequestException, NotFoundException } from 'src/common/exceptions';
 import { PaymentService } from 'src/modules/payment/services/payment.service';
@@ -23,8 +24,8 @@ export class CreateMembershipHandler
     const { billing_info, custom_id, status, plan_id } = subscription;
 
     // Validate payment
-    const payedAt = new Date(billing_info.last_payment.time);
-    const isPayedNow = new Date(payedAt.getTime() + 60000) > new Date();
+    const payedAt = dayjs(billing_info.last_payment.time);
+    const isPayedNow = dayjs().isBefore(payedAt.add(1, 'minute'));
     const isActive = status === 'ACTIVE';
     const isUserMatched = id === custom_id;
 
@@ -41,13 +42,13 @@ export class CreateMembershipHandler
 
     const { name } = await this.paymentService.getPlan(plan_id);
 
-    const nextBillingTime = new Date(billing_info.next_billing_time);
-    const expiredAt = new Date(nextBillingTime.setUTCHours(23, 59, 59, 999));
+    const nextBillingTime = dayjs(billing_info.next_billing_time);
+    const expiresIn = nextBillingTime.endOf('date').toDate();
 
     const membership: Membership = {
       id: subscriptionId,
       name: name.toLowerCase() as Membership['name'],
-      expiredAt,
+      expiresIn,
       cancelled: false,
     };
 

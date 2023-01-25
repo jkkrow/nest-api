@@ -10,7 +10,7 @@ export class MembershipResponse {
   name: MembershipName;
 
   @Expose()
-  expiredAt: Date;
+  expiresIn: Date;
 
   @Expose()
   cancelled: boolean;
