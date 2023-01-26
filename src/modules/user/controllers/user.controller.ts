@@ -37,7 +37,7 @@ import { DeleteGoogleUserCommand } from '../commands/impl/delete-google-user.com
 import { SigninQuery } from '../queries/impl/signin.query';
 import { SignoutQuery } from '../queries/impl/signout.query';
 import { GoogleSigninQuery } from '../queries/impl/google-signin.query';
-import { GetSessionQuery } from '../queries/impl/get-session.query';
+import { GetCredentialsQuery } from '../queries/impl/get-credentials.query';
 
 import { SignupRequest } from '../dtos/request/signup.request';
 import { SignupResponse } from '../dtos/response/signup.response';
@@ -49,7 +49,7 @@ import { GoogleSigninResponse } from '../dtos/response/google-signin.response';
 import { SendVerificationRequest } from '../dtos/request/send-verification.request';
 import { SendRecoveryRequest } from '../dtos/request/send-recovery.request';
 import { ResetPasswordRequest } from '../dtos/request/reset-password.request';
-import { GetSessionResponse } from '../dtos/response/get-session.response';
+import { GetCredentialsResponse } from '../dtos/response/get-credentials.response';
 import { GetUserResponse } from '../dtos/response/get-user.response';
 import { GetMembershipResponse } from '../dtos/response/get-membership.response';
 import { UpdateNameRequest } from '../dtos/request/update-name.request';
@@ -73,51 +73,52 @@ export class UserController {
   /* Signup User */
   /*--------------------------------------------*/
   @Post('signup')
-  @Serialize(SignupResponse, { status: 201 })
   @SetCookie('refreshToken', { httpOnly: true })
+  @Serialize(SignupResponse, { status: 201 })
   async signup(@Body() { name, email, password }: SignupRequest) {
     const command = new CreateUserCommand(name, email, password);
     await this.commandBus.execute(command);
 
     const query = new SigninQuery(email, password);
-    const userWithSession = await this.queryBus.execute(query);
+    const userWithCredentials = await this.queryBus.execute(query);
 
     const message = 'Verification email sent. Check email to finish signup';
 
-    return { ...userWithSession, message };
+    return { ...userWithCredentials, message };
   }
 
   /* Signin User */
   /*--------------------------------------------*/
   @Post('signin')
-  @Serialize(SigninResponse)
   @SetCookie('refreshToken', { httpOnly: true })
+  @Serialize(SigninResponse)
   async signin(@Body() { email, password }: SigninRequest) {
     const query = new SigninQuery(email, password);
-    const userWithSession = await this.queryBus.execute(query);
+    const userWithCredentials = await this.queryBus.execute(query);
 
-    return userWithSession;
+    return userWithCredentials;
   }
 
   /* Signin Google User */
   /*--------------------------------------------*/
   @Post('signin-google')
+  @SetCookie('refreshToken', { httpOnly: true })
   @Serialize(GoogleSigninResponse)
   async googleSignin(@Body() { token }: GoogleSigninRequest) {
     const command = new CreateGoogleUserCommand(token);
     await this.commandBus.execute(command);
 
     const query = new GoogleSigninQuery(token);
-    const userWithSession = await this.queryBus.execute(query);
+    const userWithCredentials = await this.queryBus.execute(query);
 
-    return userWithSession;
+    return userWithCredentials;
   }
 
   /* Signout User */
   /*--------------------------------------------*/
   @Post('signout')
-  @Serialize(SignoutResponse)
   @SetCookie('refreshToken', { expires: new Date() })
+  @Serialize(SignoutResponse)
   async signout(@Cookie('refreshToken') refreshToken: string) {
     const query = new SignoutQuery(refreshToken);
     await this.queryBus.execute(query);
@@ -211,17 +212,17 @@ export class UserController {
     return { membership };
   }
 
-  /* Get User Session */
+  /* Get User Credentials */
   /*--------------------------------------------*/
-  @Get('current/session')
+  @Get('current/credentials')
   @ApiCookieAuth()
-  @Serialize(GetSessionResponse)
   @SetCookie('refreshToken', { httpOnly: true })
-  async getToken(@Cookie('refreshToken') refreshToken: string) {
-    const query = new GetSessionQuery(refreshToken);
-    const session = await this.queryBus.execute(query);
+  @Serialize(GetCredentialsResponse)
+  async getCredentials(@Cookie('refreshToken') refreshToken: string) {
+    const query = new GetCredentialsQuery(refreshToken);
+    const credentials = await this.queryBus.execute(query);
 
-    return session;
+    return credentials;
   }
 
   /* Update User Name */

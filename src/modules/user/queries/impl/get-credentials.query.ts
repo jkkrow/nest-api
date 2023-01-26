@@ -1,5 +1,5 @@
 import { IQuery } from '@nestjs/cqrs';
 
-export class GetSessionQuery implements IQuery {
+export class GetCredentialsQuery implements IQuery {
   constructor(public readonly refreshToken: string) {}
 }

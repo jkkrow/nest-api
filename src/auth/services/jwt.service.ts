@@ -41,13 +41,12 @@ export class JwtService {
     }
   }
 
-  createSession(userId: string) {
+  signCredentials(userId: string) {
     const refreshToken = this.sign(userId, { sub: 'refresh', exp: '7d' });
     const accessToken = this.sign(userId, { sub: 'access', exp: '15m' });
-    const lastSignedIn = dayjs().toDate();
-    const sessionExpiresIn = dayjs().add(7, 'day').toDate();
+    const refreshTokenExp = dayjs().add(7, 'day').toDate();
 
-    return { refreshToken, accessToken, lastSignedIn, sessionExpiresIn };
+    return { refreshToken, accessToken, refreshTokenExp };
   }
 
   async rotateRefreshToken(refreshToken: string) {
@@ -55,13 +54,13 @@ export class JwtService {
     const { userId, exp } = await this.verifyRefreshToken(refreshToken);
 
     // Sign new auth token
-    const result = this.createSession(userId);
+    const credentials = this.signCredentials(userId);
 
     // Invalidate previous refresh token
-    const next = result.refreshToken;
+    const next = credentials.refreshToken;
     await this.invalidateRefreshToken(refreshToken, next, exp);
 
-    return result;
+    return credentials;
   }
 
   async verifyRefreshToken(refreshToken: string) {
