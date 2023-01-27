@@ -35,7 +35,7 @@ export async function bootstrap(server = true) {
     },
   });
 
-  app.enableCors({ origin });
+  app.enableCors({ origin, credentials: true });
   app.use(cookieParser());
   app.use(helmet());
   app.use(mw({ attributeName: 'ip' }));
