@@ -12,7 +12,8 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiTags, ApiCookieAuth } from '@nestjs/swagger';
 
 import { Serialize } from 'src/common/decorators/serialize.decorator';
-import { SetCookie, Cookie } from 'src/common/decorators/cookie.decorator';
+import { Cookie } from 'src/common/decorators/cookie.decorator';
+import { Authenticate } from 'src/auth/decorators/auth.decorator';
 import { MessageResponse } from 'src/common/dtos/response/message.response';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { CurrentUser, CurrentUserId } from 'src/auth/decorators/user.decorator';
@@ -73,7 +74,7 @@ export class UserController {
   /* Signup User */
   /*--------------------------------------------*/
   @Post('signup')
-  @SetCookie('refreshToken', { httpOnly: true })
+  @Authenticate()
   @Serialize(SignupResponse, { status: 201 })
   async signup(@Body() { name, email, password }: SignupRequest) {
     const command = new CreateUserCommand(name, email, password);
@@ -90,7 +91,7 @@ export class UserController {
   /* Signin User */
   /*--------------------------------------------*/
   @Post('signin')
-  @SetCookie('refreshToken', { httpOnly: true })
+  @Authenticate()
   @Serialize(SigninResponse)
   async signin(@Body() { email, password }: SigninRequest) {
     const query = new SigninQuery(email, password);
@@ -102,7 +103,7 @@ export class UserController {
   /* Signin Google User */
   /*--------------------------------------------*/
   @Post('signin-google')
-  @SetCookie('refreshToken', { httpOnly: true })
+  @Authenticate()
   @Serialize(GoogleSigninResponse)
   async googleSignin(@Body() { token }: GoogleSigninRequest) {
     const command = new CreateGoogleUserCommand(token);
@@ -117,7 +118,7 @@ export class UserController {
   /* Signout User */
   /*--------------------------------------------*/
   @Post('signout')
-  @SetCookie('refreshToken', { expires: new Date() })
+  @Authenticate({ expire: true })
   @Serialize(SignoutResponse)
   async signout(@Cookie('refreshToken') refreshToken: string) {
     const query = new SignoutQuery(refreshToken);
@@ -216,7 +217,7 @@ export class UserController {
   /*--------------------------------------------*/
   @Get('current/credentials')
   @ApiCookieAuth()
-  @SetCookie('refreshToken', { httpOnly: true })
+  @Authenticate()
   @Serialize(GetCredentialsResponse)
   async getCredentials(@Cookie('refreshToken') refreshToken: string) {
     const query = new GetCredentialsQuery(refreshToken);
