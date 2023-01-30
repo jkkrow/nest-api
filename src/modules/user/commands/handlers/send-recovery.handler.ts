@@ -26,10 +26,13 @@ export class SendRecoveryHandler
     }
 
     const clientUrl = this.configService.get('CLIENT_URL');
-    const token = this.jwtService.sign(user.id, {
-      sub: 'recovery',
-      exp: '1h',
-    });
+    const token = this.jwtService.sign(
+      { userId: user.id },
+      {
+        sub: 'recovery',
+        exp: '1h',
+      },
+    );
 
     const actionUrl = `${clientUrl}/auth/verification/${token}`;
     const retryUrl = `${clientUrl}/user/account`;

@@ -30,10 +30,13 @@ export class SendVerificationHandler
     }
 
     const clientUrl = this.configService.get('CLIENT_URL');
-    const token = this.jwtService.sign(user.id, {
-      sub: 'verification',
-      exp: '1d',
-    });
+    const token = this.jwtService.sign(
+      { userId: user.id },
+      {
+        sub: 'verification',
+        exp: '1d',
+      },
+    );
 
     const actionUrl = `${clientUrl}/auth/verification/${token}`;
     const retryUrl = `${clientUrl}/user/account`;

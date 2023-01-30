@@ -5,6 +5,7 @@ import { JwtModule as BaseJwtModule } from '@nestjs/jwt';
 
 import { ConfigService } from 'src/config/services/config.service';
 import { CacheModule } from 'src/providers/cache/cache.module';
+import { AuthService } from './services/auth.service';
 import { JwtService } from './services/jwt.service';
 import { EncryptService } from './services/encrypt.service';
 import { RoleGuard } from './guards/role.guard';
@@ -27,7 +28,7 @@ const GlobalRoleGuard = {
     CqrsModule,
     CacheModule,
   ],
-  providers: [JwtService, EncryptService, GlobalRoleGuard],
-  exports: [JwtService, EncryptService],
+  providers: [AuthService, JwtService, EncryptService, GlobalRoleGuard],
+  exports: [AuthService, JwtService, EncryptService],
 })
 export class AuthModule {}

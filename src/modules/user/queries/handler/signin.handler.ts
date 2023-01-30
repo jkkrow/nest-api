@@ -2,7 +2,7 @@ import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
 
 import { BadRequestException } from 'src/common/exceptions';
 import { UserRepository } from '../../repositories/user.repository';
-import { JwtService } from 'src/auth/services/jwt.service';
+import { AuthService } from 'src/auth/services/auth.service';
 import { EncryptService } from 'src/auth/services/encrypt.service';
 import { SigninQuery } from '../impl/signin.query';
 
@@ -10,7 +10,7 @@ import { SigninQuery } from '../impl/signin.query';
 export class SigninHandler implements IQueryHandler<SigninQuery> {
   constructor(
     private readonly userRepository: UserRepository,
-    private readonly jwtService: JwtService,
+    private readonly authService: AuthService,
     private readonly encryptService: EncryptService,
   ) {}
 
@@ -24,7 +24,7 @@ export class SigninHandler implements IQueryHandler<SigninQuery> {
 
     await this.encryptService.verify(password, user.password, errorMessage);
 
-    const credentials = this.jwtService.signCredentials(user.id);
+    const credentials = await this.authService.signCredentials(user.id);
     const userWithCredentials = { user, ...credentials };
 
     return userWithCredentials;

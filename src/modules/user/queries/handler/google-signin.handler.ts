@@ -2,7 +2,7 @@ import { QueryHandler, IQueryHandler } from '@nestjs/cqrs';
 
 import { NotFoundException } from 'src/common/exceptions';
 import { UserRepository } from '../../repositories/user.repository';
-import { JwtService } from 'src/auth/services/jwt.service';
+import { AuthService } from 'src/auth/services/auth.service';
 import { OAuthService } from 'src/providers/gcp/oauth/services/oauth.service';
 import { GoogleSigninQuery } from '../impl/google-signin.query';
 
@@ -10,7 +10,7 @@ import { GoogleSigninQuery } from '../impl/google-signin.query';
 export class GoogleSigninHandler implements IQueryHandler<GoogleSigninQuery> {
   constructor(
     private readonly repository: UserRepository,
-    private readonly jwtService: JwtService,
+    private readonly authService: AuthService,
     private readonly oAuthService: OAuthService,
   ) {}
 
@@ -23,7 +23,7 @@ export class GoogleSigninHandler implements IQueryHandler<GoogleSigninQuery> {
       throw new NotFoundException('User not found');
     }
 
-    const credentials = this.jwtService.signCredentials(user.id);
+    const credentials = await this.authService.signCredentials(user.id);
     const userWithCredentials = { user, ...credentials };
 
     return userWithCredentials;
