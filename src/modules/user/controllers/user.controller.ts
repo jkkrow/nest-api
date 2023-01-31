@@ -4,7 +4,6 @@ import {
   Get,
   Post,
   Patch,
-  Redirect,
   Body,
   Param,
 } from '@nestjs/common';
@@ -52,7 +51,6 @@ import { SendRecoveryRequest } from '../dtos/request/send-recovery.request';
 import { ResetPasswordRequest } from '../dtos/request/reset-password.request';
 import { GetCredentialsResponse } from '../dtos/response/get-credentials.response';
 import { GetUserResponse } from '../dtos/response/get-user.response';
-import { GetMembershipResponse } from '../dtos/response/get-membership.response';
 import { UpdateNameRequest } from '../dtos/request/update-name.request';
 import { UpdatePasswordRequest } from '../dtos/request/update-password.request';
 import { UpdatePictureRequest } from '../dtos/request/update-picture.request';
@@ -61,7 +59,6 @@ import { CancelMembershipRequest } from '../dtos/request/cancel-membership.reque
 import { UpdateMembershipRequest } from '../dtos/request/update-membership.request';
 import { DeleteUserRequest } from '../dtos/request/delete-user.request';
 import { DeleteGoogleUserRequest } from '../dtos/request/delete-google-user.request';
-import { RedirectResponse } from 'src/common/dtos/response/redirect.response';
 
 @ApiTags('Users')
 @Controller('users')
@@ -204,15 +201,6 @@ export class UserController {
     return { user };
   }
 
-  /* Get User Membership */
-  /*--------------------------------------------*/
-  @Get('current/membership')
-  @Role('user')
-  @Serialize(GetMembershipResponse)
-  async getMembership(@CurrentUser() { membership }: RequestUser) {
-    return { membership };
-  }
-
   /* Get User Credentials */
   /*--------------------------------------------*/
   @Get('current/credentials')
@@ -255,7 +243,7 @@ export class UserController {
     const command = new UpdatePasswordCommand(id, password, newPassword);
     await this.commandBus.execute(command);
 
-    const message = 'User password updated successfully';
+    const message = 'Password updated successfully';
 
     return { message };
   }
@@ -272,7 +260,7 @@ export class UserController {
     const command = new UpdatePictureCommand(id, picture);
     await this.commandBus.execute(command);
 
-    const message = 'User picture updated successfully';
+    const message = 'Profile picture updated successfully';
 
     return { message };
   }
@@ -280,9 +268,8 @@ export class UserController {
   /* Create User Membership */
   /*--------------------------------------------*/
   @Post('current/membership')
-  @Redirect()
   @Role('verified')
-  @Serialize(RedirectResponse, { status: 302 })
+  @Serialize(MessageResponse)
   async createMembership(
     @Body() { subscriptionId }: CreateMembershipRequest,
     @CurrentUserId() id: string,
@@ -290,7 +277,9 @@ export class UserController {
     const command = new CreateMembershipCommand(id, subscriptionId);
     await this.commandBus.execute(command);
 
-    return { url: 'current/membership' };
+    const message = 'Membership registered successfully';
+
+    return { message };
   }
 
   /* Cancel User Membership */
