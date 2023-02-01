@@ -18,7 +18,7 @@ export class GetWatchedVideoTreesHandler
           condition: { 'histories.video_id': 'id' },
         },
         where: { 'histories.user_id': userId, editing: false, ...filterEnded },
-        orderBy: { 'histories.updated_at': 'ASC' },
+        orderBy: { 'histories.updated_at': 'DESC' },
         groupBy: { 'histories.updated_at': true },
         pagination: params,
       },

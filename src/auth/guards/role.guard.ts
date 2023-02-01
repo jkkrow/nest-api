@@ -3,6 +3,7 @@ import { Reflector } from '@nestjs/core';
 import { QueryBus } from '@nestjs/cqrs';
 import dayjs from 'dayjs';
 
+import { ForbiddenException } from 'src/common/exceptions';
 import { GetUserQuery } from 'src/modules/user/queries/impl/get-user.query';
 import { BearerGuard } from './bearer.guard';
 import { JwtService } from '../services/jwt.service';
