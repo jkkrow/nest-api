@@ -55,7 +55,7 @@ export class ChannelController {
     @CurrentUserId() userId: string,
   ) {
     const query = new GetSubscribersQuery(userId, params);
-    const { channels, count } = await this.queryBus.execute(query);
+    const [channels, count] = await this.queryBus.execute(query);
 
     return { channels, count };
   }
@@ -70,7 +70,7 @@ export class ChannelController {
     @CurrentUserId() userId: string,
   ) {
     const query = new GetSubscribesQuery(userId, params);
-    const { channels, count } = await this.queryBus.execute(query);
+    const [channels, count] = await this.queryBus.execute(query);
 
     return { channels, count };
   }
@@ -85,7 +85,7 @@ export class ChannelController {
     @CurrentUserId() userId: string,
   ) {
     const query = new GetFavoritedVideoTreesQuery(userId, params);
-    const { videoTrees, count } = await this.queryBus.execute(query);
+    const [videoTrees, count] = await this.queryBus.execute(query);
 
     return { videoTrees, count };
   }
@@ -100,7 +100,7 @@ export class ChannelController {
     @CurrentUserId() userId: string,
   ) {
     const query = new GetWatchedVideoTreesQuery(userId, skipEnded, rest);
-    const { videoTrees, count } = await this.queryBus.execute(query);
+    const [videoTrees, count] = await this.queryBus.execute(query);
 
     return { videoTrees, count };
   }
@@ -115,7 +115,7 @@ export class ChannelController {
     @CurrentUserId() userId: string,
   ) {
     const query = new GetCreatedVideoTreesQuery(userId, params);
-    const { videoTrees, count } = await this.queryBus.execute(query);
+    const [videoTrees, count] = await this.queryBus.execute(query);
 
     return { videoTrees, count };
   }
@@ -161,7 +161,7 @@ export class ChannelController {
     @CurrentUserId() userId?: string,
   ) {
     const query = new GetChannelVideoTreesQuery(id, params, userId);
-    const { videoTrees, count } = await this.queryBus.execute(query);
+    const [videoTrees, count] = await this.queryBus.execute(query);
 
     return { videoTrees, count };
   }

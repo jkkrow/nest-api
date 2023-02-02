@@ -3,7 +3,10 @@ import { Reflector } from '@nestjs/core';
 import { QueryBus } from '@nestjs/cqrs';
 import dayjs from 'dayjs';
 
-import { ForbiddenException } from 'src/common/exceptions';
+import {
+  ForbiddenException,
+  UnauthorizedException,
+} from 'src/common/exceptions';
 import { GetUserQuery } from 'src/modules/user/queries/impl/get-user.query';
 import { BearerGuard } from './bearer.guard';
 import { JwtService } from '../services/jwt.service';
@@ -20,45 +23,39 @@ export class RoleGuard extends BearerGuard {
     super(jwtService);
   }
 
-  private readonly roles: Record<RoleName, boolean> = {
-    user: false,
-    verified: false,
-    member: false,
-    admin: false,
-  };
-
   async canActivate(context: ExecutionContext) {
     const request = context.switchToHttp().getRequest<RequestWithUser>();
-    const requiredRole = this.reflector.getAllAndOverride<RoleName>(ROLE_KEY, [
+    const role = this.reflector.getAllAndOverride<RoleName>(ROLE_KEY, [
       context.getClass(),
       context.getHandler(),
     ]);
 
-    if (!requiredRole) {
+    if (!role) {
       return true;
     }
 
     await super.canActivate(context);
 
-    request.user = await this.validateRole(request.userId as string);
-
-    return this.roles[requiredRole];
-  }
-
-  private async validateRole(userId: string) {
-    const query = new GetUserQuery(userId);
+    const query = new GetUserQuery(request.userId as string);
     const user = await this.queryBus.execute<GetUserQuery, RequestUser>(query);
 
     if (!user) {
-      return;
+      throw new UnauthorizedException('Unable to find request user');
     }
 
-    this.roles.user = !!user;
-    this.roles.verified = user.verified;
-    this.roles.member = this.validateMembership(user);
-    this.roles.admin = user.admin;
+    const userRoles = {
+      verified: user.verified,
+      admin: user.admin,
+      member: this.validateMembership(user),
+    };
 
-    return user;
+    if (!userRoles[role]) {
+      throw new ForbiddenException(`Not allowed action except ${role} users`);
+    }
+
+    request.user = user;
+
+    return true;
   }
 
   private validateMembership(user: RequestUser) {

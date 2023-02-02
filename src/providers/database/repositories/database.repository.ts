@@ -5,7 +5,7 @@ import {
 } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
-import { FindOptions } from '../types/database.type';
+import { FindOptions, Offset, Cursor } from '../types/database.type';
 
 export abstract class BaseRepository<
   T extends ObjectLiteral,
@@ -13,7 +13,33 @@ export abstract class BaseRepository<
 > {
   constructor(protected readonly alias: string) {}
 
-  protected filterQuery(query: QueryBuilder<T>, options: K) {
+  protected getMany<D>(
+    query: QueryBuilder<T>,
+    options: K,
+    identifier?: string[],
+  ) {
+    const findQuery = this.filterQuery(query, options);
+    const promises: [Promise<D[]>, Promise<number>?] = [
+      findQuery.getMapMany<D>(identifier),
+    ];
+
+    if (options.pagination && this.isOffset(options.pagination)) {
+      promises.push(findQuery.getCount());
+    }
+
+    return Promise.all(promises);
+  }
+
+  protected getOne<D>(
+    query: QueryBuilder<T>,
+    options: K,
+    identifier?: string[],
+  ) {
+    const findQuery = this.filterQuery(query, options);
+    return findQuery.getMapOne<D>(identifier);
+  }
+
+  private filterQuery(query: QueryBuilder<T>, options: K) {
     const { where, search, orderBy, groupBy, relation, pagination } = options;
 
     this.setWhere(query, where);
@@ -86,9 +112,11 @@ export abstract class BaseRepository<
 
   private setPagination(query: QueryBuilder<T>, pagination: K['pagination']) {
     if (!pagination) return;
-    const { page, max } = pagination;
-    query.limit(max);
-    query.offset(max * (page - 1));
+    if (this.isOffset(pagination)) {
+      const { page, max } = pagination;
+      query.limit(max);
+      query.offset(max * (page - 1));
+    }
   }
 
   private parseFindOperator(operator: FindOperator<any> | any, uid: string) {
@@ -124,5 +152,9 @@ export abstract class BaseRepository<
 
   private camelToSnake(key: string) {
     return key.replace(/[A-Z]/g, (char) => `_${char.toLowerCase()}`);
+  }
+
+  private isOffset(pagination: Offset | Cursor): pagination is Offset {
+    return (pagination as Offset).page !== undefined;
   }
 }

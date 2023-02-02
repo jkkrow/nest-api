@@ -34,7 +34,8 @@
     "seed:run": "ts-node -r tsconfig-paths/register ./node_modules/typeorm-seeding/dist/cli.js seed -n src/database/config/seeding.config.ts",
     "seed:run:dev": "cross-env NODE_ENV=development npm run seed:run",
     "seed:run:test": "cross-env NODE_ENV=test npm run seed:run",
-    "serverless": "serverless offline start"
+    "serverless": "serverless offline start",
+    "redis:run:local": "docker run --name watchtree-redis --rm -d -p 6379:6379 redis"
   },
   "dependencies": {
     "@nestjs/axios": "^1.0.0",

@@ -23,21 +23,12 @@ export class UserRepository extends BaseRepository<
 
   async find(options: FindUserOptions) {
     const query = this.getUserQuery();
-    const findQuery = this.filterQuery(query, options);
-
-    const [users, count] = await Promise.all([
-      findQuery.getMapMany<User>(),
-      findQuery.getCount(),
-    ]);
-
-    return { users, count };
+    return this.getMany<User>(query, options);
   }
 
   async findOne(options: FindUserOptions) {
     const query = this.getUserQuery();
-    const findQuery = this.filterQuery(query, options);
-
-    return await findQuery.getMapOne<User>();
+    return this.getOne<User>(query, options);
   }
 
   private getUserQuery() {

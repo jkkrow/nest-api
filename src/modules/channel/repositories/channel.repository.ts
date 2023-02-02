@@ -24,21 +24,12 @@ export class ChannelRepository extends BaseRepository<
 
   async find(options: FindChannelOptions, userId?: string) {
     const query = this.getChannelQuery(userId);
-    const findQuery = this.filterQuery(query, options);
-
-    const [channels, count] = await Promise.all([
-      findQuery.getMapMany<Channel>(),
-      findQuery.getCount(),
-    ]);
-
-    return { channels, count };
+    return this.getMany<Channel>(query, options);
   }
 
   async findOne(options: FindChannelOptions, userId?: string) {
     const query = this.getChannelQuery(userId);
-    const findQuery = this.filterQuery(query, options);
-
-    return findQuery.getMapOne<Channel>();
+    return this.getOne<Channel>(query, options);
   }
 
   private getChannelQuery(userId?: string) {

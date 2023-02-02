@@ -151,7 +151,7 @@ export class VideoTreeController {
     @CurrentUserId() userId?: string,
   ) {
     const query = new GetVideoTreesQuery({ ids }, rest, userId);
-    const { videoTrees, count } = await this.queryBus.execute(query);
+    const [videoTrees, count] = await this.queryBus.execute(query);
 
     return { videoTrees, count };
   }
@@ -165,7 +165,7 @@ export class VideoTreeController {
     @CurrentUserId() userId?: string,
   ) {
     const query = new SearchVideoTreesQuery(keyword, rest, userId);
-    const { videoTrees, count } = await this.queryBus.execute(query);
+    const [videoTrees, count] = await this.queryBus.execute(query);
 
     return { videoTrees, count };
   }

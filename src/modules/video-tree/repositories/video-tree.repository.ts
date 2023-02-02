@@ -34,50 +34,36 @@ export class VideoTreeRepository extends BaseRepository<
 
   async find(options: FindVideoTreeOptions) {
     const query = this.getVideoTreeQuery();
-    const findQuery = this.filterQuery(query, options);
-
-    const [videoTrees, count] = await Promise.all([
-      findQuery.getMapMany<VideoTreeNoRoot>(),
-      findQuery.getCount(),
-    ]);
-
-    return { videoTrees, count };
+    return this.getMany<VideoTreeNoRoot>(query, options);
   }
 
   async findWithData(options: FindVideoTreeOptions, userId?: string) {
     const query = this.getVideoTreeWithDataQuery(userId);
-    const findQuery = this.filterQuery(query, options);
-
-    const [videoTrees, count] = await Promise.all([
-      findQuery.getMapMany<VideoTreeNoRootWithData>(),
-      findQuery.getCount(),
-    ]);
-
-    return { videoTrees, count };
+    return this.getMany<VideoTreeNoRootWithData>(query, options);
   }
 
   async findOne(options: FindVideoTreeOptions) {
     const query = this.getVideoTreeQuery(true);
-    const findQuery = this.filterQuery(query, options);
+    const videoTree = await this.getOne<VideoTreeOnlyRoot>(query, options);
 
-    const videoTree = await findQuery.getMapOne<VideoTreeOnlyRoot>();
     return videoTree ? this.withAllNodes(videoTree) : null;
   }
 
   async findOneWithData(options: FindVideoTreeOptions, userId?: string) {
     const query = this.getVideoTreeWithDataQuery(userId, true);
-    const findQuery = this.filterQuery(query, options);
+    const videoTree = await this.getOne<VideoTreeOnlyRootWithData>(
+      query,
+      options,
+    );
 
-    const videoTree = await findQuery.getMapOne<VideoTreeOnlyRootWithData>();
     return videoTree ? this.withAllNodes<VideoTreeWithData>(videoTree) : null;
   }
 
   async findOneNode(options: FindVideoTreeOptions, nodeId: string) {
     const query = this.getVideoTreeQuery(true);
-    const findQuery = this.filterQuery(query, options);
-
-    const videoTree = await findQuery.getMapOne<VideoTreeOnlyRoot>();
+    const videoTree = await this.getOne<VideoTreeOnlyRoot>(query, options);
     const nodes = videoTree ? await this.getAllNodes(videoTree) : [];
+
     return nodes.find((node) => node.id === nodeId);
   }
 

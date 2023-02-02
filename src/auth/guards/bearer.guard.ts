@@ -12,15 +12,14 @@ export class BearerGuard implements CanActivate {
     const { authorization } = request.headers;
 
     const token = authorization ? authorization.split('Bearer ')[1] : '';
-    const errorMessage = 'Invalid auth credentials (bearer token)';
 
     if (!token) {
-      throw new UnauthorizedException(errorMessage);
+      throw new UnauthorizedException('Not allowed action except signed users');
     }
 
     const { userId } = this.jwtService.verify(token, {
       sub: 'access',
-      errorMessage,
+      errorMessage: 'Invalid or expired auth credentials (bearer token)',
     });
 
     request.userId = userId;
