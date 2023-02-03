@@ -15,7 +15,11 @@ export class GetSubscribersHandler implements IQueryHandler {
           condition: { 'subscriptions.subscriber_id': 'id' },
         },
         where: { 'subscriptions.publisher_id': id },
-        orderBy: { 'subscriptions.created_at': 'DESC' },
+        orderBy: {
+          'subscriptions.created_at': 'DESC',
+          'subscriptions.publisher_id': 'DESC',
+          'subscriptions.subscriber_id': 'DESC',
+        },
         pagination: params,
       },
       id,

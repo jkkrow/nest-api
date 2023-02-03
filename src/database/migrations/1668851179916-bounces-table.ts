@@ -11,9 +11,9 @@ export class bouncesTable1668851179916 implements MigrationInterface {
         description VARCHAR(200) NOT NULL,
         details VARCHAR(200) NOT NULL,
         message_stream VARCHAR(20) NOT NULL,
-        bounced_at TIMESTAMP NOT NULL,
-        created_at TIMESTAMP NOT NULL DEFAULT now(),
-        updated_at TIMESTAMP NOT NULL DEFAULT now()
+        bounced_at TIMESTAMPTZ NOT NULL,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )
     `);
   }

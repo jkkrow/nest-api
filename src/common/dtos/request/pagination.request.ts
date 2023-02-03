@@ -1,7 +1,7 @@
-import { IsOptional, IsInt, IsPositive } from 'class-validator';
+import { IsOptional, IsInt, IsPositive, IsString } from 'class-validator';
 import { Type } from 'class-transformer';
 
-export class PaginationRequest {
+export class OffsetPaginationRequest {
   @IsOptional()
   @IsInt()
   @IsPositive()
@@ -12,5 +12,17 @@ export class PaginationRequest {
   @IsInt()
   @IsPositive()
   @Type(() => Number)
-  max: number = 12;
+  max: number = 30;
+}
+
+export class KeysetPaginationRequest {
+  @IsOptional()
+  @IsString()
+  token?: string;
+
+  @IsOptional()
+  @IsInt()
+  @IsPositive()
+  @Type(() => Number)
+  max: number = 30;
 }

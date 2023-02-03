@@ -1,12 +1,12 @@
-import { Entity, Index, Column, ManyToOne, CreateDateColumn } from 'typeorm';
+import { Entity, Index, Column, ManyToOne } from 'typeorm';
 
-import { BaseEntity } from 'src/providers/database/entities/database.entity';
+import { BaseEntityWithCreatedAt } from 'src/providers/database/entities/database.entity';
 import { UserEntity } from 'src/modules/user/entities/user.entity';
 import { VideoTreeEntity } from './video-tree.entity';
 
 @Entity('views')
 @Index(['videoId', 'userId', 'ip'])
-export class ViewEntity extends BaseEntity {
+export class ViewEntity extends BaseEntityWithCreatedAt {
   @Column({ type: 'uuid' })
   videoId: string;
 
@@ -15,9 +15,6 @@ export class ViewEntity extends BaseEntity {
 
   @Column({ type: 'varchar', length: 50 })
   ip: string;
-
-  @CreateDateColumn()
-  createdAt: Date;
 
   @ManyToOne(() => VideoTreeEntity, (tree) => tree.id, { onDelete: 'CASCADE' })
   video: VideoTreeEntity;

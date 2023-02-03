@@ -2,7 +2,6 @@ export type FindOptions<T, K extends string> = {
   where?: Where<T, K>;
   relation?: Relation<T, K>;
   search?: Search;
-  groupBy?: GroupBy<T, K>;
   orderBy?: OrderBy<T, K>;
   pagination?: Pagination;
 };
@@ -26,13 +25,8 @@ export type JoinType = 'INNER' | 'LEFT';
 export type Relation<T, K extends string> = {
   table: K;
   condition: JoinCondition<T, K>;
+  // index: string | string[];
   type?: JoinType;
-};
-
-export type GroupBy<T, K extends string> = {
-  [key in keyof T]?: boolean;
-} & {
-  [key in Prefix<K>]: boolean;
 };
 
 export type OrderBy<T, K extends string> = {
@@ -41,16 +35,15 @@ export type OrderBy<T, K extends string> = {
   [key in Prefix<K>]: 'ASC' | 'DESC';
 };
 
-export type Pagination = Offset | Cursor;
+export type Pagination = Offset | Keyset;
 
 export type Offset = {
   page: number;
   max: number;
 };
 
-export type Cursor = {
-  key: string;
-  direction: 'ASC' | 'DESC';
+export type Keyset = {
+  token?: string;
   max: number;
 };
 

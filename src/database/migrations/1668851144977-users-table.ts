@@ -15,8 +15,8 @@ export class usersTable1668851144977 implements MigrationInterface {
         picture VARCHAR(200) NOT NULL DEFAULT '',
         verified BOOLEAN NOT NULL DEFAULT false,
         admin BOOLEAN NOT NULL DEFAULT false,
-        created_at TIMESTAMP NOT NULL DEFAULT now(),
-        updated_at TIMESTAMP NOT NULL DEFAULT now()
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
       )
     `);
   }

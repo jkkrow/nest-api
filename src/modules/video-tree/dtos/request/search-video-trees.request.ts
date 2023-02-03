@@ -1,8 +1,8 @@
 import { IsString } from 'class-validator';
 
-import { PaginationRequest } from 'src/common/dtos/request/pagination.request';
+import { OffsetPaginationRequest } from 'src/common/dtos/request/pagination.request';
 
-export class SearchVideoTreesRequest extends PaginationRequest {
+export class SearchVideoTreesRequest extends OffsetPaginationRequest {
   @IsString()
   keyword: string;
 }

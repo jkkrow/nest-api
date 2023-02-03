@@ -20,7 +20,7 @@ const GlobalRoleGuard = {
     BaseJwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        secret: config.get('JWT_SECRET_KEY'),
+        secret: config.get('TOKEN_SECRET_KEY'),
         signOptions: { issuer: config.get('DOMAIN_URL') },
         verifyOptions: { issuer: config.get('DOMAIN_URL') },
       }),

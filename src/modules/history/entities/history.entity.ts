@@ -1,13 +1,6 @@
-import {
-  Entity,
-  PrimaryColumn,
-  Check,
-  Column,
-  ManyToOne,
-  CreateDateColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { Entity, PrimaryColumn, Check, Column, ManyToOne } from 'typeorm';
 
+import { CompositeEntityWithTimestamps } from 'src/providers/database/entities/database.entity';
 import { UserEntity } from 'src/modules/user/entities/user.entity';
 import { VideoTreeEntity } from 'src/modules/video-tree/entities/video-tree.entity';
 
@@ -15,7 +8,7 @@ import { VideoTreeEntity } from 'src/modules/video-tree/entities/video-tree.enti
 @Check('progress >= 0')
 @Check('total_progress >= 0')
 @Check('total_progress >= progress')
-export class HistoryEntity {
+export class HistoryEntity extends CompositeEntityWithTimestamps {
   @PrimaryColumn({ type: 'uuid' })
   videoId: string;
 
@@ -33,12 +26,6 @@ export class HistoryEntity {
 
   @Column({ type: 'boolean' })
   ended: boolean;
-
-  @CreateDateColumn()
-  createdAt: Date;
-
-  @UpdateDateColumn()
-  updatedAt: Date;
 
   @ManyToOne(() => VideoTreeEntity, (tree) => tree.id, { onDelete: 'CASCADE' })
   video: VideoTreeEntity;

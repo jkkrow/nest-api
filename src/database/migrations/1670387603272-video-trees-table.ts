@@ -17,8 +17,8 @@ export class videoTreesTable1670387603272 implements MigrationInterface {
         min_duration REAL NOT NULL CHECK (min_duration >= 0),
         status video_tree_status NOT NULL,
         editing BOOLEAN NOT NULL,
-        created_at TIMESTAMP NOT NULL DEFAULT now(),
-        updated_at TIMESTAMP NOT NULL DEFAULT now()
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
         CHECK (max_duration >= min_duration)
       )
     `);

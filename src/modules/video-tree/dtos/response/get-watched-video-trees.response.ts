@@ -2,7 +2,7 @@ import { Expose, Type } from 'class-transformer';
 
 import { VideoTreeEntryWithDataResponse } from './video-tree-entry-with-data.response';
 
-export class GetVideoTreesResponse {
+export class GetWatchedVideoTreesResponse {
   @Expose()
   @Type(() => VideoTreeEntryWithDataResponse)
   videoTrees: VideoTreeEntryWithDataResponse[];

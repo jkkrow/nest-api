@@ -18,7 +18,6 @@ export class GetFavoritedVideoTreesHandler
         },
         where: { 'favorites.user_id': userId, editing: false },
         orderBy: { 'favorites.created_at': 'DESC' },
-        groupBy: { 'favorites.created_at': true },
         pagination: params,
       },
       userId,

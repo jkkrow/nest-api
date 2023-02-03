@@ -36,6 +36,7 @@ import { UpdateVideoNodeRequest } from '../dtos/request/update-video-node.reques
 import { GetVideoTreesRequest } from '../dtos/request/get-video-trees.request';
 import { SearchVideoTreesRequest } from '../dtos/request/search-video-trees.request';
 import { GetVideoTreesResponse } from '../dtos/response/get-video-trees.response';
+import { SearchVideoTreesResponse } from '../dtos/response/search-video-trees.response';
 import { WatchVideoTreeResponse } from '../dtos/response/watch-video-tree.response';
 
 @ApiTags('VideoTrees')
@@ -151,15 +152,15 @@ export class VideoTreeController {
     @CurrentUserId() userId?: string,
   ) {
     const query = new GetVideoTreesQuery({ ids }, rest, userId);
-    const [videoTrees, count] = await this.queryBus.execute(query);
+    const [videoTrees, token] = await this.queryBus.execute(query);
 
-    return { videoTrees, count };
+    return { videoTrees, token };
   }
 
   /* Search VideoTrees */
   /*--------------------------------------------*/
   @Get('search')
-  @Serialize(GetVideoTreesResponse)
+  @Serialize(SearchVideoTreesResponse)
   async searchVideoTrees(
     @Query() { keyword, ...rest }: SearchVideoTreesRequest,
     @CurrentUserId() userId?: string,

@@ -4,8 +4,10 @@ import {
   FindOperator,
 } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
+import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
 
-import { FindOptions, Offset, Cursor } from '../types/database.type';
+import { Exception } from 'src/common/exceptions';
+import { FindOptions, Offset, Keyset } from '../types/database.type';
 
 export abstract class BaseRepository<
   T extends ObjectLiteral,
@@ -13,68 +15,75 @@ export abstract class BaseRepository<
 > {
   constructor(protected readonly alias: string) {}
 
-  protected getMany<D>(
+  protected async getMany<D>(
     query: QueryBuilder<T>,
     options: K,
     identifier?: string[],
   ) {
-    const findQuery = this.filterQuery(query, options);
-    const promises: [Promise<D[]>, Promise<number>?] = [
-      findQuery.getMapMany<D>(identifier),
-    ];
+    const { pagination } = options;
+    const filteredQuery = this.filterQuery(query, options);
+    const getDataPromise = filteredQuery.getMapMany<D>(identifier);
 
-    if (options.pagination && this.isOffset(options.pagination)) {
-      promises.push(findQuery.getCount());
+    if (pagination && this.isOffset(pagination)) {
+      return Promise.all([getDataPromise, filteredQuery.getCount()]);
     }
 
-    return Promise.all(promises);
+    const result = await getDataPromise;
+    let token = '';
+
+    if (result.length) {
+      const lastItem = result[result.length - 1] as any;
+      token = this.generateKeysetToken(lastItem.$pagination);
+    }
+
+    return [result, token];
   }
 
-  protected getOne<D>(
+  protected async getOne<D>(
     query: QueryBuilder<T>,
     options: K,
     identifier?: string[],
   ) {
-    const findQuery = this.filterQuery(query, options);
-    return findQuery.getMapOne<D>(identifier);
+    const filteredQuery = this.filterQuery(query, options);
+    return filteredQuery.getMapOne<D>(identifier);
   }
 
-  private filterQuery(query: QueryBuilder<T>, options: K) {
-    const { where, search, orderBy, groupBy, relation, pagination } = options;
-
-    this.setWhere(query, where);
-    this.setSearch(query, search);
-    this.setRelation(query, relation);
-    this.setGroupBy(query, groupBy);
-    this.setOrderBy(query, orderBy);
-    this.setPagination(query, pagination);
+  protected filterQuery(query: QueryBuilder<T>, options: K) {
+    this.setWhere(query, options);
+    this.setSearch(query, options);
+    this.setRelation(query, options);
+    this.setOrderBy(query, options);
+    this.setPagination(query, options);
 
     return query;
   }
 
-  private setWhere(query: QueryBuilder<T>, where: K['where']) {
+  private setWhere(query: QueryBuilder<T>, options: K) {
+    const { where } = options;
     if (!where) return;
     Object.entries(where).forEach(([key, operator]) => {
-      const property = this.parseKey(key);
-      const uid = uuidv4().replace(/-/g, '');
+      const property = this.formatKey(key);
+      const uid = this.generateRandomKey();
       const [expression, value] = this.parseFindOperator(operator, uid);
       query.andWhere(`${property} ${expression}`, { [uid]: value });
     });
   }
 
-  private setSearch(query: QueryBuilder<T>, search: K['search']) {
+  private setSearch(query: QueryBuilder<T>, options: K) {
+    const { search } = options;
     if (!search) return;
-    const uid = uuidv4().replace(/-/g, '');
+    const uid = this.generateRandomKey();
     query.andWhere(`search @@ plainto_tsquery(:${uid})`, { [uid]: search });
     query.addOrderBy(`ts_rank(search, plainto_tsquery(:${uid}))`, 'DESC');
   }
 
-  private setRelation(query: QueryBuilder<T>, relation: K['relation']) {
+  private setRelation(query: QueryBuilder<T>, options: K) {
+    const { relation } = options;
     if (!relation) return;
     const { table, condition, type } = relation;
     const conditions = Object.entries(condition).map(([key, value]) => {
-      const keyProp = this.parseKey(key);
-      const valueProp = this.parseKey(value as string);
+      const keyProp = this.formatKey(key);
+      const valueProp = this.formatKey(value as string);
       return `${keyProp} = ${valueProp}`;
     });
 
@@ -94,28 +103,53 @@ export abstract class BaseRepository<
     }
   }
 
-  private setGroupBy(query: QueryBuilder<T>, groupBy: K['groupBy']) {
-    if (!groupBy) return;
-    Object.entries(groupBy).forEach(([key, value]) => {
-      const property = this.parseKey(key);
-      value && query.addGroupBy(property);
-    });
-  }
-
-  private setOrderBy(query: QueryBuilder<T>, orderBy: K['orderBy']) {
+  private setOrderBy(query: QueryBuilder<T>, options: K) {
+    const { orderBy } = options;
     if (!orderBy) return;
     Object.entries(orderBy).forEach(([key, value]) => {
-      const property = this.parseKey(key);
+      const property = this.formatKey(key);
+      const isGrouped = query.getQuery().includes('GROUP BY');
       query.addOrderBy(property, value);
+      isGrouped && query.addGroupBy(property);
     });
   }
 
-  private setPagination(query: QueryBuilder<T>, pagination: K['pagination']) {
+  private setPagination(query: QueryBuilder<T>, options: K) {
+    const { pagination, orderBy } = options;
     if (!pagination) return;
     if (this.isOffset(pagination)) {
       const { page, max } = pagination;
       query.limit(max);
       query.offset(max * (page - 1));
+    }
+    if (!this.isOffset(pagination)) {
+      if (!orderBy) throw new Exception('OrderBy option must be provided');
+      const { token, max } = pagination;
+      query.take(max);
+
+      if (token) {
+        const keyset = this.parseKeysetToken(token);
+        const keys = Object.keys(keyset);
+        const values = Object.values(keyset);
+
+        const params: Record<string, any> = {};
+        const uids = values.map((value) => {
+          const uid = this.generateRandomKey();
+          params[uid] = value;
+          return `:${uid}`;
+        });
+
+        const left = `(${keys.join(', ')})`;
+        const right = `(${uids.join(', ')})`;
+        const direction = Object.values(orderBy)[0];
+        const range = direction === 'DESC' ? '<' : '>';
+
+        query.andWhere(`${left} ${range} ${right}`, params);
+      }
+
+      Object.entries(orderBy).forEach(([key]) => {
+        query.addSelect(key, `$pagination.${key}`);
+      });
     }
   }
 
@@ -145,7 +179,7 @@ export abstract class BaseRepository<
     }
   }
 
-  private parseKey(key: string) {
+  private formatKey(key: string) {
     const property = this.camelToSnake(key);
     return key.includes('.') ? property : `${this.alias}.${property}`;
   }
@@ -154,7 +188,35 @@ export abstract class BaseRepository<
     return key.replace(/[A-Z]/g, (char) => `_${char.toLowerCase()}`);
   }
 
-  private isOffset(pagination: Offset | Cursor): pagination is Offset {
+  private isOffset(pagination: Offset | Keyset): pagination is Offset {
     return (pagination as Offset).page !== undefined;
+  }
+
+  private generateRandomKey() {
+    return uuidv4().replace(/-/g, '');
+  }
+
+  private generateKeysetToken(keyset: Record<string, any>) {
+    const secret = process.env.TOKEN_SECRET_KEY as string;
+    const iv = randomBytes(16);
+    const cipher = createCipheriv('aes256', secret, iv);
+
+    return (
+      iv.toString('hex') +
+      cipher.update(JSON.stringify(keyset), 'utf-8', 'hex') +
+      cipher.final('hex')
+    );
+  }
+
+  private parseKeysetToken(token: string) {
+    const secret = process.env.TOKEN_SECRET_KEY as string;
+    const iv = Buffer.from(token.slice(0, 32), 'hex');
+    const encrypted = token.slice(32);
+
+    const decipher = createDecipheriv('aes256', secret, iv);
+
+    return JSON.parse(
+      decipher.update(encrypted, 'hex', 'utf-8') + decipher.final('utf-8'),
+    ) as Record<string, any>;
   }
 }

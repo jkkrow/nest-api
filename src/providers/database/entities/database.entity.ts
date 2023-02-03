@@ -9,10 +9,22 @@ export abstract class BaseEntity {
   id: string;
 }
 
-export abstract class BaseEntityWithTimestamps extends BaseEntity {
-  @CreateDateColumn()
+export abstract class BaseEntityWithCreatedAt extends BaseEntity {
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date;
+}
 
-  @UpdateDateColumn()
+export abstract class BaseEntityWithTimestamps extends BaseEntityWithCreatedAt {
+  @UpdateDateColumn({ type: 'timestamptz' })
+  updatedAt: Date;
+}
+
+export abstract class CompositeEntity {
+  @CreateDateColumn({ type: 'timestamptz' })
+  createdAt: Date;
+}
+
+export abstract class CompositeEntityWithTimestamps extends CompositeEntity {
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date;
 }

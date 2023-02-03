@@ -14,7 +14,7 @@ export class EnvironmentVariables {
   CLIENT_URL: string;
 
   @IsString()
-  JWT_SECRET_KEY: string;
+  TOKEN_SECRET_KEY: string;
 
   @IsString()
   AUTH_CREDENTIALS_USERNAME: string;

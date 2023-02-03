@@ -23,9 +23,9 @@ SelectQueryBuilder.prototype.getMapMany = async function (identifier = ['id']) {
     );
 
     Object.entries(matchedRawItem).forEach(([key, value]) => {
-      if (key.includes('_')) return;
+      if (key.includes(`${this.alias}_`)) return;
       if (key.includes('.')) {
-        const [property, nestedProperty] = key.split('.');
+        const [property, nestedProperty] = key.split(/\.(.*)/s);
         entity[property] = entity[property] || {};
         entity[property][nestedProperty] = value;
       } else {

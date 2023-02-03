@@ -10,8 +10,8 @@ export class historiesTable1670914526176 implements MigrationInterface {
         progress REAL NOT NULL CHECK (progress >= 0),
         total_progress REAL NOT NULL CHECK (total_progress >= 0),
         ended BOOLEAN NOT NULL,
-        created_at TIMESTAMP NOT NULL DEFAULT now(),
-        updated_at TIMESTAMP NOT NULL DEFAULT now(),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
         PRIMARY KEY (video_id, user_id),
         CHECK (total_progress >= progress)
       )

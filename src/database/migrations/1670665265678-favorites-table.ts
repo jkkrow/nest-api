@@ -6,7 +6,7 @@ export class favoritesTable1670665265678 implements MigrationInterface {
       CREATE TABLE favorites (
         video_id UUID NOT NULL REFERENCES video_trees(id) ON DELETE CASCADE,
         user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        created_at TIMESTAMP NOT NULL DEFAULT now(),
+        created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
         PRIMARY KEY (video_id, user_id)
       )
     `);

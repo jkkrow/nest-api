@@ -44,6 +44,7 @@ export class RoleGuard extends BearerGuard {
     }
 
     const userRoles = {
+      user: !!user,
       verified: user.verified,
       admin: user.admin,
       member: this.validateMembership(user),

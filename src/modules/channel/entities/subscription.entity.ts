@@ -1,17 +1,15 @@
-import { Entity, PrimaryColumn, ManyToOne, CreateDateColumn } from 'typeorm';
+import { Entity, PrimaryColumn, ManyToOne } from 'typeorm';
 
+import { CompositeEntity } from 'src/providers/database/entities/database.entity';
 import { UserEntity } from '../../user/entities/user.entity';
 
 @Entity('subscriptions')
-export class SubscriptionEntity {
+export class SubscriptionEntity extends CompositeEntity {
   @PrimaryColumn({ type: 'uuid' })
   publisherId: string;
 
   @PrimaryColumn({ type: 'uuid' })
   subscriberId: string;
-
-  @CreateDateColumn()
-  createdAt: Date;
 
   @ManyToOne(() => UserEntity, (user) => user.id, { onDelete: 'CASCADE' })
   publisher: UserEntity;

@@ -2,7 +2,7 @@ import { Expose, Type } from 'class-transformer';
 
 import { ChannelResponse } from './channel.response';
 
-export class GetChannelsResponse {
+export class GetSubscribesResponse {
   @Expose()
   @Type(() => ChannelResponse)
   channels: ChannelResponse[];

@@ -16,7 +16,7 @@ export class GetVideoTreesHandler implements IQueryHandler<GetVideoTreesQuery> {
     return this.repository.findWithData(
       {
         where: { editing: false, ...filterIds },
-        orderBy: { createdAt: 'DESC' },
+        orderBy: { createdAt: 'DESC', id: 'DESC' },
         pagination: params,
       },
       userId,
