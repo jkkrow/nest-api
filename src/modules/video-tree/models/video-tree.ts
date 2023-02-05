@@ -18,7 +18,7 @@ export class VideoTree extends AggregateRoot {
       readonly creatorId: string;
       title: string;
       description: string;
-      categories: { name: string }[];
+      categories: string[];
       thumbnail: string;
       size: number;
       maxDuration: number;
@@ -44,7 +44,7 @@ export class VideoTree extends AggregateRoot {
   }
 
   get categories() {
-    return this.props.categories.map((category) => ({ name: category.name }));
+    return [...this.props.categories];
   }
 
   get description() {

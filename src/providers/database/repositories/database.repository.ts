@@ -15,14 +15,10 @@ export abstract class BaseRepository<
 > {
   constructor(protected readonly alias: string) {}
 
-  protected async getMany<D>(
-    query: QueryBuilder<T>,
-    options: K,
-    identifier?: string[],
-  ) {
+  protected async getMany<D>(query: QueryBuilder<T>, options: K) {
     const { pagination } = options;
     const filteredQuery = this.filterQuery(query, options);
-    const getDataPromise = filteredQuery.getMapMany<D>(identifier);
+    const getDataPromise = filteredQuery.getMapMany<D>();
 
     if (pagination && this.isOffset(pagination)) {
       return Promise.all([getDataPromise, filteredQuery.getCount()]);
@@ -39,13 +35,11 @@ export abstract class BaseRepository<
     return [result, token];
   }
 
-  protected async getOne<D>(
-    query: QueryBuilder<T>,
-    options: K,
-    identifier?: string[],
-  ) {
+  protected async getOne<D>(query: QueryBuilder<T>, options: K) {
     const filteredQuery = this.filterQuery(query, options);
-    return filteredQuery.getMapOne<D>(identifier);
+    const result = await filteredQuery.getMapOne<D>();
+
+    return result;
   }
 
   protected filterQuery(query: QueryBuilder<T>, options: K) {
@@ -125,12 +119,21 @@ export abstract class BaseRepository<
     if (!this.isOffset(pagination)) {
       if (!orderBy) throw new Exception('OrderBy option must be provided');
       const { token, max } = pagination;
-      query.take(max);
+      query.limit(max);
 
       if (token) {
         const keyset = this.parseKeysetToken(token);
-        const keys = Object.keys(keyset);
-        const values = Object.values(keyset);
+        const sortBy = Object.keys(orderBy).map((key) => this.formatKey(key));
+
+        const entries = Object.entries(keyset);
+
+        const sortedKeyset = Object.fromEntries(
+          entries.sort((a, b) => sortBy.indexOf(a[0]) - sortBy.indexOf(b[0])),
+        );
+
+        const keys = Object.keys(sortedKeyset);
+        const values = Object.values(sortedKeyset);
+        const direction = Object.values(orderBy)[0];
 
         const params: Record<string, any> = {};
         const uids = values.map((value) => {
@@ -141,14 +144,16 @@ export abstract class BaseRepository<
 
         const left = `(${keys.join(', ')})`;
         const right = `(${uids.join(', ')})`;
-        const direction = Object.values(orderBy)[0];
         const range = direction === 'DESC' ? '<' : '>';
+        const condition = `${left} ${range} ${right}`;
 
-        query.andWhere(`${left} ${range} ${right}`, params);
+        query.andWhere(condition, params);
       }
 
       Object.entries(orderBy).forEach(([key]) => {
-        query.addSelect(key, `$pagination.${key}`);
+        const property = this.formatKey(key);
+        const column = this.toPaginationColumn(property);
+        query.addSelect(column, `$pagination.${property}`);
       });
     }
   }
@@ -214,9 +219,25 @@ export abstract class BaseRepository<
     const encrypted = token.slice(32);
 
     const decipher = createDecipheriv('aes256', secret, iv);
+    const update = decipher.update(encrypted, 'hex', 'utf-8');
+    const final = decipher.final('utf-8');
+    const decoded: Record<string, any> = JSON.parse(update + final);
 
-    return JSON.parse(
-      decipher.update(encrypted, 'hex', 'utf-8') + decipher.final('utf-8'),
-    ) as Record<string, any>;
+    const keyset = Object.fromEntries(
+      Object.entries(decoded).map(([key, value]) => [
+        key,
+        this.fromPaginationColumn(value),
+      ]),
+    );
+
+    return keyset;
+  }
+
+  private toPaginationColumn(column: string) {
+    return `'$pagination.' || ${column}`;
+  }
+
+  private fromPaginationColumn(column: string) {
+    return column.split('$pagination.')[1];
   }
 }

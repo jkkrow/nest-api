@@ -7,7 +7,7 @@ export interface VideoTree {
   id: string;
   title: string;
   description: string;
-  categories: { name: string }[];
+  categories: string[];
   thumbnail: string;
   size: number;
   maxDuration: number;
@@ -44,7 +44,7 @@ export interface VideoTreeOnlyRootWithData
 
 export interface UpdateVideoTreeProps {
   title: string;
-  categories: { name: string }[];
+  categories: string[];
   description: string;
   thumbnail: string;
   status: VideoTreeStatus;

@@ -30,18 +30,12 @@ export class UpdateVideoTreeRoot {
   children: UpdateVideoTreeRoot[];
 }
 
-export class UpdateVideoTreeCategory {
-  @IsString()
-  name: string;
-}
-
 export class UpdateVideoTreeRequest {
   @IsString()
   title: string;
 
-  @ValidateNested({ each: true })
-  @Type(() => UpdateVideoTreeCategory)
-  categories: { name: string }[];
+  @IsString({ each: true })
+  categories: string[];
 
   @IsString()
   description: string;

@@ -1,11 +1,6 @@
-import { Expose, Type } from 'class-transformer';
+import { Expose } from 'class-transformer';
 
 import { VideoTreeStatus } from '../../constants/video-tree.contstant';
-
-class VideoTreeCategory {
-  @Expose()
-  name: string;
-}
 
 export class VideoTreeEntryResponse {
   @Expose()
@@ -15,8 +10,7 @@ export class VideoTreeEntryResponse {
   title: string;
 
   @Expose()
-  @Type(() => VideoTreeCategory)
-  categories: VideoTreeCategory[];
+  categories: string[];
 
   @Expose()
   thumbnail: string;
