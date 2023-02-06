@@ -19,16 +19,18 @@ import { GetWatchedVideoTreesQuery } from 'src/modules/video-tree/queries/impl/g
 import { GetCreatedVideoTreesResponse } from '../dtos/response/get-created-video-trees.response';
 import { GetCreatedVideoTreeResponse } from 'src/modules/channel/dtos/response/get-created-video-tree.response';
 import { GetCreatedVideoNodeResponse } from '../dtos/response/get-created-video-node.response';
-import { GetVideoTreesResponse } from 'src/modules/video-tree/dtos/response/get-video-trees.response';
 import { GetChannelQuery } from '../queries/impl/get-channel.query';
 import { GetSubscribersQuery } from '../queries/impl/get-subscribers.query';
 import { GetSubscribesQuery } from '../queries/impl/get-subscribes.query';
 import { SubscribeChannelCommand } from '../commands/impl/subscribe.command';
 import { UnsubscribeChannelCommand } from '../commands/impl/unsubscribe.command';
+import { GetHistoriesRequest } from '../dtos/request/get-histories.request';
 import { GetChannelResponse } from '../dtos/response/get-channel.response';
 import { GetSubscribersResponse } from '../dtos/response/get-subscribers.response';
 import { GetSubscribesResponse } from '../dtos/response/get-subscribes.response';
-import { GetHistoriesRequest } from '../dtos/request/get-histories.request';
+import { GetChannelVideoTreesResponse } from '../dtos/response/get-channel-video-trees.response';
+import { GetFavoritesResponse } from '../dtos/response/get-favorites.response';
+import { GetHistoriesResponse } from '../dtos/response/get-histories.response';
 
 @ApiTags('Channels')
 @Controller('channels')
@@ -83,7 +85,7 @@ export class ChannelController {
   /*--------------------------------------------*/
   @Get('current/favorites')
   @Role('user')
-  @Serialize(GetVideoTreesResponse)
+  @Serialize(GetFavoritesResponse)
   async getFavoritedVideoTrees(
     @Query() params: OffsetPaginationRequest,
     @CurrentUserId() userId: string,
@@ -98,7 +100,7 @@ export class ChannelController {
   /*--------------------------------------------*/
   @Get('current/histories')
   @Role('user')
-  @Serialize(GetVideoTreesResponse)
+  @Serialize(GetHistoriesResponse)
   async getWatchedVideoTrees(
     @Query() { skipEnded, ...rest }: GetHistoriesRequest,
     @CurrentUserId() userId: string,
@@ -158,7 +160,7 @@ export class ChannelController {
   /* Get Channel Videos */
   /*--------------------------------------------*/
   @Get(':id/video-trees')
-  @Serialize(GetVideoTreesResponse)
+  @Serialize(GetChannelVideoTreesResponse)
   async getChannelVideoTrees(
     @Param('id') id: string,
     @Query() params: OffsetPaginationRequest,

@@ -25,7 +25,7 @@ export abstract class BaseRepository<
     }
 
     const result = await getDataPromise;
-    let token = '';
+    let token: string | null = null;
 
     if (result.length) {
       const lastItem = result[result.length - 1] as any;
