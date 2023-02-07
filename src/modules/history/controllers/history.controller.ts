@@ -11,7 +11,7 @@ import { DeleteHistoryCommand } from '../commands/impl/delete-history.command';
 import { SaveHistoryRequest } from '../dtos/request/save-history.request';
 
 @ApiTags('Histories')
-@Controller('historires')
+@Controller('histories')
 export class HistoryController {
   constructor(private readonly commandBus: CommandBus) {}
 

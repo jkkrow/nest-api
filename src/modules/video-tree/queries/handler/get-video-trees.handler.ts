@@ -10,9 +10,7 @@ export class GetVideoTreesHandler implements IQueryHandler<GetVideoTreesQuery> {
 
   async execute({ options, params, userId }: GetVideoTreesQuery) {
     const { ids } = options;
-    const filterIds = ids
-      ? { id: ids instanceof Array ? In(ids) : ids }
-      : { status: 'public' };
+    const filterIds = ids?.length ? { id: In(ids) } : { status: 'public' };
     return this.repository.findWithData(
       {
         where: { editing: false, ...filterIds },
