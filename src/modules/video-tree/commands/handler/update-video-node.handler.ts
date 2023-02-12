@@ -24,9 +24,22 @@ export class UpdateVideoNodeHandler
       throw new UnauthorizedException('VideoTree not belong to user');
     }
 
+    if (!updates.url || (updates.url && updates.url.startsWith('blob'))) {
+      const sameFile = videoTree.nodes.find((n) => n.name === updates.name);
+      updates.url = sameFile ? sameFile.url : '';
+    }
+
     // TODO: Validate data by comparing to uploaded video in s3
 
     videoTree.updateNode(id, updates);
+
+    const fileName = updates.name;
+    const duplicates = videoTree.nodes.filter((node) => node.name == fileName);
+    const ids = duplicates.map((node) => node.id);
+
+    for (const id of ids) {
+      videoTree.updateNode(id, updates);
+    }
 
     await this.repository.save(videoTree);
 
