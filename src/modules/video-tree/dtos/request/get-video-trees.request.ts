@@ -6,6 +6,9 @@ import { KeysetPaginationRequest } from 'src/common/dtos/request/pagination.requ
 export class GetVideoTreesRequest extends KeysetPaginationRequest {
   @IsOptional()
   @IsString({ each: true })
-  @Transform(({ value }) => (!value ? [] : value.split(',')))
+  @Transform(({ value }) => {
+    if (value instanceof Array) return value;
+    return value ? value.split(',') : [];
+  })
   ids?: string[];
 }
