@@ -25,26 +25,30 @@ export type JoinType = 'INNER' | 'LEFT';
 export type Relation<T, K extends string> = {
   table: K;
   condition: JoinCondition<T, K>;
-  // index: string | string[];
   type?: JoinType;
 };
 
 export type OrderBy<T, K extends string> = {
-  [key in keyof T]?: 'ASC' | 'DESC';
+  [key in keyof T]?: Direction;
 } & {
-  [key in Prefix<K>]: 'ASC' | 'DESC';
+  [key in Prefix<K>]: Direction;
 };
 
-export type Pagination = Offset | Keyset;
+export type Pagination = { max: number } & (Offset | Keyset);
 
 export type Offset = {
   page: number;
-  max: number;
+  withCount?: boolean;
 };
 
 export type Keyset = {
   token?: string;
-  max: number;
 };
 
 export type Prefix<K> = K extends string ? `${K}.${string}` : K;
+
+export type Direction = 'ASC' | 'DESC';
+
+export type Count = number | null;
+
+export type Token = string | null;

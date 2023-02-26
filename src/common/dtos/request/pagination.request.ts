@@ -1,21 +1,24 @@
-import { IsOptional, IsInt, IsPositive, IsString } from 'class-validator';
-import { Type } from 'class-transformer';
+import {
+  IsOptional,
+  IsInt,
+  IsPositive,
+  IsString,
+  IsBoolean,
+} from 'class-validator';
+import { Type, Transform } from 'class-transformer';
 
-export class OffsetPaginationRequest {
+export class PaginationRequest {
   @IsOptional()
   @IsInt()
   @IsPositive()
   @Type(() => Number)
-  page: number = 1;
+  page?: number;
 
   @IsOptional()
-  @IsInt()
-  @IsPositive()
-  @Type(() => Number)
-  max: number = 30;
-}
+  @IsBoolean()
+  @Transform(({ value }) => value === 'true')
+  withCount?: boolean;
 
-export class KeysetPaginationRequest {
   @IsOptional()
   @IsString()
   token?: string;

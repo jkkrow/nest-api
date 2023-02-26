@@ -1,9 +1,6 @@
-export interface OffsetParams {
-  page: number;
-  max: number;
-}
-
-export interface KeysetParams {
+export interface PaginationParams {
+  page?: number;
+  withCount?: boolean;
   token?: string;
   max: number;
 }

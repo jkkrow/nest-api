@@ -1,9 +1,9 @@
 import { Transform } from 'class-transformer';
 import { IsString, IsOptional } from 'class-validator';
 
-import { KeysetPaginationRequest } from 'src/common/dtos/request/pagination.request';
+import { PaginationRequest } from 'src/common/dtos/request/pagination.request';
 
-export class GetVideoTreesRequest extends KeysetPaginationRequest {
+export class GetVideoTreesRequest extends PaginationRequest {
   @IsOptional()
   @IsString({ each: true })
   @Transform(({ value }) => {

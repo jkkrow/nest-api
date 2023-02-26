@@ -7,7 +7,13 @@ import { v4 as uuidv4 } from 'uuid';
 import { createCipheriv, createDecipheriv, randomBytes } from 'crypto';
 
 import { Exception } from 'src/common/exceptions';
-import { FindOptions, Offset, Keyset } from '../types/database.type';
+import {
+  FindOptions,
+  Offset,
+  Keyset,
+  Count,
+  Token,
+} from '../types/database.type';
 
 export abstract class BaseRepository<
   T extends ObjectLiteral,
@@ -15,31 +21,37 @@ export abstract class BaseRepository<
 > {
   constructor(protected readonly alias: string) {}
 
-  protected async getMany<D>(query: QueryBuilder<T>, options: K) {
+  protected async getMany<D>(
+    query: QueryBuilder<T>,
+    options: K,
+  ): Promise<[D[], Count, Token]> {
     const { pagination } = options;
     const filteredQuery = this.filterQuery(query, options);
-    const getDataPromise = filteredQuery.getMapMany<D>();
+    const dataPromise = filteredQuery.getMapMany<D>();
 
-    if (pagination && this.isOffset(pagination)) {
-      return Promise.all([getDataPromise, filteredQuery.getCount()]);
+    if (pagination && this.isOffset(pagination) && pagination.withCount) {
+      return Promise.all([dataPromise, filteredQuery.getCount(), null]);
     }
 
-    const result = await getDataPromise;
-    let token: string | null = null;
-
-    if (result.length) {
-      const lastItem = result[result.length - 1] as any;
-      token = this.generateKeysetToken(lastItem.$pagination);
+    if (pagination && this.isOffset(pagination) && !pagination.withCount) {
+      return Promise.all([dataPromise, null, null]);
     }
 
-    return [result, token];
+    const data = await dataPromise;
+    if (pagination && data.length && data.length >= pagination.max) {
+      const lastItem = data[data.length - 1] as any;
+      const token = this.generateKeysetToken(lastItem.$pagination);
+      return [data, null, token];
+    }
+
+    return [data, null, null];
   }
 
   protected async getOne<D>(query: QueryBuilder<T>, options: K) {
     const filteredQuery = this.filterQuery(query, options);
-    const result = await filteredQuery.getMapOne<D>();
+    const data = await filteredQuery.getMapOne<D>();
 
-    return result;
+    return data;
   }
 
   protected filterQuery(query: QueryBuilder<T>, options: K) {
@@ -84,16 +96,10 @@ export abstract class BaseRepository<
     const alias = table;
     const conditionString = conditions.join(' AND ');
 
-    switch (type) {
-      case 'INNER':
-        query.innerJoin(table, alias, conditionString);
-        break;
-      case 'LEFT':
-        query.leftJoin(table, alias, conditionString);
-        break;
-      default:
-        query.innerJoin(table, alias, conditionString);
-        break;
+    if (type === 'INNER') {
+      query.innerJoin(table, alias, conditionString);
+    } else {
+      query.leftJoin(table, alias, conditionString);
     }
   }
 
@@ -115,47 +121,46 @@ export abstract class BaseRepository<
       const { page, max } = pagination;
       query.limit(max);
       query.offset(max * (page - 1));
+      return;
     }
-    if (!this.isOffset(pagination)) {
-      if (!orderBy) throw new Exception('OrderBy option must be provided');
-      const { token, max } = pagination;
-      query.limit(max);
 
-      if (token) {
-        const keyset = this.parseKeysetToken(token);
-        const sortBy = Object.keys(orderBy).map((key) => this.formatKey(key));
+    if (!orderBy) throw new Exception('OrderBy option must be provided');
+    const { token, max } = pagination;
+    query.limit(max);
 
-        const entries = Object.entries(keyset);
+    if (token) {
+      const keyset = this.parseKeysetToken(token);
+      const sortBy = Object.keys(orderBy).map((key) => this.formatKey(key));
+      const entries = Object.entries(keyset);
 
-        const sortedKeyset = Object.fromEntries(
-          entries.sort((a, b) => sortBy.indexOf(a[0]) - sortBy.indexOf(b[0])),
-        );
+      const sortedKeyset = Object.fromEntries(
+        entries.sort((a, b) => sortBy.indexOf(a[0]) - sortBy.indexOf(b[0])),
+      );
 
-        const keys = Object.keys(sortedKeyset);
-        const values = Object.values(sortedKeyset);
-        const direction = Object.values(orderBy)[0];
+      const keys = Object.keys(sortedKeyset);
+      const values = Object.values(sortedKeyset);
+      const direction = Object.values(orderBy)[0];
 
-        const params: Record<string, any> = {};
-        const uids = values.map((value) => {
-          const uid = this.generateRandomKey();
-          params[uid] = value;
-          return `:${uid}`;
-        });
-
-        const left = `(${keys.join(', ')})`;
-        const right = `(${uids.join(', ')})`;
-        const range = direction === 'DESC' ? '<' : '>';
-        const condition = `${left} ${range} ${right}`;
-
-        query.andWhere(condition, params);
-      }
-
-      Object.entries(orderBy).forEach(([key]) => {
-        const property = this.formatKey(key);
-        const column = this.toPaginationColumn(property);
-        query.addSelect(column, `$pagination.${property}`);
+      const params: Record<string, any> = {};
+      const uids = values.map((value) => {
+        const uid = this.generateRandomKey();
+        params[uid] = value;
+        return `:${uid}`;
       });
+
+      const left = `(${keys.join(', ')})`;
+      const right = `(${uids.join(', ')})`;
+      const range = direction === 'DESC' ? '<' : '>';
+      const condition = `${left} ${range} ${right}`;
+
+      query.andWhere(condition, params);
     }
+
+    Object.entries(orderBy).forEach(([key]) => {
+      const property = this.formatKey(key);
+      const column = this.toPaginationColumn(property);
+      query.addSelect(column, `$pagination.${property}`);
+    });
   }
 
   private parseFindOperator(operator: FindOperator<any> | any, uid: string) {
@@ -194,7 +199,7 @@ export abstract class BaseRepository<
   }
 
   private isOffset(pagination: Offset | Keyset): pagination is Offset {
-    return (pagination as Offset).page !== undefined;
+    return !!(pagination as Offset).page && !(pagination as Keyset).token;
   }
 
   private generateRandomKey() {

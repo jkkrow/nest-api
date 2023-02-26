@@ -1,11 +1,9 @@
 import { Expose } from 'class-transformer';
 
-export class OffsetPaginationResponse {
+export class PaginationResponse {
   @Expose()
-  count: number;
-}
+  count: number | null;
 
-export class KeysetPaginationResponse {
   @Expose()
   token: string | null;
 }

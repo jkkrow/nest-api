@@ -3,10 +3,7 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiTags } from '@nestjs/swagger';
 
 import { Serialize } from 'src/common/decorators/serialize.decorator';
-import {
-  KeysetPaginationRequest,
-  OffsetPaginationRequest,
-} from 'src/common/dtos/request/pagination.request';
+import { PaginationRequest } from 'src/common/dtos/request/pagination.request';
 import { MessageResponse } from 'src/common/dtos/response/message.response';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { CurrentUserId } from 'src/auth/decorators/user.decorator';
@@ -57,13 +54,13 @@ export class ChannelController {
   @Role('user')
   @Serialize(GetSubscribersResponse)
   async getSubscribers(
-    @Query() params: KeysetPaginationRequest,
+    @Query() params: PaginationRequest,
     @CurrentUserId() userId: string,
   ) {
     const query = new GetSubscribersQuery(userId, params);
-    const [channels, token] = await this.queryBus.execute(query);
+    const [channels, count, token] = await this.queryBus.execute(query);
 
-    return { channels, token };
+    return { channels, count, token };
   }
 
   /* Get Subscribes */
@@ -72,13 +69,13 @@ export class ChannelController {
   @Role('user')
   @Serialize(GetSubscribesResponse)
   async getSubscribes(
-    @Query() params: OffsetPaginationRequest,
+    @Query() params: PaginationRequest,
     @CurrentUserId() userId: string,
   ) {
     const query = new GetSubscribesQuery(userId, params as any);
-    const [channels, count] = await this.queryBus.execute(query);
+    const [channels, count, token] = await this.queryBus.execute(query);
 
-    return { channels, count };
+    return { channels, count, token };
   }
 
   /* Get Favorited Videos */
@@ -87,13 +84,13 @@ export class ChannelController {
   @Role('user')
   @Serialize(GetFavoritesResponse)
   async getFavoritedVideoTrees(
-    @Query() params: OffsetPaginationRequest,
+    @Query() params: PaginationRequest,
     @CurrentUserId() userId: string,
   ) {
     const query = new GetFavoritedVideoTreesQuery(userId, params);
-    const [videoTrees, count] = await this.queryBus.execute(query);
+    const [videoTrees, count, token] = await this.queryBus.execute(query);
 
-    return { videoTrees, count };
+    return { videoTrees, count, token };
   }
 
   /* Get Watched Videos */
@@ -106,9 +103,9 @@ export class ChannelController {
     @CurrentUserId() userId: string,
   ) {
     const query = new GetWatchedVideoTreesQuery(userId, skipEnded, rest);
-    const [videoTrees, token] = await this.queryBus.execute(query);
+    const [videoTrees, count, token] = await this.queryBus.execute(query);
 
-    return { videoTrees, token };
+    return { videoTrees, count, token };
   }
 
   /* Get Created Video Trees */
@@ -117,13 +114,13 @@ export class ChannelController {
   @Role('user')
   @Serialize(GetCreatedVideoTreesResponse)
   async getCreatedVideoTrees(
-    @Query() params: OffsetPaginationRequest,
+    @Query() params: PaginationRequest,
     @CurrentUserId() userId: string,
   ) {
     const query = new GetCreatedVideoTreesQuery(userId, params);
-    const [videoTrees, count] = await this.queryBus.execute(query);
+    const [videoTrees, count, token] = await this.queryBus.execute(query);
 
-    return { videoTrees, count };
+    return { videoTrees, count, token };
   }
 
   /* Get Created Video Tree */
@@ -163,13 +160,13 @@ export class ChannelController {
   @Serialize(GetChannelVideoTreesResponse)
   async getChannelVideoTrees(
     @Param('id') id: string,
-    @Query() params: OffsetPaginationRequest,
+    @Query() params: PaginationRequest,
     @CurrentUserId() userId?: string,
   ) {
     const query = new GetChannelVideoTreesQuery(id, params, userId);
-    const [videoTrees, count] = await this.queryBus.execute(query);
+    const [videoTrees, count, token] = await this.queryBus.execute(query);
 
-    return { videoTrees, count };
+    return { videoTrees, count, token };
   }
 
   /* Subscribe to Channel */
