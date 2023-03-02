@@ -30,7 +30,7 @@ import { GetFavoritesResponse } from '../dtos/response/get-favorites.response';
 import { GetHistoriesResponse } from '../dtos/response/get-histories.response';
 
 @ApiTags('Channels')
-@Controller('channels')
+@Controller('items')
 export class ChannelController {
   constructor(
     private readonly commandBus: CommandBus,
@@ -58,9 +58,9 @@ export class ChannelController {
     @CurrentUserId() userId: string,
   ) {
     const query = new GetSubscribersQuery(userId, params);
-    const [channels, count, token] = await this.queryBus.execute(query);
+    const [items, count, token] = await this.queryBus.execute(query);
 
-    return { channels, count, token };
+    return { items, count, token };
   }
 
   /* Get Subscribes */
@@ -73,9 +73,9 @@ export class ChannelController {
     @CurrentUserId() userId: string,
   ) {
     const query = new GetSubscribesQuery(userId, params as any);
-    const [channels, count, token] = await this.queryBus.execute(query);
+    const [items, count, token] = await this.queryBus.execute(query);
 
-    return { channels, count, token };
+    return { items, count, token };
   }
 
   /* Get Favorited Videos */

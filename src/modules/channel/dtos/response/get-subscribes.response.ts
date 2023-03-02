@@ -6,5 +6,5 @@ import { ChannelResponse } from './channel.response';
 export class GetSubscribesResponse extends PaginationResponse {
   @Expose()
   @Type(() => ChannelResponse)
-  channels: ChannelResponse[];
+  items: ChannelResponse[];
 }

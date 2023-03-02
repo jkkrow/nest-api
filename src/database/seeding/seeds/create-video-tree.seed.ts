@@ -3,10 +3,10 @@ import { Seeder, Factory } from 'typeorm-seeding';
 import { VideoTreeEntity } from 'src/modules/video-tree/entities/video-tree.entity';
 import { VideoTreeContext } from '../factories/video-tree.factory';
 
-export default class CreateVideoTrees implements Seeder {
+export default class CreateVideoTree implements Seeder {
   async run(factory: Factory) {
     await factory<VideoTreeEntity, VideoTreeContext>(VideoTreeEntity)({
-      maxLevel: 1,
-    }).createMany(20);
+      maxLevel: 3,
+    }).create();
   }
 }

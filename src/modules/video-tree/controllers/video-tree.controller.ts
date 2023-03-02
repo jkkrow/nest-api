@@ -152,9 +152,9 @@ export class VideoTreeController {
     @CurrentUserId() userId?: string,
   ) {
     const query = new GetVideoTreesQuery({ ids }, rest, userId);
-    const [videoTrees, count, token] = await this.queryBus.execute(query);
+    const [items, count, token] = await this.queryBus.execute(query);
 
-    return { videoTrees, count, token };
+    return { items, count, token };
   }
 
   /* Search VideoTrees */
@@ -166,9 +166,9 @@ export class VideoTreeController {
     @CurrentUserId() userId?: string,
   ) {
     const query = new SearchVideoTreesQuery(keyword, rest, userId);
-    const [videoTrees, count, token] = await this.queryBus.execute(query);
+    const [items, count, token] = await this.queryBus.execute(query);
 
-    return { videoTrees, count, token };
+    return { items, count, token };
   }
 
   /* Get VideoTree */

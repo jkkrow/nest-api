@@ -13,11 +13,11 @@ define<VideoTreeEntity, VideoTreeContext>(VideoTreeEntity, (_, context) => {
   const videoTree = new VideoTreeEntity();
 
   videoTree.id = faker.datatype.uuid();
-  videoTree.title = faker.lorem.word({ length: { max: 10, min: 3 } });
+  videoTree.title = faker.lorem.words(Math.floor(Math.random() * 4) + 2);
   videoTree.thumbnail = faker.image.imageUrl();
   videoTree.description = faker.lorem.paragraph();
   videoTree.size = faker.datatype.number({ min: 100 });
-  videoTree.maxDuration = faker.datatype.number({ min: 100 });
+  videoTree.maxDuration = faker.datatype.number({ min: 10, max: 200 });
   videoTree.minDuration = faker.datatype.number({ max: videoTree.maxDuration });
   videoTree.editing = false;
   videoTree.status = 'public';

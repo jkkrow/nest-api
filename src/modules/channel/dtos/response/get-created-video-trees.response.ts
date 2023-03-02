@@ -6,5 +6,5 @@ import { VideoTreeEntryResponse } from 'src/modules/video-tree/dtos/response/vid
 export class GetCreatedVideoTreesResponse extends PaginationResponse {
   @Expose()
   @Type(() => VideoTreeEntryResponse)
-  videoTrees: VideoTreeEntryResponse[];
+  items: VideoTreeEntryResponse[];
 }

@@ -6,5 +6,5 @@ import { VideoTreeEntryWithDataResponse } from './video-tree-entry-with-data.res
 export class GetWatchedVideoTreesResponse extends PaginationResponse {
   @Expose()
   @Type(() => VideoTreeEntryWithDataResponse)
-  videoTrees: VideoTreeEntryWithDataResponse[];
+  items: VideoTreeEntryWithDataResponse[];
 }
