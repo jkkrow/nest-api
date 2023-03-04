@@ -16,7 +16,7 @@ export class GetFavoritedVideoTreesHandler
           table: 'favorites',
           condition: { 'favorites.video_id': 'id' },
         },
-        where: { 'favorites.user_id': userId, editing: false },
+        where: { 'favorites.user_id': userId },
         orderBy: { 'favorites.created_at': 'DESC' },
         pagination: params,
       },

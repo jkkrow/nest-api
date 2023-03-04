@@ -3,6 +3,7 @@ import { QueryHandler, IQueryHandler, EventBus } from '@nestjs/cqrs';
 import {
   NotFoundException,
   UnauthorizedException,
+  BadRequestException,
 } from 'src/common/exceptions';
 import { WatchVideoTreeQuery } from '../impl/watch-video-tree.query';
 import { VideoTreeWatchedEvent } from '../../events/impl/video-tree-watched.event';
@@ -25,6 +26,10 @@ export class WatchVideoTreeHandler
 
     if (!videoTree) {
       throw new NotFoundException('VideoTree not found');
+    }
+
+    if (videoTree.editing && videoTree.creatorId !== userId) {
+      throw new BadRequestException('Unable to access content being edited');
     }
 
     // TODO: Add validation logic for private video

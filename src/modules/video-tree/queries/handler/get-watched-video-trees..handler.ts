@@ -17,7 +17,7 @@ export class GetWatchedVideoTreesHandler
           table: 'histories',
           condition: { 'histories.video_id': 'id' },
         },
-        where: { 'histories.user_id': userId, editing: false, ...filterEnded },
+        where: { 'histories.user_id': userId, ...filterEnded },
         orderBy: {
           'histories.updated_at': 'DESC',
           'histories.video_id': 'DESC',
