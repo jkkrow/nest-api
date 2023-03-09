@@ -1,5 +1,5 @@
 import { CreateUserHandler } from './create-user.handler';
-import { CreateGoogleUserCommand } from '../impl/create-google-user.command';
+import { CreateGoogleUserHandler } from './create-google-user.handler';
 import { SendVerificationHandler } from './send-verification.handler';
 import { CheckVerificationHandler } from './check-verification.handler';
 import { SendRecoveryHandler } from './send-recovery.handler';
@@ -16,7 +16,7 @@ import { DeleteGoogleUserHandler } from './delete-google-user.handler';
 
 export const CommandHandlers = [
   CreateUserHandler,
-  CreateGoogleUserCommand,
+  CreateGoogleUserHandler,
   SendVerificationHandler,
   CheckVerificationHandler,
   SendRecoveryHandler,

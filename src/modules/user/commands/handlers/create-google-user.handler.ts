@@ -9,7 +9,7 @@ import { UserRepository } from '../../models/user.repository';
 import { UserFactory } from '../../models/user.factory';
 
 @CommandHandler(CreateGoogleUserCommand)
-export class CreateUserHandler
+export class CreateGoogleUserHandler
   implements ICommandHandler<CreateGoogleUserCommand>
 {
   constructor(
