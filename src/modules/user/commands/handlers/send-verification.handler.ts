@@ -38,7 +38,7 @@ export class SendVerificationHandler
       },
     );
 
-    const actionUrl = `${clientUrl}/auth/verification/${token}`;
+    const actionUrl = `${clientUrl}/auth/verification?token=${token}`;
     const retryUrl = `${clientUrl}/user/account`;
 
     await this.emailService.sendEmailWithTemplate({

@@ -34,7 +34,7 @@ export class SendRecoveryHandler
       },
     );
 
-    const actionUrl = `${clientUrl}/auth/verification/${token}`;
+    const actionUrl = `${clientUrl}/auth/reset-password?token=${token}`;
     const retryUrl = `${clientUrl}/user/account`;
 
     await this.emailService.sendEmailWithTemplate({
