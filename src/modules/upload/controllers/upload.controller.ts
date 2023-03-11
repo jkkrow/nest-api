@@ -5,6 +5,7 @@ import {
   Delete,
   Body,
   Param,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
@@ -29,6 +30,7 @@ import { CompleteMultipartUploadResponse } from '../dtos/response/complete-multi
 import { CancelMultipartUploadRequest } from '../dtos/request/cancel-multipart-upload.request';
 import { UploadImageRequest } from '../dtos/request/upload-image.request';
 import { UploadImageResponse } from '../dtos/response/upload-image.response';
+import { DeleteImageRequest } from '../dtos/request/delete-image.request';
 import { InitiateVideoConvertRequest } from '../dtos/request/initiate-video-convert.request';
 import { CompleteVideoConvertRequest } from '../dtos/request/complete-video-convert.request';
 
@@ -133,11 +135,11 @@ export class UploadController {
 
   /* Delete Image */
   /*--------------------------------------------*/
-  @Delete('images/:key')
+  @Delete('images')
   @Role('verified')
   @Serialize(MessageResponse)
   async deleteImage(
-    @Param('key') key: string,
+    @Query() { key }: DeleteImageRequest,
     @CurrentUserId() userId: string,
   ) {
     if (key.split('/')[1] !== userId) {
