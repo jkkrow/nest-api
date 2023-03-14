@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
-import { NotFoundException, BadRequestException } from 'src/common/exceptions';
+import { NotFoundException } from 'src/common/exceptions';
 import { EncryptService } from 'src/auth/services/encrypt.service';
 import { DeleteUserCommand } from '../impl/delete-user.command';
 import { UserRepository } from '../../models/user.repository';
@@ -12,16 +12,12 @@ export class DeleteUserHandler implements ICommandHandler<DeleteUserCommand> {
     private readonly encryptService: EncryptService,
   ) {}
 
-  async execute({ id, email, password }: DeleteUserCommand) {
+  async execute({ id, password }: DeleteUserCommand) {
     const user = await this.repository.findOneById(id);
-    const errorMessage = 'Invalid email or password';
+    const errorMessage = 'Invalid password';
 
     if (!user) {
       throw new NotFoundException('User not found');
-    }
-
-    if (email !== user.email) {
-      throw new BadRequestException(errorMessage);
     }
 
     await this.encryptService.verify(password, user.password, errorMessage);

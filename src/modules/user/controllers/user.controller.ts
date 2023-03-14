@@ -328,10 +328,10 @@ export class UserController {
   @Role('user')
   @Serialize(MessageResponse)
   async deleteUser(
-    @Body() { email, password }: DeleteUserRequest,
+    @Body() { password }: DeleteUserRequest,
     @CurrentUserId() id: string,
   ) {
-    const command = new DeleteUserCommand(id, email, password);
+    const command = new DeleteUserCommand(id, password);
     await this.commandBus.execute(command);
 
     const message = 'User deleted successfully';

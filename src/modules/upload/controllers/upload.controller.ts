@@ -13,13 +13,13 @@ import { ApiTags, ApiSecurity } from '@nestjs/swagger';
 
 import { Serialize } from 'src/common/decorators/serialize.decorator';
 import { MessageResponse } from 'src/common/dtos/response/message.response';
-import { UnauthorizedException } from 'src/common/exceptions';
 import { Role } from 'src/auth/decorators/role.decorator';
 import { CurrentUserId } from 'src/auth/decorators/user.decorator';
 import { ApiKeyGuard } from 'src/auth/guards/apikey.guard';
 import { S3Service } from 'src/providers/aws/s3/services/s3.service';
 import { MediaConvertService } from 'src/providers/aws/media-convert/services/media-convert.service';
 import { UpdateVideoNodesCommand } from 'src/modules/video-tree/commands/impl/update-video-nodes.command';
+import { UploadService } from '../services/upload.service';
 import { ConvertGuard } from '../guards/convert.guard';
 import { InitiateMultipartUploadRequest } from '../dtos/request/initiate-multipart-upload.request';
 import { InitiateMultipartUploadResponse } from '../dtos/response/initiate-multipart-upload.response';
@@ -39,6 +39,7 @@ import { CompleteVideoConvertRequest } from '../dtos/request/complete-video-conv
 export class UploadController {
   constructor(
     private readonly commandBus: CommandBus,
+    private readonly uploadService: UploadService,
     private readonly s3Service: S3Service,
     private readonly mediaConvertService: MediaConvertService,
   ) {}
@@ -52,7 +53,7 @@ export class UploadController {
     @Body() { videoId, fileName, fileType }: InitiateMultipartUploadRequest,
     @CurrentUserId() userId: string,
   ) {
-    const key = this.s3Service.generateVideoKey(userId, videoId, fileName);
+    const key = this.uploadService.generateVideoKey(userId, videoId, fileName);
     const result = await this.s3Service.initiateMultipart(key, fileType);
 
     return { uploadId: result.UploadId };
@@ -68,7 +69,7 @@ export class UploadController {
     @Param('uploadId') uploadId: string,
     @CurrentUserId() userId: string,
   ) {
-    const key = this.s3Service.generateVideoKey(userId, videoId, fileName);
+    const key = this.uploadService.generateVideoKey(userId, videoId, fileName);
     const presignedUrls = await this.s3Service.processMultipart(
       key,
       uploadId,
@@ -88,7 +89,7 @@ export class UploadController {
     @Param('uploadId') uploadId: string,
     @CurrentUserId() userId: string,
   ) {
-    const key = this.s3Service.generateVideoKey(userId, videoId, fileName);
+    const key = this.uploadService.generateVideoKey(userId, videoId, fileName);
     const result = await this.s3Service.completeMultipart(key, uploadId, parts);
 
     return { url: result.Key };
@@ -104,7 +105,7 @@ export class UploadController {
     @Param('uploadId') uploadId: string,
     @CurrentUserId() userId: string,
   ) {
-    const key = this.s3Service.generateVideoKey(userId, videoId, fileName);
+    const key = this.uploadService.generateVideoKey(userId, videoId, fileName);
     await this.s3Service.cancelMultipart(key, uploadId);
 
     return { message: 'Video upload cancelled successfully' };
@@ -119,14 +120,11 @@ export class UploadController {
     @Body() { key, fileType }: UploadImageRequest,
     @CurrentUserId() userId: string,
   ) {
-    if (key && key.split('/')[1] !== userId) {
-      throw new UnauthorizedException('Image not belong to user');
-    }
-
-    const newKey = this.s3Service.generateImageKey(userId, fileType);
+    const isLocal = this.uploadService.verifyFileKey(key, userId);
+    const newKey = this.uploadService.generateImageKey(userId, fileType);
     const presignedUrl = await this.s3Service.uploadObject(newKey, fileType);
 
-    if (key) {
+    if (key && isLocal) {
       await this.s3Service.deleteObject(key);
     }
 
@@ -142,11 +140,11 @@ export class UploadController {
     @Query() { key }: DeleteImageRequest,
     @CurrentUserId() userId: string,
   ) {
-    if (key.split('/')[1] !== userId) {
-      throw new UnauthorizedException('Image not belong to user');
-    }
+    const isLocal = this.uploadService.verifyFileKey(key, userId);
 
-    await this.s3Service.deleteObject(key);
+    if (isLocal) {
+      await this.s3Service.deleteObject(key);
+    }
 
     return { message: 'Image deleted successfully' };
   }

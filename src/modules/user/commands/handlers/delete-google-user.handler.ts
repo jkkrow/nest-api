@@ -29,7 +29,7 @@ export class DeleteGoogleUserHandler
 
     user.delete();
 
-    await this.repository.save(user);
+    await this.repository.delete(user);
 
     user.commit();
   }

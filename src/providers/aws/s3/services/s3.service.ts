@@ -1,6 +1,5 @@
 import AWS from 'aws-sdk';
 import { Injectable } from '@nestjs/common';
-import { v4 as uuidv4 } from 'uuid';
 
 import { ConfigService } from 'src/config/services/config.service';
 import { UploadPart } from '../interfaces/s3.interface';
@@ -13,15 +12,6 @@ export class S3Service {
   constructor(private readonly config: ConfigService) {
     this.s3 = new AWS.S3();
     this.bucket = this.config.get('AWS_S3_BUCKET');
-  }
-
-  generateVideoKey(userId: string, videoId: string, fileName: string) {
-    return `videos/${userId}/${videoId}/source/${fileName}`;
-  }
-
-  generateImageKey(userId: string, fileType: string) {
-    const ext = fileType.split('/')[1];
-    return `images/${userId}/${uuidv4()}.${ext}`;
   }
 
   initiateMultipart(key: string, fileType: string) {
