@@ -10,7 +10,7 @@ export class GetCreatedVideoTreesHandler
   constructor(private readonly repository: VideoTreeRepository) {}
 
   async execute({ creatorId, params }: GetCreatedVideoTreesQuery) {
-    return this.repository.find({
+    return this.repository.findWithData({
       where: { creatorId },
       orderBy: { createdAt: 'DESC' },
       pagination: params,

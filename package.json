@@ -35,7 +35,8 @@
     "seed:run:dev": "cross-env NODE_ENV=development pnpm seed:run",
     "seed:run:test": "cross-env NODE_ENV=test pnpm seed:run",
     "serverless": "serverless offline start",
-    "redis:run:local": "docker run --name watchtree-redis --rm -d -p 6379:6379 redis"
+    "redis:run:local": "docker run --name watchtree-redis --rm -d -p 6379:6379 redis",
+    "redis:stop:local": "docker stop watchtree-redis"
   },
   "dependencies": {
     "@nestjs/axios": "^1.0.0",

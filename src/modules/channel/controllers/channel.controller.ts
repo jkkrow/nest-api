@@ -30,7 +30,7 @@ import { GetFavoritesResponse } from '../dtos/response/get-favorites.response';
 import { GetHistoriesResponse } from '../dtos/response/get-histories.response';
 
 @ApiTags('Channels')
-@Controller('items')
+@Controller('channels')
 export class ChannelController {
   constructor(
     private readonly commandBus: CommandBus,
@@ -88,9 +88,9 @@ export class ChannelController {
     @CurrentUserId() userId: string,
   ) {
     const query = new GetFavoritedVideoTreesQuery(userId, params);
-    const [videoTrees, count, token] = await this.queryBus.execute(query);
+    const [items, count, token] = await this.queryBus.execute(query);
 
-    return { videoTrees, count, token };
+    return { items, count, token };
   }
 
   /* Get Watched Videos */
@@ -103,9 +103,9 @@ export class ChannelController {
     @CurrentUserId() userId: string,
   ) {
     const query = new GetWatchedVideoTreesQuery(userId, skipEnded, rest);
-    const [videoTrees, count, token] = await this.queryBus.execute(query);
+    const [items, count, token] = await this.queryBus.execute(query);
 
-    return { videoTrees, count, token };
+    return { items, count, token };
   }
 
   /* Get Created Video Trees */
@@ -118,9 +118,9 @@ export class ChannelController {
     @CurrentUserId() userId: string,
   ) {
     const query = new GetCreatedVideoTreesQuery(userId, params);
-    const [videoTrees, count, token] = await this.queryBus.execute(query);
+    const [items, count, token] = await this.queryBus.execute(query);
 
-    return { videoTrees, count, token };
+    return { items, count, token };
   }
 
   /* Get Created Video Tree */
@@ -164,9 +164,9 @@ export class ChannelController {
     @CurrentUserId() userId?: string,
   ) {
     const query = new GetChannelVideoTreesQuery(id, params, userId);
-    const [videoTrees, count, token] = await this.queryBus.execute(query);
+    const [items, count, token] = await this.queryBus.execute(query);
 
-    return { videoTrees, count, token };
+    return { items, count, token };
   }
 
   /* Subscribe to Channel */
