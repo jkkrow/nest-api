@@ -4,6 +4,7 @@ import { faker } from '@faker-js/faker';
 import { VideoTreeEntity } from 'src/modules/video-tree/entities/video-tree.entity';
 import { VideoNodeEntity } from 'src/modules/video-tree/entities/video-node.entity';
 import { UserEntity } from 'src/modules/user/entities/user.entity';
+import { CategoryEntity } from 'src/modules/category/entities/category.entity';
 
 export interface VideoTreeContext {
   creatorId?: string;
@@ -22,11 +23,7 @@ define<VideoTreeEntity, VideoTreeContext>(VideoTreeEntity, (_, context) => {
   videoTree.minDuration = faker.datatype.number({ max: videoTree.maxDuration });
   videoTree.editing = false;
   videoTree.status = 'public';
-
-  videoTree.categories = faker.lorem
-    .words(Math.floor(Math.random() * 5))
-    .split(' ')
-    .map((category) => ({ name: category }));
+  videoTree.categories = [factory(CategoryEntity)(context) as any];
 
   videoTree.creator = context?.creatorId
     ? { id: context.creatorId }

@@ -8,6 +8,7 @@ import { VideoTreeEntity } from 'src/modules/video-tree/entities/video-tree.enti
 import { CategoryEntity } from 'src/modules/category/entities/category.entity';
 import { SubscriptionEntity } from 'src/modules/channel/entities/subscription.entity';
 import { FavoriteEntity } from 'src/modules/video-tree/entities/favorite.entity';
+import { HistoryEntity } from 'src/modules/history/entities/history.entity';
 
 export default {
   ...typeOrmConfig,
@@ -19,6 +20,7 @@ export default {
     CategoryEntity,
     SubscriptionEntity,
     FavoriteEntity,
+    HistoryEntity,
   ],
   factories: [path.join(__dirname, '../seeding/factories/*.{ts,js}')],
   seeds: [path.join(__dirname, '../seeding/seeds/*.{ts,js}')],

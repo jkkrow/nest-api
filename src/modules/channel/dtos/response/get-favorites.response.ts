@@ -1,10 +1,10 @@
 import { Expose, Type } from 'class-transformer';
 
 import { PaginationResponse } from 'src/common/dtos/response/pagination.response';
-import { VideoTreeEntryResponse } from 'src/modules/video-tree/dtos/response/video-tree-entry.response';
+import { VideoTreeEntryWithDataResponse } from 'src/modules/video-tree/dtos/response/video-tree-entry-with-data.response';
 
 export class GetFavoritesResponse extends PaginationResponse {
   @Expose()
-  @Type(() => VideoTreeEntryResponse)
-  items: VideoTreeEntryResponse[];
+  @Type(() => VideoTreeEntryWithDataResponse)
+  items: VideoTreeEntryWithDataResponse[];
 }

@@ -30,17 +30,22 @@ export class RoleGuard extends BearerGuard {
       context.getHandler(),
     ]);
 
+    await super.canActivate(context, true);
+    const errorMessage = `Not allowed action except ${role} users`;
+
     if (!role) {
       return true;
     }
 
-    await super.canActivate(context);
+    if (!request.userId) {
+      throw new UnauthorizedException(errorMessage);
+    }
 
-    const query = new GetUserQuery(request.userId as string);
+    const query = new GetUserQuery(request.userId);
     const user = await this.queryBus.execute<GetUserQuery, RequestUser>(query);
 
     if (!user) {
-      throw new UnauthorizedException('Unable to find request user');
+      throw new UnauthorizedException(errorMessage);
     }
 
     const userRoles = {
@@ -51,7 +56,7 @@ export class RoleGuard extends BearerGuard {
     };
 
     if (!userRoles[role]) {
-      throw new ForbiddenException(`Not allowed action except ${role} users`);
+      throw new ForbiddenException(errorMessage);
     }
 
     request.user = user;
