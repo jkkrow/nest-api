@@ -19,4 +19,8 @@ export class HistoryService {
   async delete(videoId: string, userId: string) {
     await this.repository.delete({ videoId, userId });
   }
+
+  async clear(userId: string) {
+    await this.repository.delete({ userId });
+  }
 }

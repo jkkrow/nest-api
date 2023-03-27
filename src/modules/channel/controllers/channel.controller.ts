@@ -13,6 +13,7 @@ import { GetCreatedVideoNodeQuery } from 'src/modules/video-tree/queries/impl/ge
 import { GetChannelVideoTreesQuery } from 'src/modules/video-tree/queries/impl/get-channel-video-trees.query';
 import { GetFavoritedVideoTreesQuery } from 'src/modules/video-tree/queries/impl/get-favorited-video-trees.query';
 import { GetWatchedVideoTreesQuery } from 'src/modules/video-tree/queries/impl/get-watched-video-trees.query';
+import { ClearHistoryCommand } from 'src/modules/history/commands/impl/clear-history.command';
 import { GetCreatedVideoTreesResponse } from '../dtos/response/get-created-video-trees.response';
 import { GetCreatedVideoTreeResponse } from 'src/modules/channel/dtos/response/get-created-video-tree.response';
 import { GetCreatedVideoNodeResponse } from '../dtos/response/get-created-video-node.response';
@@ -106,6 +107,18 @@ export class ChannelController {
     const [items, count, token] = await this.queryBus.execute(query);
 
     return { items, count, token };
+  }
+
+  /* Clear Watched History */
+  /*--------------------------------------------*/
+  @Delete('current/histories')
+  @Role('user')
+  @Serialize(MessageResponse)
+  async clearHistory(@CurrentUserId() userId: string) {
+    const command = new ClearHistoryCommand(userId);
+    await this.commandBus.execute(command);
+
+    return { message: 'Histories deleted successfully' };
   }
 
   /* Get Created Video Trees */

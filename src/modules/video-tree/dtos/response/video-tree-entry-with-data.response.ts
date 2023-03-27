@@ -25,6 +25,9 @@ class VideoTreeHistory {
 
   @Expose()
   ended: boolean;
+
+  @Expose({ name: 'updatedAt' })
+  watchedAt: Date;
 }
 
 export class VideoTreeEntryWithDataResponse extends VideoTreeEntryResponse {
