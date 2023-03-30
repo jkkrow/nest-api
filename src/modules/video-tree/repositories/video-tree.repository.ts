@@ -62,7 +62,8 @@ export class VideoTreeRepository extends BaseRepository<
   async findOneNode(options: FindVideoTreeOptions, nodeId: string) {
     const query = this.getVideoTreeQuery(true);
     const videoTree = await this.getOne<VideoTreeOnlyRoot>(query, options);
-    const nodes = videoTree ? await this.getAllNodes(videoTree) : [];
+    const videoTreeNode = videoTree ? await this.withAllNodes(videoTree) : null;
+    const nodes = videoTreeNode ? this.traverseNodes(videoTreeNode.root) : [];
 
     return nodes.find((node) => node.id === nodeId);
   }
@@ -151,13 +152,21 @@ export class VideoTreeRepository extends BaseRepository<
     return videoTree as T;
   }
 
-  private async getAllNodes<T extends VideoTree['root']>(
-    videoTree: VideoTreeOnlyRoot,
-  ) {
-    const descendants = await this.treeRepository.findDescendants(
-      videoTree.root as VideoNodeEntity,
-    );
+  private traverseNodes<T extends VideoTree['root']>(root: T) {
+    let currentNode = root;
+    const queue: T[] = [];
+    const nodes: T[] = [];
 
-    return descendants as any as T[];
+    while (currentNode) {
+      nodes.push(currentNode);
+
+      if (currentNode.children.length) {
+        currentNode.children.forEach((child: T) => queue.push(child));
+      }
+
+      currentNode = queue.shift() as T;
+    }
+
+    return nodes;
   }
 }
