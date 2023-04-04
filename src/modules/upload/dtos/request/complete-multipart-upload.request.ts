@@ -1,4 +1,5 @@
 import { IsString, IsNumber, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CompleteMultipartUploadRequest {
   @IsString()
@@ -7,7 +8,8 @@ export class CompleteMultipartUploadRequest {
   @IsString()
   fileName: string;
 
-  @ValidateNested()
+  @ValidateNested({ each: true })
+  @Type(() => Parts)
   parts: Parts[];
 }
 

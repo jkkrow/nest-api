@@ -6,7 +6,8 @@ import { UnauthorizedException } from 'src/common/exceptions';
 @Injectable()
 export class UploadService {
   generateVideoKey(userId: string, videoId: string, fileName: string) {
-    return `videos/${userId}/${videoId}/source/${fileName}`;
+    const formattedFilename = encodeURIComponent(fileName);
+    return `videos/${userId}/${videoId}/source/${formattedFilename}`;
   }
 
   generateImageKey(userId: string, fileType: string) {

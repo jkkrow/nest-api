@@ -1,4 +1,4 @@
-import AWS from 'aws-sdk';
+import { S3 } from '../../config/aws.config';
 import { Injectable } from '@nestjs/common';
 
 import { ConfigService } from 'src/config/services/config.service';
@@ -10,7 +10,7 @@ export class S3Service {
   private readonly bucket: string;
 
   constructor(private readonly config: ConfigService) {
-    this.s3 = new AWS.S3();
+    this.s3 = S3;
     this.bucket = this.config.get('AWS_S3_BUCKET');
   }
 

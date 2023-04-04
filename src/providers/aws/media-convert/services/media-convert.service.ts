@@ -1,4 +1,4 @@
-import AWS from 'aws-sdk';
+import { MediaConvert } from '../../config/aws.config';
 import { Injectable } from '@nestjs/common';
 import { parse } from 'path';
 
@@ -14,9 +14,7 @@ export class MediaConvertService {
   private readonly ext: string;
 
   constructor(private readonly config: ConfigService) {
-    const endpoint = this.config.get('AWS_MEDIACONVERT_ENDPOINT');
-
-    this.mediaConvert = new AWS.MediaConvert({ endpoint });
+    this.mediaConvert = MediaConvert;
     this.applicationId = this.config.get('APPLICATION_ID');
     this.role = this.config.get('AWS_MEDIACONVERT_ROLE');
     this.jobTemplate = this.config.get('AWS_MEDIACONVERT_JOB_TEMPLATE');
