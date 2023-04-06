@@ -121,7 +121,7 @@ export class VideoTreeController {
     @Param('nodeId') id: string,
     @CurrentUserId() userId: string,
   ) {
-    const command = new UpdateVideoNodeCommand(id, treeId, updates, userId);
+    const command = new UpdateVideoNodeCommand(id, treeId, userId, updates);
     await this.commandBus.execute(command);
 
     return { message: 'VideoNode updated successfully' };

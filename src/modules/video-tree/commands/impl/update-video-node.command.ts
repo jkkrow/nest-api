@@ -6,7 +6,7 @@ export class UpdateVideoNodeCommand implements ICommand {
   constructor(
     public readonly id: string,
     public readonly treeId: string,
-    public readonly updates: UpdateVideoNodeProps,
     public readonly userId: string,
+    public readonly updates: UpdateVideoNodeProps,
   ) {}
 }

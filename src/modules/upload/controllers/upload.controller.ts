@@ -101,7 +101,7 @@ export class UploadController {
   @Role('verified')
   @Serialize(MessageResponse)
   async cancelMultipartUpload(
-    @Body() { videoId, fileName }: CancelMultipartUploadRequest,
+    @Query() { videoId, fileName }: CancelMultipartUploadRequest,
     @Param('uploadId') uploadId: string,
     @CurrentUserId() userId: string,
   ) {
