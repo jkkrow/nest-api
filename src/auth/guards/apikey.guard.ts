@@ -1,8 +1,9 @@
-import { CanActivate, ExecutionContext } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 
 import { ConfigService } from 'src/config/services/config.service';
 import { UnauthorizedException } from 'src/common/exceptions';
 
+@Injectable()
 export class ApiKeyGuard implements CanActivate {
   constructor(private readonly config: ConfigService) {}
 
@@ -11,9 +12,9 @@ export class ApiKeyGuard implements CanActivate {
     const errorMessage = 'Invalid auth credentials (api key)';
 
     const request = context.switchToHttp().getRequest();
-    const { api_key } = request.headers;
+    const { secret } = request.headers;
 
-    if (!api_key || api_key !== apiKey) {
+    if (!secret || secret !== apiKey) {
       throw new UnauthorizedException(errorMessage);
     }
 

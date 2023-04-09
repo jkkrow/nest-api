@@ -55,8 +55,6 @@ export class MediaConvertService {
     const metadata = {
       applicationId: this.applicationId,
       key: `${outputVideoDir}/${name}/${name}.${this.ext}`,
-      userId: dir.split('/')[1],
-      videoId: dir.split('/')[2],
       name: base,
     };
 

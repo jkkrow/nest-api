@@ -1,10 +1,12 @@
 import { IsString, Min } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 import { IsLessThanOrEqualTo } from 'src/common/decorators/validator.decorator';
 import { UpdateVideoNodeProps } from '../../interfaces/video-node';
 
 export class UpdateVideoNodeRequest implements UpdateVideoNodeProps {
   @IsString()
+  @Transform(({ value }) => encodeURIComponent(value))
   name: string;
 
   @IsString()

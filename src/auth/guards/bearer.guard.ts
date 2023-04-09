@@ -1,9 +1,10 @@
-import { CanActivate, ExecutionContext } from '@nestjs/common';
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 
 import { JwtService } from 'src/auth/services/jwt.service';
 import { RequestWithUser } from 'src/auth/interfaces/user.interface';
 import { UnauthorizedException } from 'src/common/exceptions';
 
+@Injectable()
 export class BearerGuard implements CanActivate {
   constructor(private readonly jwtService: JwtService) {}
 

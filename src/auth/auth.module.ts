@@ -8,6 +8,9 @@ import { CacheModule } from 'src/providers/cache/cache.module';
 import { AuthService } from './services/auth.service';
 import { JwtService } from './services/jwt.service';
 import { EncryptService } from './services/encrypt.service';
+import { BasicGuard } from './guards/basic.guard';
+import { ApiKeyGuard } from './guards/apikey.guard';
+import { BearerGuard } from './guards/bearer.guard';
 import { RoleGuard } from './guards/role.guard';
 
 const GlobalRoleGuard = {
@@ -28,7 +31,15 @@ const GlobalRoleGuard = {
     CqrsModule,
     CacheModule,
   ],
-  providers: [AuthService, JwtService, EncryptService, GlobalRoleGuard],
+  providers: [
+    AuthService,
+    JwtService,
+    EncryptService,
+    BasicGuard,
+    ApiKeyGuard,
+    BearerGuard,
+    GlobalRoleGuard,
+  ],
   exports: [AuthService, JwtService, EncryptService],
 })
 export class AuthModule {}

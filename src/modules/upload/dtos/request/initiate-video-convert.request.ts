@@ -4,11 +4,11 @@ import { Transform, Expose } from 'class-transformer';
 export class InitiateVideoConvertRequest {
   @IsString()
   @Expose()
-  @Transform(({ obj }) => obj.object.key.replace(/\+/g, ' '))
+  @Transform(({ obj }) => obj.detail.object.key.replace(/\+/g, ' '))
   key: string;
 
   @IsString()
   @Expose()
-  @Transform(({ obj }) => obj.bucket.name)
+  @Transform(({ obj }) => obj.detail.bucket.name)
   bucket: string;
 }

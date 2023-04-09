@@ -53,6 +53,7 @@ export class UploadController {
     @Body() { videoId, fileName, fileType }: InitiateMultipartUploadRequest,
     @CurrentUserId() userId: string,
   ) {
+    this.uploadService.verifyVideoFileType(fileType);
     const key = this.uploadService.generateVideoKey(userId, videoId, fileName);
     const result = await this.s3Service.initiateMultipart(key, fileType);
 
@@ -171,9 +172,10 @@ export class UploadController {
   @Serialize(MessageResponse)
   @ApiSecurity('api_key')
   async completeVideoConvert(
-    @Body() { key, userId, videoId, name }: CompleteVideoConvertRequest,
+    @Body() { key, name }: CompleteVideoConvertRequest,
   ) {
     const updates = { url: key };
+    const { videoId, userId } = this.uploadService.parseVideoKey(key);
     const command = new UpdateVideoNodesCommand(name, videoId, userId, updates);
     await this.commandBus.execute(command);
 
