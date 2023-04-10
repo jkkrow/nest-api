@@ -36,6 +36,10 @@ export class ConvertGuard {
       ? dayjs().isBefore(user.membership.expiresIn)
       : false;
 
-    return isMember;
+    console.log(isMember);
+
+    // TODO: Only allow convert to members
+    // return isMember;
+    return true;
   }
 }

@@ -40,7 +40,14 @@ export async function bootstrap(server = true) {
   app.use(helmet());
   app.use(mw({ attributeName: 'ip' }));
 
-  server && (await app.listen(port));
+  if (server) {
+    await app.listen(port);
+
+    if (process.env.NODE_ENV === 'development') {
+      const { updateDevelopmentWebhooks } = await import('./devtools');
+      await updateDevelopmentWebhooks();
+    }
+  }
 
   return app;
 }
