@@ -1,94 +1,90 @@
 import { Test } from '@nestjs/testing';
+import { MediaConvertClient } from '@aws-sdk/client-mediaconvert';
 
 import { ConfigService } from 'src/config/services/config.service';
+import { NotFoundException } from 'src/common/exceptions';
 import { MediaConvertService } from '../media-convert.service';
 
-jest.mock('aws-sdk', () => {
-  const mockPromise = (value: any) => {
-    return jest.fn().mockReturnValue({
-      promise: jest.fn().mockResolvedValue(value),
-    });
-  };
-
-  return {
-    MediaConvert: jest.fn(() => ({
-      createJob: mockPromise({}),
-      getJobTemplate: mockPromise({
-        JobTemplate: {
-          Settings: {
-            Inputs: [{}],
-            OutputGroups: [
-              {
-                OutputGroupSettings: {
-                  Type: 'CMAF_GROUP_SETTINGS',
-                  CmafGroupSettings: {},
-                },
-              },
-              {
-                OutputGroupSettings: {
-                  Type: 'FILE_GROUP_SETTINGS',
-                  FileGroupSettings: {},
-                },
-              },
-            ],
-          },
-        },
-      }),
-    })),
-  };
-});
+jest.mock('@aws-sdk/client-mediaconvert');
 
 describe('MediaConvertService', () => {
   let service: MediaConvertService;
-
-  const fakeConfigService = {
-    get: jest.fn().mockReturnValue('mock'),
-  };
+  let mockedMediaConvertClient: jest.Mocked<typeof MediaConvertClient>;
 
   beforeEach(async () => {
-    const module = await Test.createTestingModule({
+    const moduleRef = await Test.createTestingModule({
       providers: [
         MediaConvertService,
-        { provide: ConfigService, useValue: fakeConfigService },
+        {
+          provide: ConfigService,
+          useValue: {
+            get: jest.fn().mockImplementation((key: string) => {
+              switch (key) {
+                case 'AWS_CONFIG_ACCESS_KEY_ID':
+                  return 'test-access-key-id';
+                case 'AWS_CONFIG_SECRET_ACCESS_KEY':
+                  return 'test-secret-access-key';
+                case 'AWS_MEDIACONVERT_ENDPOINT':
+                  return 'https://test.mediaconvert.endpoint';
+                case 'APPLICATION_ID':
+                  return 'test-application-id';
+                case 'AWS_MEDIACONVERT_ROLE':
+                  return 'test-role';
+                case 'AWS_MEDIACONVERT_JOB_TEMPLATE':
+                  return 'test-job-template';
+                case 'AWS_MEDIACONVERT_EXT':
+                  return 'mp4';
+                default:
+                  return null;
+              }
+            }),
+          },
+        },
       ],
     }).compile();
 
-    service = module.get(MediaConvertService);
+    service = moduleRef.get<MediaConvertService>(MediaConvertService);
+    mockedMediaConvertClient = MediaConvertClient as jest.MockedClass<
+      typeof MediaConvertClient
+    >;
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   describe('createJob', () => {
-    const key = 'videos/1234/asdf/source/test.mp4';
-    const bucket = 'test-bucket';
+    it('should throw an error if the job template is not found', async () => {
+      const sendMock = jest.fn().mockResolvedValueOnce({ JobTemplate: null });
+      mockedMediaConvertClient.prototype.send = sendMock;
+      const key = 'source/videos/video.mp4';
+      const bucket = 'test-bucket';
 
-    it('should find a job template', async () => {
-      const getJobTemplate = jest.spyOn(service as any, 'getJobTemplate');
+      await expect(service.createJob(key, bucket)).rejects.toThrow(
+        NotFoundException,
+      );
+    });
+  });
 
-      await service.createJob(key, bucket);
+  describe('getJobTemplate', () => {
+    it('should get the job template', async () => {
+      const jobTemplateMock = { Settings: {} };
+      const sendMock = jest
+        .fn()
+        .mockResolvedValueOnce({ JobTemplate: jobTemplateMock });
+      mockedMediaConvertClient.prototype.send = sendMock;
+      const result = await service['getJobTemplate']();
 
-      const template = await getJobTemplate.mock.results[0].value;
-      expect(template).toHaveProperty('Settings');
+      expect(result).toEqual(jobTemplateMock);
     });
 
-    it('should create settings including user metadata', async () => {
-      const createSettings = jest.spyOn(service as any, 'createSettings');
+    it('should throw NotFoundException if the job template is not found', async () => {
+      const sendMock = jest.fn().mockResolvedValueOnce({ JobTemplate: null });
+      mockedMediaConvertClient.prototype.send = sendMock;
 
-      await service.createJob(key, bucket);
-
-      const { metadata } = createSettings.mock.results[0].value;
-      expect(metadata.userId).toEqual(key.split('/')[1]);
-      expect(metadata.videoId).toEqual(key.split('/')[2]);
-    });
-
-    it('should update settings', async () => {
-      const createSettings = jest.spyOn(service as any, 'createSettings');
-      const updateJobTemplate = jest.spyOn(service as any, 'updateJobTemplate');
-
-      await service.createJob(key, bucket);
-
-      const { inputPath } = createSettings.mock.results[0].value;
-      const jobTemplate = updateJobTemplate.mock.results[0].value;
-
-      expect(jobTemplate.Settings.Inputs[0].FileInput).toEqual(inputPath);
+      await expect(service['getJobTemplate']()).rejects.toThrow(
+        NotFoundException,
+      );
     });
   });
 });

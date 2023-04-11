@@ -1,4 +1,15 @@
-import AWS from '../../config/aws.config';
+import {
+  S3Client,
+  CreateMultipartUploadCommand,
+  UploadPartCommand,
+  CompleteMultipartUploadCommand,
+  AbortMultipartUploadCommand,
+  PutObjectCommand,
+  DeleteObjectCommand,
+  DeleteObjectsCommand,
+  ListObjectsV2Command,
+} from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Injectable } from '@nestjs/common';
 
 import { ConfigService } from 'src/config/services/config.service';
@@ -6,119 +17,120 @@ import { UploadPart } from '../interfaces/s3.interface';
 
 @Injectable()
 export class S3Service {
-  private readonly s3: AWS.S3;
+  private readonly client: S3Client;
   private readonly bucket: string;
 
   constructor(private readonly config: ConfigService) {
-    this.s3 = new AWS.S3();
+    const region = this.config.get('AWS_CONFIG_REGION');
+    const accessKeyId = this.config.get('AWS_CONFIG_ACCESS_KEY_ID');
+    const secretAccessKey = this.config.get('AWS_CONFIG_SECRET_ACCESS_KEY');
+    const credentials = { accessKeyId, secretAccessKey };
+
+    this.client = new S3Client({ credentials, region });
     this.bucket = this.config.get('AWS_S3_BUCKET');
   }
 
-  initiateMultipart(key: string, fileType: string) {
-    const params = {
+  async initiateMultipart(key: string, fileType: string) {
+    const command = new CreateMultipartUploadCommand({
       Bucket: this.bucket,
       Key: key,
       ContentType: fileType,
-    };
+    });
 
-    return this.s3.createMultipartUpload(params).promise();
+    return this.client.send(command);
   }
 
-  processMultipart(key: string, uploadId: string, partCount: number) {
-    const params = {
-      Bucket: this.bucket,
-      Key: key,
-      UploadId: uploadId,
-    };
-
+  async processMultipart(key: string, uploadId: string, partCount: number) {
     const presignedUrlPromises: Promise<string>[] = [];
 
     for (let index = 0; index < partCount; index++) {
-      presignedUrlPromises.push(
-        this.s3.getSignedUrlPromise('uploadPart', {
-          ...params,
-          PartNumber: index + 1,
-        }),
-      );
+      const command = new UploadPartCommand({
+        Bucket: this.bucket,
+        Key: key,
+        UploadId: uploadId,
+        PartNumber: index + 1,
+      });
+
+      presignedUrlPromises.push(getSignedUrl(this.client, command));
     }
 
     return Promise.all(presignedUrlPromises);
   }
 
-  completeMultipart(key: string, uploadId: string, parts: UploadPart[]) {
-    const params = {
+  async completeMultipart(key: string, uploadId: string, parts: UploadPart[]) {
+    const command = new CompleteMultipartUploadCommand({
       Bucket: this.bucket,
       Key: key,
       UploadId: uploadId,
       MultipartUpload: { Parts: parts },
-    };
+    });
 
-    return this.s3.completeMultipartUpload(params).promise();
+    return this.client.send(command);
   }
 
-  cancelMultipart(key: string, uploadId: string) {
-    const params = {
+  async cancelMultipart(key: string, uploadId: string) {
+    const command = new AbortMultipartUploadCommand({
       Bucket: this.bucket,
       Key: key,
       UploadId: uploadId,
-    };
+    });
 
-    return this.s3.abortMultipartUpload(params).promise();
+    return this.client.send(command);
   }
 
-  uploadObject(key: string, fileType: string) {
-    const params = {
+  async uploadObject(key: string, fileType: string) {
+    const command = new PutObjectCommand({
       Bucket: this.bucket,
       Key: key,
       ContentType: fileType,
-    };
+    });
 
-    return this.s3.getSignedUrlPromise('putObject', params);
+    return getSignedUrl(this.client, command);
   }
 
-  deleteObject(key: string) {
-    const params = {
+  async deleteObject(key: string) {
+    const command = new DeleteObjectCommand({
       Bucket: this.bucket,
       Key: key,
-    };
+    });
 
-    return this.s3.deleteObject(params).promise();
+    return this.client.send(command);
   }
 
   async deleteDirectory(key: string) {
-    const params = {
-      Bucket: this.bucket,
-      Key: key,
-    };
-
     const prefixes = await this.getDirectoryPrefixes(key);
 
     if (prefixes.length > 0) {
-      const deleteParams = {
-        Bucket: params.Bucket,
+      const command = new DeleteObjectsCommand({
+        Bucket: this.bucket,
         Delete: { Objects: prefixes },
-      };
+      });
 
-      return this.s3.deleteObjects(deleteParams).promise();
+      return this.client.send(command);
+    } else {
+      const command = new DeleteObjectCommand({
+        Bucket: this.bucket,
+        Key: key,
+      });
+
+      return this.client.send(command);
     }
-
-    return this.s3.deleteObject(params).promise();
   }
 
   private async getDirectoryPrefixes(key: string) {
-    const params = {
+    const command = new ListObjectsV2Command({
       Bucket: this.bucket,
       Prefix: key,
       Delimiter: '/',
-    };
+    });
 
-    const prefixes: { Key: string }[] = [];
-    const promises: Promise<{ Key: string }[]>[] = [];
-
-    const listedObjects = await this.s3.listObjectsV2(params).promise();
+    const listedObjects = await this.client.send(command);
 
     const listedContents = listedObjects.Contents;
     const listedPrefixes = listedObjects.CommonPrefixes;
+
+    const prefixes: { Key: string }[] = [];
+    const promises: Promise<{ Key: string }[]>[] = [];
 
     if (listedContents && listedContents.length) {
       listedContents.forEach(({ Key }) => {

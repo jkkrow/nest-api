@@ -1,4 +1,8 @@
-import AWS from '../../config/aws.config';
+import {
+  MediaConvertClient,
+  CreateJobCommand,
+  GetJobTemplateCommand,
+} from '@aws-sdk/client-mediaconvert';
 import { Injectable } from '@nestjs/common';
 import { parse } from 'path';
 
@@ -7,15 +11,20 @@ import { ConfigService } from 'src/config/services/config.service';
 
 @Injectable()
 export class MediaConvertService {
-  private readonly mediaConvert: AWS.MediaConvert;
+  private readonly client: MediaConvertClient;
   private readonly applicationId: string;
   private readonly role: string;
   private readonly jobTemplate: string;
   private readonly ext: string;
 
   constructor(private readonly config: ConfigService) {
+    const region = this.config.get('AWS_CONFIG_REGION');
+    const accessKeyId = this.config.get('AWS_CONFIG_ACCESS_KEY_ID');
+    const secretAccessKey = this.config.get('AWS_CONFIG_SECRET_ACCESS_KEY');
     const endpoint = config.get('AWS_MEDIACONVERT_ENDPOINT');
-    this.mediaConvert = new AWS.MediaConvert({ endpoint });
+    const credentials = { accessKeyId, secretAccessKey };
+
+    this.client = new MediaConvertClient({ credentials, endpoint, region });
     this.applicationId = this.config.get('APPLICATION_ID');
     this.role = this.config.get('AWS_MEDIACONVERT_ROLE');
     this.jobTemplate = this.config.get('AWS_MEDIACONVERT_JOB_TEMPLATE');
@@ -27,15 +36,17 @@ export class MediaConvertService {
     const settings = this.createSettings(key, bucket);
     const jobTemplate = this.updateJobTemplate(template, settings);
 
-    return this.mediaConvert.createJob(jobTemplate).promise();
+    const command = new CreateJobCommand(jobTemplate);
+
+    return this.client.send(command);
   }
 
   private async getJobTemplate() {
-    const params = { Name: this.jobTemplate };
+    const command = new GetJobTemplateCommand({
+      Name: this.jobTemplate,
+    });
 
-    const { JobTemplate } = await this.mediaConvert
-      .getJobTemplate(params)
-      .promise();
+    const { JobTemplate } = await this.client.send(command);
 
     if (!JobTemplate) {
       throw new NotFoundException('Job template not found');
