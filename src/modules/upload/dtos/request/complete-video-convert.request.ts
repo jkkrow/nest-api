@@ -11,4 +11,9 @@ export class CompleteVideoConvertRequest {
   @Expose()
   @Transform(({ obj }) => obj.detail.userMetadata.name)
   name: string;
+
+  @IsString()
+  @Expose()
+  @Transform(({ obj }) => obj.detail.userMetadata.thumbnail)
+  thumbnail: string;
 }

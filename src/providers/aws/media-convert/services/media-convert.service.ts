@@ -67,6 +67,7 @@ export class MediaConvertService {
     const metadata = {
       applicationId: this.applicationId,
       key: `${outputVideoDir}/${name}/${name}.${this.ext}`,
+      thumbnail: `${outputThumbnailDir}/${name}/${name}.0000001.jpg`,
       name: base,
     };
 

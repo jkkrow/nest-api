@@ -11,6 +11,9 @@ export class VideoNodeResponse {
   url: string;
 
   @Expose()
+  thumbnail: string;
+
+  @Expose()
   label: string;
 
   @Expose()

@@ -172,9 +172,9 @@ export class UploadController {
   @Serialize(MessageResponse)
   @ApiSecurity('api_key')
   async completeVideoConvert(
-    @Body() { key, name }: CompleteVideoConvertRequest,
+    @Body() { key, thumbnail, name }: CompleteVideoConvertRequest,
   ) {
-    const updates = { url: key };
+    const updates = { url: key, thumbnail };
     const { videoId, userId } = this.uploadService.parseVideoKey(key);
     const command = new UpdateVideoNodesCommand(name, videoId, userId, updates);
     await this.commandBus.execute(command);

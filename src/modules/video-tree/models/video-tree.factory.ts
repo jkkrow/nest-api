@@ -30,6 +30,7 @@ export class VideoTreeFactory
           level: 0,
           name: '',
           url: '',
+          thumbnail: '',
           label: '',
           size: 0,
           duration: 0,

@@ -25,6 +25,7 @@ function generateVideoNode(level = 0) {
   videoNode.name = faker.lorem.word({ length: { max: 10, min: 2 } });
   videoNode.label = faker.lorem.word({ length: { max: 10, min: 2 } });
   videoNode.url = faker.image.imageUrl();
+  videoNode.thumbnail = faker.image.imageUrl();
   videoNode.size = faker.datatype.number({ min: 100 });
   videoNode.duration = faker.datatype.number({ min: 10 });
   videoNode.selectionTimeEnd = faker.datatype.number({

@@ -35,6 +35,9 @@ export class VideoNodeEntity extends BaseEntity {
   @Column({ type: 'varchar', length: 200 })
   url: string;
 
+  @Column({ type: 'varchar', length: 200, default: '' })
+  thumbnail: string;
+
   @Column({ type: 'integer' })
   level: number;
 

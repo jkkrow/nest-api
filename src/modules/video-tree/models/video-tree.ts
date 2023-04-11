@@ -139,6 +139,7 @@ export class VideoTree extends AggregateRoot {
       name: '',
       label: '',
       url: '',
+      thumbnail: '',
       size: 0,
       duration: 0,
       selectionTimeStart: 0,
@@ -200,8 +201,8 @@ export class VideoTree extends AggregateRoot {
 
   private traverseNodes(root = this.props.root) {
     let currentNode = root;
-    const queue: typeof root[] = [];
-    const nodes: typeof root[] = [];
+    const queue: (typeof root)[] = [];
+    const nodes: (typeof root)[] = [];
 
     while (currentNode) {
       nodes.push(currentNode);
