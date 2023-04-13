@@ -111,6 +111,10 @@ export class VideoTree extends AggregateRoot {
     const isTitleMissing = !this.title;
     const isNodeUrlMissing = !!savedNodes.find((node) => !node.url);
 
+    if (this.categories.length > 10) {
+      throw new BadRequestException('Exceeded categories length (max: 10)');
+    }
+
     if (isTitleMissing || isNodeUrlMissing) {
       this.props.editing = true;
     }
@@ -130,7 +134,7 @@ export class VideoTree extends AggregateRoot {
     }
 
     if (parentNode.children.length >= 4) {
-      throw new BadRequestException('Max length of children exceeded (max: 4)');
+      throw new BadRequestException('Exceeded children length (max: 4)');
     }
 
     const node: VideoNode = {

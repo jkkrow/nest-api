@@ -4,6 +4,8 @@ import {
   IsBoolean,
   IsIn,
   ValidateNested,
+  ArrayMaxSize,
+  MaxLength,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -32,12 +34,15 @@ export class UpdateVideoTreeRoot {
 
 export class UpdateVideoTreeRequest {
   @IsString()
+  @MaxLength(50)
   title: string;
 
   @IsString({ each: true })
+  @ArrayMaxSize(10)
   categories: string[];
 
   @IsString()
+  @MaxLength(1000)
   description: string;
 
   @IsString()

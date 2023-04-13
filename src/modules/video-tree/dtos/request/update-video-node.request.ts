@@ -1,4 +1,4 @@
-import { IsString, Min } from 'class-validator';
+import { IsOptional, IsString, Min } from 'class-validator';
 import { Transform } from 'class-transformer';
 
 import { IsLessThanOrEqualTo } from 'src/common/decorators/validator.decorator';
@@ -11,6 +11,10 @@ export class UpdateVideoNodeRequest implements UpdateVideoNodeProps {
 
   @IsString()
   url: string;
+
+  @IsString()
+  @IsOptional()
+  thumbnail?: string;
 
   @Min(0)
   duration: number;
