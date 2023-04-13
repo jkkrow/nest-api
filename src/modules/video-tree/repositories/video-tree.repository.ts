@@ -80,7 +80,7 @@ export class VideoTreeRepository extends BaseRepository<
     const query = this.repository
       .createQueryBuilder(video)
       .addSelect(
-        `ARRAY_REMOVE(ARRAY_REMOVE(ARRAY_AGG(${category}.name), ''), NULL)`,
+        `ARRAY_REMOVE(ARRAY_REMOVE(ARRAY_AGG(DISTINCT ${category}.name), ''), NULL)`,
         'categories',
       )
       .leftJoin('categories_video_trees', categoryGroup, joinCategoryGroup)
