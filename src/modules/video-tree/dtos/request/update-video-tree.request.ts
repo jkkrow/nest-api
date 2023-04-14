@@ -1,14 +1,15 @@
 import {
   IsString,
-  IsNumber,
   IsBoolean,
   IsIn,
+  Min,
   ValidateNested,
   ArrayMaxSize,
   MaxLength,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
+import { IsLessThanOrEqualTo } from 'src/common/decorators/validator.decorator';
 import {
   VideoTreeStatus,
   VIDEO_TREE_STATUS,
@@ -19,12 +20,14 @@ export class UpdateVideoTreeRoot {
   id: string;
 
   @IsString()
+  @MaxLength(150)
   label: string;
 
-  @IsNumber()
+  @Min(0)
+  @IsLessThanOrEqualTo('selectionTimeEnd')
   selectionTimeStart: number;
 
-  @IsNumber()
+  @Min(0)
   selectionTimeEnd: number;
 
   @ValidateNested({ each: true })
@@ -34,7 +37,7 @@ export class UpdateVideoTreeRoot {
 
 export class UpdateVideoTreeRequest {
   @IsString()
-  @MaxLength(50)
+  @MaxLength(200)
   title: string;
 
   @IsString({ each: true })
@@ -42,7 +45,7 @@ export class UpdateVideoTreeRequest {
   categories: string[];
 
   @IsString()
-  @MaxLength(1000)
+  @MaxLength(2000)
   description: string;
 
   @IsString()

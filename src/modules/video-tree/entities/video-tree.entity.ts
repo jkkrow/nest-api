@@ -23,10 +23,10 @@ import {
 @Check('min_duration >= 0')
 @Check('max_duration >= min_duration')
 export class VideoTreeEntity extends BaseEntityWithTimestamps {
-  @Column({ type: 'varchar', length: 50 })
+  @Column({ type: 'varchar', length: 200 })
   title: string;
 
-  @Column({ type: 'varchar', length: 1000 })
+  @Column({ type: 'varchar', length: 2000 })
   description: string;
 
   @Column({ type: 'varchar', length: 200 })

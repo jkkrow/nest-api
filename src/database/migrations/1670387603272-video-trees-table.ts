@@ -9,8 +9,8 @@ export class videoTreesTable1670387603272 implements MigrationInterface {
       CREATE TABLE video_trees (
         id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
         creator_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-        title VARCHAR(50) NOT NULL,
-        description VARCHAR(1000) NOT NULL,
+        title VARCHAR(200) NOT NULL,
+        description VARCHAR(2000) NOT NULL,
         thumbnail VARCHAR(200) NOT NULL,
         size REAL NOT NULL CHECK (size >= 0),
         max_duration REAL NOT NULL CHECK (max_duration >= 0),

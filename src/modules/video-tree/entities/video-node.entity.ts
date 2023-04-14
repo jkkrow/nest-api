@@ -29,13 +29,13 @@ export class VideoNodeEntity extends BaseEntity {
   @Column({ type: 'varchar', length: 100 })
   name: string;
 
-  @Column({ type: 'varchar', length: 100 })
+  @Column({ type: 'varchar', length: 150 })
   label: string;
 
-  @Column({ type: 'varchar', length: 200 })
+  @Column({ type: 'varchar', length: 300 })
   url: string;
 
-  @Column({ type: 'varchar', length: 200, default: '' })
+  @Column({ type: 'varchar', length: 300, default: '' })
   thumbnail: string;
 
   @Column({ type: 'integer' })

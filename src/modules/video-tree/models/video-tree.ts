@@ -108,17 +108,11 @@ export class VideoTree extends AggregateRoot {
       });
     });
 
-    const isTitleMissing = !this.title;
-    const isNodeUrlMissing = !!savedNodes.find((node) => !node.url);
-
     if (this.categories.length > 10) {
       throw new BadRequestException('Exceeded categories length (max: 10)');
     }
 
-    if (isTitleMissing || isNodeUrlMissing) {
-      this.props.editing = true;
-    }
-
+    this.validateCompletion();
     this.apply(new VideoTreeUpdatedEvent(this.id));
   }
 
@@ -152,6 +146,7 @@ export class VideoTree extends AggregateRoot {
     };
 
     parentNode.children.push(node);
+    this.validateCompletion();
     this.apply(new VideoNodeCreatedEvent(id));
   }
 
@@ -169,6 +164,7 @@ export class VideoTree extends AggregateRoot {
 
     this.updateTotalSize();
     this.updateMinMaxDuration();
+    this.validateCompletion();
 
     this.apply(new VideoNodeUpdatedEvent(id));
   }
@@ -187,6 +183,7 @@ export class VideoTree extends AggregateRoot {
 
     this.updateTotalSize();
     this.updateMinMaxDuration();
+    this.validateCompletion();
 
     this.traverseNodes(deletedNode).forEach((node) => {
       this.apply(new VideoNodeDeletedEvent(node.id, node.url));
@@ -266,5 +263,15 @@ export class VideoTree extends AggregateRoot {
     iterate(this.props.root, []);
 
     return paths;
+  }
+
+  private validateCompletion() {
+    const nodes = this.traverseNodes();
+    const isTitleMissing = !this.title;
+    const isNodeUrlMissing = !!nodes.find((node) => !node.url);
+
+    if (isTitleMissing || isNodeUrlMissing) {
+      this.props.editing = true;
+    }
   }
 }
