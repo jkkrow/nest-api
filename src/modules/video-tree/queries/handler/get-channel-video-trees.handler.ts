@@ -12,7 +12,7 @@ export class GetChannelVideoTreesHandler
   async execute({ channelId, params, userId }: GetChannelVideoTreesQuery) {
     return this.repository.findWithData(
       {
-        where: { creatorId: channelId },
+        where: { creatorId: channelId, editing: false },
         orderBy: { createdAt: 'DESC' },
         pagination: params,
       },

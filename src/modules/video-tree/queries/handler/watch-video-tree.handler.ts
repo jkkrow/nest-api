@@ -37,7 +37,9 @@ export class WatchVideoTreeHandler
       throw new UnauthorizedException('Unable to access private content');
     }
 
-    this.eventBus.publish(new VideoTreeWatchedEvent(id, ip, userId));
+    if (videoTree.creatorId !== userId) {
+      this.eventBus.publish(new VideoTreeWatchedEvent(id, ip, userId));
+    }
 
     return videoTree;
   }
