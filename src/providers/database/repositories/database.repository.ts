@@ -79,7 +79,14 @@ export abstract class BaseRepository<
     const { search } = options;
     if (!search) return;
     const uid = this.generateRandomKey();
-    query.andWhere(`search @@ plainto_tsquery(:${uid})`, { [uid]: search });
+    query.andWhere(
+      `(
+          search @@ plainto_tsquery('english', :${uid})
+          OR
+          search @@ plainto_tsquery('simple', :${uid})
+        )`,
+      { [uid]: search },
+    );
     query.addOrderBy(`ts_rank(search, plainto_tsquery(:${uid}))`, 'DESC');
   }
 
