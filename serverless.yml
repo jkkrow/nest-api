@@ -18,11 +18,16 @@ plugins:
   - serverless-tscpaths
   - serverless-dotenv-plugin
   - serverless-deployment-bucket
+  - serverless-layers
   - serverless-offline
 
 custom:
   tscpaths:
     src: src
+
+  serverless-layers:
+    dependenciesPath: ./package.json
+
   serverless-offline:
     noPrependStageInUrl: true
     httpPort: 4000
