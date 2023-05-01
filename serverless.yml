@@ -18,6 +18,7 @@ plugins:
   - serverless-tscpaths
   - serverless-dotenv-plugin
   - serverless-deployment-bucket
+  - serverless-layers
   - serverless-offline
 
 package:
@@ -27,6 +28,10 @@ package:
 custom:
   tscpaths:
     src: src
+
+  serverless-layers:
+    dependenciesPath: ./package.json
+    customInstallationCommand: 'npm install --production --omit=dev --legacy-peer-deps'
 
   serverless-offline:
     noPrependStageInUrl: true
