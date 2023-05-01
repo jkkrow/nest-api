@@ -18,7 +18,6 @@ plugins:
   - serverless-tscpaths
   - serverless-dotenv-plugin
   - serverless-deployment-bucket
-  - serverless-layers
   - serverless-offline
 
 package:
