@@ -76,6 +76,7 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@baemingo/tscpaths-async": "^0.0.15",
     "@faker-js/faker": "^7.6.0",
     "@nestjs/cli": "^9.0.0",
     "@nestjs/schematics": "^9.0.0",
