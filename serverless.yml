@@ -21,6 +21,10 @@ plugins:
   - serverless-layers
   - serverless-offline
 
+package:
+  patterns:
+    - '!node_modules/**'
+
 custom:
   tscpaths:
     src: src
