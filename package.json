@@ -39,6 +39,10 @@
     "redis:stop:local": "docker stop watchtree-redis"
   },
   "dependencies": {
+    "@aws-sdk/client-eventbridge": "^3.321.1",
+    "@aws-sdk/client-mediaconvert": "^3.321.1",
+    "@aws-sdk/client-s3": "^3.321.1",
+    "@aws-sdk/s3-request-presigner": "^3.321.1",
     "@nestjs/axios": "^1.0.0",
     "@nestjs/common": "^9.0.0",
     "@nestjs/config": "^2.2.0",
@@ -49,7 +53,6 @@
     "@nestjs/swagger": "^6.1.3",
     "@nestjs/typeorm": "^9.0.1",
     "@vendia/serverless-express": "^4.10.1",
-    "aws-sdk": "^2.1349.0",
     "bcryptjs": "^2.4.3",
     "cache-manager": "^5.1.3",
     "cache-manager-redis-store": "^3.0.1",
