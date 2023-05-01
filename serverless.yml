@@ -27,6 +27,7 @@ custom:
 
   serverless-layers:
     dependenciesPath: ./package.json
+    customInstallationCommand: 'npm install --production --omit=dev --legacy-peer-deps'
 
   serverless-offline:
     noPrependStageInUrl: true
