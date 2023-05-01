@@ -11,19 +11,31 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-      - uses: pnpm/action-setup@v2
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Install Node.JS
+        uses: actions/setup-node@v3
         with:
-          node-version: '16.x'
+          node-version: '16'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 7
+
       - name: Create .env file
         run: |
           echo "${{ secrets.ENV_PROD }}" > .env.production
+
       - name: Install Serverless Framework
         run: pnpm add -g serverless
+
       - name: Install dependencies
         run: pnpm i --frozen-lockfile
+
       - name: Serverless AWS authentication
         run: serverless config credentials --provider aws --key ${{ secrets.AWS_ACCESS_KEY_ID }} --secret ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
       - name: Deploy
         run: serverless deploy --stage production
