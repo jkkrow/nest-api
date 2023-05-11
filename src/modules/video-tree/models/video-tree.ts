@@ -20,6 +20,7 @@ export class VideoTree extends AggregateRoot {
       description: string;
       categories: string[];
       thumbnail: string;
+      defaultThumbnail: string;
       size: number;
       maxDuration: number;
       minDuration: number;
@@ -55,6 +56,10 @@ export class VideoTree extends AggregateRoot {
     return this.props.thumbnail;
   }
 
+  get defaultThumbnail() {
+    return this.props.defaultThumbnail;
+  }
+
   get size() {
     return this.props.size;
   }
@@ -84,36 +89,36 @@ export class VideoTree extends AggregateRoot {
   }
 
   create() {
-    this.apply(new VideoTreeCreatedEvent(this.id));
+    this.apply(new VideoTreeCreatedEvent(this.id, this.creatorId));
   }
 
   update(updates: UpdateVideoTreeProps) {
-    this.props.title = updates.title;
-    this.props.description = updates.description;
-    this.props.categories = updates.categories;
-    this.props.thumbnail = updates.thumbnail;
-    this.props.status = updates.status;
-    this.props.editing = updates.editing;
+    for (const key in updates) {
+      if (key === 'root' || updates[key] === undefined) continue;
+      this.props[key] = updates[key];
+    }
 
-    const savedNodes = this.traverseNodes();
-    const newNodes = this.traverseNodes(updates.root as VideoNode);
+    if (updates['root'] !== undefined) {
+      const savedNodes = this.traverseNodes();
+      const newNodes = this.traverseNodes(updates.root as VideoNode);
 
-    savedNodes.forEach((savedNode) => {
-      newNodes.forEach((newNode) => {
-        if (savedNode.id !== newNode.id) return;
+      savedNodes.forEach((savedNode) => {
+        newNodes.forEach((newNode) => {
+          if (savedNode.id !== newNode.id) return;
 
-        savedNode.label = newNode.label;
-        savedNode.selectionTimeStart = newNode.selectionTimeStart;
-        savedNode.selectionTimeEnd = newNode.selectionTimeEnd;
+          savedNode.label = newNode.label;
+          savedNode.selectionTimeStart = newNode.selectionTimeStart;
+          savedNode.selectionTimeEnd = newNode.selectionTimeEnd;
+        });
       });
-    });
+    }
 
     if (this.categories.length > 10) {
       throw new BadRequestException('Exceeded categories length (max: 10)');
     }
 
     this.validateCompletion();
-    this.apply(new VideoTreeUpdatedEvent(this.id));
+    this.apply(new VideoTreeUpdatedEvent(this.id, this.creatorId, updates));
   }
 
   delete() {
@@ -147,7 +152,9 @@ export class VideoTree extends AggregateRoot {
 
     parentNode.children.push(node);
     this.validateCompletion();
-    this.apply(new VideoNodeCreatedEvent(id));
+
+    const meta = { treeId: this.id, userId: this.creatorId };
+    this.apply(new VideoNodeCreatedEvent(id, meta));
   }
 
   updateNode(id: string, updates: UpdateVideoNodeProps) {
@@ -166,7 +173,9 @@ export class VideoTree extends AggregateRoot {
     this.updateMinMaxDuration();
     this.validateCompletion();
 
-    this.apply(new VideoNodeUpdatedEvent(id));
+    const level = videoNode.level;
+    const meta = { treeId: this.id, userId: this.creatorId, level };
+    this.apply(new VideoNodeUpdatedEvent(id, meta, updates));
   }
 
   deleteNode(id: string) {
@@ -186,7 +195,8 @@ export class VideoTree extends AggregateRoot {
     this.validateCompletion();
 
     this.traverseNodes(deletedNode).forEach((node) => {
-      this.apply(new VideoNodeDeletedEvent(node.id, node.url));
+      const meta = { treeId: this.id, userId: this.creatorId, url: node.url };
+      this.apply(new VideoNodeDeletedEvent(node.id, meta));
     });
   }
 

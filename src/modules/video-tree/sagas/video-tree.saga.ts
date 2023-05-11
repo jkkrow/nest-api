@@ -3,9 +3,9 @@ import { Saga, ofType } from '@nestjs/cqrs';
 import { Observable, filter, map, tap } from 'rxjs';
 
 import { VideoTreeWatchedEvent } from '../events/impl/video-tree-watched.event';
-import { VideoTreeDeletedEvent } from '../events/impl/video-tree-deleted.event';
-import { VideoNodeDeletedEvent } from '../events/impl/video-node-deleted.event';
+import { VideoNodeUpdatedEvent } from '../events/impl/video-node-updated.event';
 import { AddViewCommand } from '../commands/impl/add-view.command';
+import { UpdateVideoTreeCommand } from '../commands/impl/update-video-tree.command';
 
 @Injectable()
 export class VideoTreeSaga {
@@ -17,6 +17,25 @@ export class VideoTreeSaga {
       tap(() =>
         Logger.log(
           'VideoTreeWatchedEvent triggered AddViewCommand',
+          'VideoTreeSaga',
+        ),
+      ),
+    );
+  };
+
+  @Saga()
+  videoNodeThumbnailUpdated = (event$: Observable<any>) => {
+    return event$.pipe(
+      ofType(VideoNodeUpdatedEvent),
+      filter(({ meta, updates }) => meta.level === 0 && !!updates.thumbnail),
+      map(({ meta, updates }) => {
+        const { treeId, userId } = meta;
+        const treeUpdates = { defaultThumbnail: updates.thumbnail };
+        return new UpdateVideoTreeCommand(treeId, userId, treeUpdates);
+      }),
+      tap(() =>
+        Logger.log(
+          'Detected thumbnail update of root video node. VideoNodeUpdatedEvent triggered UpdateVideoTreeCommand',
           'VideoTreeSaga',
         ),
       ),

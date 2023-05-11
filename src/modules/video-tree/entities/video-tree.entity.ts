@@ -32,6 +32,9 @@ export class VideoTreeEntity extends BaseEntityWithTimestamps {
   @Column({ type: 'varchar', length: 200 })
   thumbnail: string;
 
+  @Column({ type: 'varchar', length: 300 })
+  defaultThumbnail: string;
+
   @Column({ type: 'real' })
   size: number;
 

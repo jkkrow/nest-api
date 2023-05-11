@@ -16,6 +16,9 @@ export class VideoTreeEntryResponse {
   thumbnail: string;
 
   @Expose()
+  defaultThumbnail: string;
+
+  @Expose()
   size: number;
 
   @Expose()

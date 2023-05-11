@@ -9,6 +9,7 @@ export interface VideoTree {
   description: string;
   categories: string[];
   thumbnail: string;
+  defaultThumbnail: string;
   size: number;
   maxDuration: number;
   minDuration: number;
@@ -43,13 +44,14 @@ export interface VideoTreeOnlyRootWithData
     Omit<VideoTreeWithData, 'root'> {}
 
 export interface UpdateVideoTreeProps {
-  title: string;
-  categories: string[];
-  description: string;
-  thumbnail: string;
-  status: VideoTreeStatus;
-  editing: boolean;
-  root: {
+  title?: string;
+  categories?: string[];
+  description?: string;
+  thumbnail?: string;
+  defaultThumbnail?: string;
+  status?: VideoTreeStatus;
+  editing?: boolean;
+  root?: {
     id: string;
     label: string;
     selectionTimeStart: number;

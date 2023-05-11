@@ -18,6 +18,7 @@ import { videoTreesFullTextSearch1672564973161 } from '../migrations/16725649731
 import { createTimestampsIndex1675252484543 } from '../migrations/1675252484543-create-timestamps-index';
 import { updateVideoNodesTable1681204708836 } from '../migrations/1681204708836-update-video-nodes-table';
 import { updateVideoTreesSearch1682150229606 } from '../migrations/1682150229606-update-video-trees-search';
+import { updateVideoTreesTable1683787896746 } from '../migrations/1683787896746-update-video-trees-table';
 
 export default new DataSource({
   ...typeOrmConfig,
@@ -40,5 +41,6 @@ export default new DataSource({
     createTimestampsIndex1675252484543,
     updateVideoNodesTable1681204708836,
     updateVideoTreesSearch1682150229606,
+    updateVideoTreesTable1683787896746,
   ],
 });
