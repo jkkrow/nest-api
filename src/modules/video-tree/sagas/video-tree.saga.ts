@@ -10,7 +10,7 @@ import { UpdateVideoTreeCommand } from '../commands/impl/update-video-tree.comma
 @Injectable()
 export class VideoTreeSaga {
   @Saga()
-  videoTreeWatched = (event$: Observable<any>) => {
+  videoTreeWatched = (event$: Observable<VideoTreeWatchedEvent>) => {
     return event$.pipe(
       ofType(VideoTreeWatchedEvent),
       map(({ id, ip, userId }) => new AddViewCommand(id, ip, userId)),
@@ -24,7 +24,7 @@ export class VideoTreeSaga {
   };
 
   @Saga()
-  videoNodeThumbnailUpdated = (event$: Observable<any>) => {
+  videoNodeThumbnailUpdated = (event$: Observable<VideoNodeUpdatedEvent>) => {
     return event$.pipe(
       ofType(VideoNodeUpdatedEvent),
       filter(({ meta, updates }) => meta.level === 0 && !!updates.thumbnail),
@@ -43,7 +43,7 @@ export class VideoTreeSaga {
   };
 
   // @Saga()
-  // videoTreeDeleted = (event$: Observable<any>) => {
+  // videoTreeDeleted = (event$: Observable<VideoTreeDeletedEvent>) => {
   //   return event$.pipe(
   //     ofType(VideoTreeDeletedEvent),
   //     // map(({ id, userId }) => new DeleteVideoFileCommand(id, userId)),
@@ -56,7 +56,7 @@ export class VideoTreeSaga {
   //   );
   // };
   // @Saga()
-  // videoNodeDeleted = (event$: Observable<any>) => {
+  // videoNodeDeleted = (event$: Observable<VideoNodeDeletedEvent>) => {
   //   return event$.pipe(
   //     ofType(VideoNodeDeletedEvent),
   //     filter(({ url }) => url.length > 0),

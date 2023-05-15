@@ -8,7 +8,7 @@ import { SendVerificationCommand } from '../commands/impl/send-verification.comm
 @Injectable()
 export class UserSaga {
   @Saga()
-  userCreated = (event$: Observable<any>) => {
+  userCreated = (event$: Observable<UserCreatedEvent>) => {
     return event$.pipe(
       ofType(UserCreatedEvent),
       filter(({ type }) => type === 'native'),
